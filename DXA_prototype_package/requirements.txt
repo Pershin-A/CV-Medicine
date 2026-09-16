@@ -1,0 +1,15 @@
+pydicom>=3.0
+pylibjpeg>=2.0
+pylibjpeg-libjpeg>=2.0
+numpy>=1.26
+pandas>=2.2
+matplotlib>=3.8
+scipy>=1.12
+scikit-image>=0.23
+scikit-learn>=1.4
+opencv-python-headless>=4.9
+Pillow>=10
+tqdm>=4.66
+torch>=2.2
+torchvision>=0.17
+segmentation-models-pytorch>=0.3.3
