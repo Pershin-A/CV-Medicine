@@ -291,9 +291,18 @@ def save_annotation(
 
 
 def move_to(index: int, files):
+    """
+    Переключает текущий файл.
+
+    ВАЖНО:
+    Нельзя менять st.session_state.file_select после того,
+    как selectbox с key="file_select" уже создан в текущем run.
+    Поэтому новое значение кладём во временный ключ и применяем
+    его в начале следующего rerun, до создания selectbox.
+    """
     index = max(0, min(index, len(files) - 1))
     st.session_state.current_idx = index
-    st.session_state.file_select = str(
+    st.session_state.pending_file_select = str(
         files[index].relative_to(DATA_ROOT)
     )
 
@@ -341,6 +350,17 @@ if "file_select" not in st.session_state:
     st.session_state.file_select = relative_options[
         st.session_state.current_idx
     ]
+
+# Если навигационная кнопка на предыдущем run запросила переход,
+# применяем новое значение ДО создания st.selectbox.
+if "pending_file_select" in st.session_state:
+    pending_value = st.session_state.pop("pending_file_select")
+
+    if pending_value in relative_options:
+        st.session_state.file_select = pending_value
+        st.session_state.current_idx = relative_options.index(
+            pending_value
+        )
 
 
 def on_file_selected():
