@@ -1,4 +1,4 @@
-streamlit>=1.40,<2
+streamlit>=1.55,<2
 pydicom>=3.0,<4
 numpy>=1.26,<3
 pandas>=2.2,<3
