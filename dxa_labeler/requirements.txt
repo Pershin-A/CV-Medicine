@@ -1,0 +1,7 @@
+streamlit>=1.40,<2
+pydicom>=3.0,<4
+numpy>=1.26,<3
+pandas>=2.2,<3
+Pillow>=10,<13
+pylibjpeg>=2,<3
+pylibjpeg-libjpeg>=2,<3

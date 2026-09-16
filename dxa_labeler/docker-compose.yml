@@ -1,0 +1,17 @@
+services:
+  dxa-labeler:
+    build: .
+    container_name: dxa_dicom_labeler
+    ports:
+      - "8501:8501"
+
+    environment:
+      DATA_ROOT: /data
+      OUTPUT_ROOT: /output
+
+    volumes:
+      # Проект dxa_labeler должен лежать рядом с папкой "Исследования"
+      - ../Исследования:/data:ro
+      - ../Размеченные:/output
+
+    restart: unless-stopped
