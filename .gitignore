@@ -1,0 +1,34 @@
+# Local configuration
+.env
+*.env
+!.env.example
+
+# Medical / local data
+Исследования/
+#Размеченные/
+Для теста/
+#разметка.xlsx
+#разметка.csv
+#*.dcm
+
+# Generated prototype files
+prototype/output/
+prototype/models/
+*.pt
+*.pth
+*.ckpt
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
