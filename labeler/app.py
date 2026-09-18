@@ -11,12 +11,13 @@ import numpy as np
 import pandas as pd
 import pydicom
 import streamlit as st
+import streamlit.components.v1 as components
 from openpyxl import load_workbook
 from PIL import Image
 from pydicom.pixel_data_handlers.util import apply_voi_lut
 
 
-APP_VERSION = "4.5-fast-clinical"
+APP_VERSION = "4.6-search-keyboard-spine-metal"
 
 warnings.filterwarnings(
     "ignore",
@@ -69,6 +70,13 @@ SPINE_ISSUE_OPTIONS = {
     "Сколиоз + люмбализация": "BOTH",
 }
 SPINE_ISSUE_OPTIONS_REVERSE = {v: k for k, v in SPINE_ISSUE_OPTIONS.items()}
+
+# Известные случаи с металлом, указанные вручную.
+# Метка только предвыбирается в интерфейсе и попадёт в labels.csv
+# лишь после явного сохранения пользователем.
+KNOWN_METAL_RELATIVE_PATHS = {
+    "2.25.13566237352084812982996047541944701548/series_002_2_CR/A2504268931 DXA/CR DXA/CR000000.dcm",
+}
 
 CLASS_OPTIONS = {
     "Не определено": ("UNKNOWN", ""),
@@ -659,7 +667,7 @@ def save_annotation(
     )
     ds.add_new(datetime_tag, "DT", dicom_dt)
     ds.add_new(side_tag, "CS", side if label == "LEG" else "")
-    ds.add_new(metal_tag, "CS", metal if label == "LEG" else "")
+    ds.add_new(metal_tag, "CS", metal if label in {"LEG", "SPINE"} else "")
     ds.add_new(fracture_tag, "CS", fracture if label == "LEG" else "")
     ds.add_new(spine_issue_tag, "CS", spine_issue if label == "SPINE" else "")
 
@@ -679,7 +687,7 @@ def save_annotation(
         annotated_at=iso_dt,
         output_path=out_path,
         side=side if label == "LEG" else "",
-        metal=metal if label == "LEG" else "",
+        metal=metal if label in {"LEG", "SPINE"} else "",
         fracture=fracture if label == "LEG" else "",
         spine_issue=spine_issue if label == "SPINE" else "",
     )
@@ -884,17 +892,77 @@ def render_reference_info(reference_record, label, side, study_id):
 # ============================================================
 
 def move_to(index: int, files):
-    index = max(
-        0,
-        min(index, len(files) - 1),
-    )
-
+    index = max(0, min(index, len(files) - 1))
     st.session_state.current_idx = index
 
-    # Значение selectbox изменяем на следующем rerun,
-    # до создания самого widget.
-    st.session_state.pending_file_select = (
-        relative_path_string(files[index])
+    # Значения widgets меняем на следующем rerun, до их создания.
+    st.session_state.pending_file_select = relative_path_string(files[index])
+    st.session_state.pending_file_search = ""
+
+
+def install_keyboard_shortcuts():
+    """
+    Горячие клавиши:
+      ← / →  — предыдущий / следующий DICOM
+      Enter  — сохранить и перейти к следующему
+
+    Сочетания не перехватываются, если фокус находится в input,
+    textarea, select или contenteditable — это позволяет спокойно
+    вводить поиск, имя разметчика и комментарий.
+    """
+    components.html(
+        r"""
+<script>
+(() => {
+  try {
+    const win = window.parent;
+    const doc = win.document;
+
+    // Streamlit перерисовывает iframe на rerun. Обработчик на parent
+    // устанавливаем только один раз для текущей страницы.
+    if (win.__DXA_KEYBOARD_SHORTCUTS_INSTALLED__) return;
+    win.__DXA_KEYBOARD_SHORTCUTS_INSTALLED__ = true;
+
+    function clickButton(fragment) {
+      const buttons = Array.from(doc.querySelectorAll('button'));
+      const button = buttons.find((b) =>
+        !b.disabled && (b.innerText || b.textContent || '').includes(fragment)
+      );
+      if (button) {
+        button.click();
+        return true;
+      }
+      return false;
+    }
+
+    doc.addEventListener('keydown', (event) => {
+      const target = event.target;
+      const tag = (target && target.tagName || '').toUpperCase();
+
+      if (
+        tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT' ||
+        (target && target.isContentEditable)
+      ) return;
+
+      // Не мешаем навигации внутри открытого выпадающего списка.
+      if (doc.querySelector('[role="listbox"]')) return;
+
+      if (event.key === 'ArrowLeft') {
+        if (clickButton('Пред.')) event.preventDefault();
+      } else if (event.key === 'ArrowRight') {
+        if (clickButton('След.')) event.preventDefault();
+      } else if (event.key === 'Enter' && !event.shiftKey && !event.ctrlKey && !event.altKey && !event.metaKey) {
+        if (clickButton('Сохранить и следующий')) event.preventDefault();
+      }
+    }, true);
+  } catch (err) {
+    console.warn('DXA keyboard shortcuts are unavailable:', err);
+  }
+})();
+</script>
+        """,
+        height=0,
+        width=0,
     )
 
 
@@ -907,7 +975,7 @@ st.caption(
     "Исходные DICOM читаются только из /data. "
     "Разметка хранится в /output. "
     "labels.csv является основным реестром разметки. "
-    f"Для ног размечаются сторона, металл и перелом; для позвоночника — тип проблемы. Версия: {APP_VERSION}."
+    f"Для ног размечаются сторона, металл и перелом; для позвоночника — металл и тип проблемы. Версия: {APP_VERSION}."
 )
 
 if not DATA_ROOT.exists():
@@ -962,9 +1030,11 @@ else:
     n_leg_side, n_leg_total = 0, 0
 
 if "metal" in labels_df.columns:
-    n_metal_labeled = leg_rows["metal"].astype(str).isin(["0", "1"]).sum() if n_leg_total else 0
+    n_leg_metal_labeled = (
+        leg_rows["metal"].astype(str).isin(["0", "1"]).sum() if n_leg_total else 0
+    )
 else:
-    n_metal_labeled = 0
+    n_leg_metal_labeled = 0
 
 if "fracture" in labels_df.columns:
     n_fracture_labeled = leg_rows["fracture"].astype(str).isin(["0", "1"]).sum() if n_leg_total else 0
@@ -973,6 +1043,11 @@ else:
 
 spine_rows = labels_df[labels_df["label"].astype(str).str.upper().eq("SPINE")]
 n_spine_total = len(spine_rows)
+n_spine_metal_labeled = (
+    spine_rows["metal"].astype(str).isin(["0", "1"]).sum()
+    if "metal" in spine_rows.columns and n_spine_total else 0
+)
+
 if "spine_issue" in labels_df.columns:
     n_spine_issue_labeled = spine_rows["spine_issue"].astype(str).str.upper().isin(
         ["NONE", "SCOLIOSIS", "LUMBARIZATION", "BOTH"]
@@ -1000,6 +1075,12 @@ dataset_ok = count_ok and fingerprint_ok
 
 if "current_idx" not in st.session_state:
     st.session_state.current_idx = 0
+
+if "file_search" not in st.session_state:
+    st.session_state.file_search = ""
+
+if "pending_file_search" in st.session_state:
+    st.session_state.file_search = st.session_state.pop("pending_file_search")
 
 st.session_state.current_idx = min(
     st.session_state.current_idx,
@@ -1056,12 +1137,42 @@ with st.sidebar:
         st.cache_data.clear()
         st.rerun()
 
+    search_query = st.text_input(
+        "Поиск по имени файла",
+        key="file_search",
+        placeholder="Например: CR000000.dcm или часть пути",
+        help=(
+            "Фильтрует выпадающий список по имени файла или части относительного пути. "
+            "После перехода стрелками поиск автоматически очищается."
+        ),
+    ).strip().casefold()
+
+    if search_query:
+        filtered_options = [
+            rel for rel in relative_options
+            if search_query in Path(rel).name.casefold()
+            or search_query in rel.casefold()
+        ]
+    else:
+        filtered_options = relative_options
+
+    if not filtered_options:
+        st.warning("Совпадений не найдено.")
+        filtered_options = [st.session_state.file_select]
+
+    if st.session_state.file_select not in filtered_options:
+        st.session_state.file_select = filtered_options[0]
+        st.session_state.current_idx = relative_options.index(filtered_options[0])
+
     st.selectbox(
         "Выберите DICOM",
-        options=relative_options,
+        options=filtered_options,
         key="file_select",
         on_change=on_file_selected,
     )
+
+    if search_query:
+        st.caption(f"Найдено: {len(filtered_options)}")
 
     idx = st.session_state.current_idx
 
@@ -1104,8 +1215,9 @@ with st.sidebar:
 
     st.progress(min(n_annotated / len(files), 1.0))
     st.metric("Сторона размечена у ног", f"{n_leg_side} / {n_leg_total}")
-    st.metric("Металл размечен у ног", f"{n_metal_labeled} / {n_leg_total}")
-    st.metric("Перелом размечен у ног", f"{n_fracture_labeled} / {n_leg_total}")
+    st.metric("Металл у ног", f"{n_leg_metal_labeled} / {n_leg_total}")
+    st.metric("Перелом у ног", f"{n_fracture_labeled} / {n_leg_total}")
+    st.metric("Металл у позвоночника", f"{n_spine_metal_labeled} / {n_spine_total}")
     st.metric("Проблема позвоночника", f"{n_spine_issue_labeled} / {n_spine_total}")
 
     if len(labels_df) != n_annotated:
@@ -1262,16 +1374,31 @@ with top_right:
     current_side = side_options[side_ui] if current_label == "LEG" else ""
 
     existing_metal = str(existing.get("metal", "")).strip()
-    initial_metal = METAL_OPTIONS_REVERSE.get(existing_metal, "Не размечено")
+    known_metal_case = normalize_relpath(relative_path) in KNOWN_METAL_RELATIVE_PATHS
+    if not existing_metal and known_metal_case:
+        initial_metal = "Есть металл"
+    else:
+        initial_metal = METAL_OPTIONS_REVERSE.get(existing_metal, "Не размечено")
+
     metal_ui = st.radio(
         "Металл / имплант",
         options=list(METAL_OPTIONS.keys()),
         index=list(METAL_OPTIONS.keys()).index(initial_metal),
         key=f"metal_{widget_suffix}",
         horizontal=True,
-        disabled=(current_label != "LEG"),
+        disabled=(current_label not in {"LEG", "SPINE"}),
     )
-    current_metal = METAL_OPTIONS[metal_ui] if current_label == "LEG" else ""
+    current_metal = (
+        METAL_OPTIONS[metal_ui]
+        if current_label in {"LEG", "SPINE"}
+        else ""
+    )
+
+    if known_metal_case and not existing_metal:
+        st.info(
+            "Этот DICOM отмечен в списке известных случаев с металлом. "
+            "Вариант «Есть металл» предвыбран, но будет сохранён только после нажатия кнопки сохранения."
+        )
 
     existing_fracture = str(existing.get("fracture", "")).strip()
     initial_fracture = FRACTURE_OPTIONS_REVERSE.get(existing_fracture, "Не размечено")
@@ -1393,6 +1520,14 @@ with top_right:
                     )
             except Exception as e:
                 st.exception(e)
+
+    st.caption(
+        "⌨️ Горячие клавиши: ← предыдущий, → следующий, Enter — сохранить и следующий. "
+        "Горячие клавиши не срабатывают, когда курсор находится в поле поиска, имени разметчика или комментария."
+    )
+
+# Устанавливаем обработчик после того, как кнопки навигации и сохранения уже есть в DOM.
+install_keyboard_shortcuts()
 
 
 # ============================================================
