@@ -1,0 +1,209 @@
+{
+  "pipeline_health": {
+    "status": "READY",
+    "device": "cuda",
+    "model_source": "C:\\Users\\Андрей\\Desktop\\Хакатон\\prototype_output\\dxa_qc_pipeline_bundle.pt",
+    "anatomy_classes": {
+      "SPINE": 0,
+      "LEG_LEFT": 1,
+      "LEG_RIGHT": 2
+    },
+    "metal_threshold": 0.0004172325134277344,
+    "metal_score_is_calibrated_probability": false,
+    "sam_checkpoint_available": false,
+    "warnings": [
+      "Порог metal-head экстремально мал; metal_score нельзя трактовать как калиброванную клиническую вероятность"
+    ]
+  },
+  "dataset": {
+    "rows_in_labels": 499,
+    "existing_dicom": 499,
+    "missing_dicom": 0,
+    "anatomy_targets": 498,
+    "metal_targets": 332,
+    "metal_positive": 4
+  },
+  "technical": {
+    "images_total": 499.0,
+    "processing_success": 499.0,
+    "processing_failure": 0.0,
+    "qc_complete": 0.0,
+    "pixel_spacing_available": 0.0,
+    "partial_quality": 448.0,
+    "partial_violation": 51.0,
+    "mean_processing_seconds": 0.028684815630998662
+  },
+  "anatomy_metrics": [
+    {
+      "n": 498,
+      "accuracy": 1.0,
+      "balanced_accuracy": 1.0,
+      "f1_macro": 1.0,
+      "f1_weighted": 1.0
+    }
+  ],
+  "metal_metrics": [
+    {
+      "evaluation": "end_to_end",
+      "n": 332,
+      "positive": 4,
+      "tn": 328,
+      "fp": 0,
+      "fn": 2,
+      "tp": 2,
+      "accuracy": 0.9939759036144579,
+      "sensitivity": 0.5,
+      "specificity": 1.0,
+      "precision": 1.0,
+      "balanced_accuracy": 0.75,
+      "f1": 0.6666666666666666,
+      "f2": 0.5555555555555556,
+      "roc_auc": 1.0,
+      "pr_auc": 1.0
+    },
+    {
+      "evaluation": "metal_head_given_true_leg",
+      "n": 332,
+      "positive": 4,
+      "tn": 328,
+      "fp": 0,
+      "fn": 2,
+      "tp": 2,
+      "accuracy": 0.9939759036144579,
+      "sensitivity": 0.5,
+      "specificity": 1.0,
+      "precision": 1.0,
+      "balanced_accuracy": 0.75,
+      "f1": 0.6666666666666666,
+      "f2": 0.5555555555555556,
+      "roc_auc": 1.0,
+      "pr_auc": 1.0
+    }
+  ],
+  "excel_link": {
+    "excel_studies": 100.0,
+    "linked_studies": 100.0,
+    "linked_images": 499.0,
+    "study_coverage": 1.0
+  },
+  "qc_metrics": [
+    {
+      "task": "spine_alignment",
+      "status": "OK",
+      "evaluable_studies": 99,
+      "target_violations": 10.0,
+      "tn": 70.0,
+      "fp": 19.0,
+      "fn": 5.0,
+      "tp": 5.0,
+      "accuracy": 0.7575757575757576,
+      "sensitivity": 0.5,
+      "specificity": 0.7865168539325843,
+      "f1": 0.29411764705882354
+    },
+    {
+      "task": "spine_coverage",
+      "status": "PREDICTION_NOT_AVAILABLE",
+      "evaluable_studies": 0,
+      "target_violations": null,
+      "tn": null,
+      "fp": null,
+      "fn": null,
+      "tp": null,
+      "accuracy": null,
+      "sensitivity": null,
+      "specificity": null,
+      "f1": null
+    },
+    {
+      "task": "right_hip_roi",
+      "status": "NO_EVALUABLE_PAIRS",
+      "evaluable_studies": 0,
+      "target_violations": null,
+      "tn": null,
+      "fp": null,
+      "fn": null,
+      "tp": null,
+      "accuracy": null,
+      "sensitivity": null,
+      "specificity": null,
+      "f1": null
+    },
+    {
+      "task": "left_hip_roi",
+      "status": "NO_EVALUABLE_PAIRS",
+      "evaluable_studies": 0,
+      "target_violations": null,
+      "tn": null,
+      "fp": null,
+      "fn": null,
+      "tp": null,
+      "accuracy": null,
+      "sensitivity": null,
+      "specificity": null,
+      "f1": null
+    },
+    {
+      "task": "spine_artifacts",
+      "status": "NOT_IMPLEMENTED",
+      "evaluable_studies": 0,
+      "target_violations": null,
+      "tn": null,
+      "fp": null,
+      "fn": null,
+      "tp": null,
+      "accuracy": null,
+      "sensitivity": null,
+      "specificity": null,
+      "f1": null
+    },
+    {
+      "task": "right_hip_position_rotation",
+      "status": "NOT_IMPLEMENTED",
+      "evaluable_studies": 0,
+      "target_violations": null,
+      "tn": null,
+      "fp": null,
+      "fn": null,
+      "tp": null,
+      "accuracy": null,
+      "sensitivity": null,
+      "specificity": null,
+      "f1": null
+    },
+    {
+      "task": "left_hip_position_rotation",
+      "status": "NOT_IMPLEMENTED",
+      "evaluable_studies": 0,
+      "target_violations": null,
+      "tn": null,
+      "fp": null,
+      "fn": null,
+      "tp": null,
+      "accuracy": null,
+      "sensitivity": null,
+      "specificity": null,
+      "f1": null
+    },
+    {
+      "task": "scoliosis_decision",
+      "status": "NOT_IMPLEMENTED",
+      "evaluable_studies": 0,
+      "target_violations": null,
+      "tn": null,
+      "fp": null,
+      "fn": null,
+      "tp": null,
+      "accuracy": null,
+      "sensitivity": null,
+      "specificity": null,
+      "f1": null
+    }
+  ],
+  "limitations": [
+    "Оценка выполнена на полном наборе, включающем обучающие изображения",
+    "metal_score не является калиброванной вероятностью",
+    "Положительных металлических изображений крайне мало",
+    "Часть QC-проверок не реализована или требует PixelSpacing/SAM"
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "cache_version": 2,
+  "bundle": {
+    "path": "C:\\Users\\Андрей\\Desktop\\Хакатон\\prototype_output\\dxa_qc_pipeline_bundle.pt",
+    "size": 89570455,
+    "mtime_ns": 1790169265531508600
+  },
+  "labels": {
+    "path": "C:\\Users\\Андрей\\Desktop\\Хакатон\\Размеченные\\labels.csv",
+    "size": 115371,
+    "mtime_ns": 1789665526000000000
+  },
+  "row_count": 499,
+  "use_sam": false
+}
