@@ -1,6 +1,9 @@
 from pathlib import Path
 from datetime import datetime
+from io import BytesIO
+import base64
 import hashlib
+import json
 import re
 import os
 import shutil
@@ -15,9 +18,13 @@ import streamlit.components.v1 as components
 from openpyxl import load_workbook
 from PIL import Image
 from pydicom.pixel_data_handlers.util import apply_voi_lut
+from geometry import (
+    empty_geometry, validate_geometry, geometry_sidecar,
+    read_geometry, save_geometry, geometry_counts, is_newer_canvas_revision,
+)
 
 
-APP_VERSION = "4.6-search-keyboard-spine-metal"
+APP_VERSION = "5.3-freehand-threshold"
 
 warnings.filterwarnings(
     "ignore",
@@ -55,6 +62,12 @@ OFFSET_SIDE = 0x05
 OFFSET_METAL = 0x06
 OFFSET_FRACTURE = 0x07
 OFFSET_SPINE_ISSUE = 0x08
+OFFSET_GEOMETRY = 0x09
+
+# Local frontend: no external JavaScript/CDN or image upload to an outside server.
+geometry_canvas = components.declare_component(
+    "dxa_geometry_canvas", path=str(Path(__file__).parent / "dxa_canvas")
+)
 
 METAL_OPTIONS = {"Не размечено": "", "Нет металла": "0", "Есть металл": "1"}
 METAL_OPTIONS_REVERSE = {v: k for k, v in METAL_OPTIONS.items()}
@@ -204,6 +217,9 @@ def read_labels_df() -> pd.DataFrame:
             "metal",
             "fracture",
             "spine_issue",
+            "geometry_path",
+            "geometry_spine_complete",
+            "geometry_hip_complete",
         ])
 
     try:
@@ -236,6 +252,9 @@ def read_labels_df() -> pd.DataFrame:
     if "spine_issue" not in df.columns:
         df["spine_issue"] = ""
     df["spine_issue"] = df["spine_issue"].astype(str).str.strip().str.upper()
+    for column in ("geometry_path", "geometry_spine_complete", "geometry_hip_complete"):
+        if column not in df.columns:
+            df[column] = ""
 
     # Если по одному пути по какой-то причине несколько строк,
     # последняя строка считается текущим состоянием.
@@ -321,6 +340,9 @@ def update_labels_csv(
     metal="",
     fracture="",
     spine_issue="",
+    geometry_path="",
+    geometry_spine_complete=False,
+    geometry_hip_complete=False,
 ):
     OUTPUT_ROOT.mkdir(parents=True, exist_ok=True)
 
@@ -348,7 +370,22 @@ def update_labels_csv(
         "metal": str(metal or "").strip(),
         "fracture": str(fracture or "").strip(),
         "spine_issue": str(spine_issue or "").strip().upper(),
+        "geometry_path": str(geometry_path or ""),
+        "geometry_spine_complete": str(int(bool(geometry_spine_complete))),
+        "geometry_hip_complete": str(int(bool(geometry_hip_complete))),
     }
+
+    if not df.empty:
+        previous = df[df["relative_path"].map(normalize_relpath).eq(relative_path)]
+        if not previous.empty:
+            existing_row = previous.iloc[-1].to_dict()
+            # Preserve user-defined columns added to the legacy registry.
+            new_row = {**existing_row, **new_row}
+            # If preview decoding fails, editing old labels must not erase
+            # the reference to an existing anatomical sidecar.
+            if not geometry_path:
+                for field in ("geometry_path", "geometry_spine_complete", "geometry_hip_complete"):
+                    new_row[field] = str(existing_row.get(field, ""))
 
     if not df.empty:
         df = df[
@@ -427,6 +464,7 @@ def annotation_from_dicom(source_path: Path):
             "metal": "",
             "fracture": "",
             "spine_issue": "",
+            "geometry_json": "",
         }
 
     return {
@@ -446,6 +484,7 @@ def annotation_from_dicom(source_path: Path):
         "metal": get_private_value(ds, OFFSET_METAL, ""),
         "fracture": get_private_value(ds, OFFSET_FRACTURE, ""),
         "spine_issue": get_private_value(ds, OFFSET_SPINE_ISSUE, "").upper(),
+        "geometry_json": get_private_value(ds, OFFSET_GEOMETRY, ""),
     }
 
 
@@ -536,6 +575,33 @@ def cached_preview(path_str: str, mtime_ns: int):
     return np.asarray(dicom_to_image(ds))
 
 
+@st.cache_data(show_spinner=False, max_entries=16)
+def cached_canvas_image(path_str: str, mtime_ns: int, max_side=1400):
+    """Downsample only the browser preview; annotations use native DICOM pixels."""
+    arr = cached_preview(path_str, mtime_ns)
+    if arr.ndim != 2:
+        raise ValueError("Геометрическая разметка поддерживает двумерный DICOM")
+    original_height, original_width = arr.shape
+    image = Image.fromarray(arr)
+    if max(image.size) > max_side:
+        image.thumbnail((max_side, max_side), Image.Resampling.LANCZOS)
+    stream = BytesIO()
+    image.save(stream, format="PNG", optimize=True)
+    return (base64.b64encode(stream.getvalue()).decode("ascii"),
+            original_width, original_height, image.width, image.height)
+
+
+def load_source_geometry(source_path: Path, width: int, height: int):
+    path = geometry_sidecar(OUTPUT_ROOT, relative_path_string(source_path))
+    if path.exists():
+        return read_geometry(path, width, height)
+    # Backwards-compatible fallback: DICOM metadata, if sidecar was moved/lost.
+    old = annotation_from_dicom(source_path).get("geometry_json", "")
+    if old:
+        return validate_geometry(json.loads(old), width, height)
+    return empty_geometry(width, height)
+
+
 def safe_value(element):
     try:
         value = element.value
@@ -618,6 +684,7 @@ def save_annotation(
     metal: str = "",
     fracture: str = "",
     spine_issue: str = "",
+    geometry: dict | None = None,
 ):
     # labels.csv — главный реестр. При сохранении всегда создаём копию
     # из чистого исходного DICOM, чтобы не накапливать старые private tags.
@@ -625,6 +692,11 @@ def save_annotation(
         source_path,
         force=True,
     )
+
+    # Geometry coordinates must correspond to the original pixel matrix.
+    if geometry is not None:
+        width, height = int(ds.Columns), int(ds.Rows)
+        geometry = validate_geometry(geometry, width, height)
 
     block = get_private_block(
         ds,
@@ -645,6 +717,7 @@ def save_annotation(
     metal_tag = block.get_tag(OFFSET_METAL)
     fracture_tag = block.get_tag(OFFSET_FRACTURE)
     spine_issue_tag = block.get_tag(OFFSET_SPINE_ISSUE)
+    geometry_tag = block.get_tag(OFFSET_GEOMETRY)
 
     now = datetime.now()
     dicom_dt = now.strftime("%Y%m%d%H%M%S.%f")
@@ -670,11 +743,24 @@ def save_annotation(
     ds.add_new(metal_tag, "CS", metal if label in {"LEG", "SPINE"} else "")
     ds.add_new(fracture_tag, "CS", fracture if label == "LEG" else "")
     ds.add_new(spine_issue_tag, "CS", spine_issue if label == "SPINE" else "")
+    if geometry is not None:
+        ds.add_new(
+            geometry_tag, "UT",
+            # ASCII escapes are independent of the source DICOM character set.
+            json.dumps(geometry, ensure_ascii=True, separators=(",", ":")),
+        )
 
     out_path = output_path_for(source_path)
 
     # 1. Сначала безопасно пишем размеченную DICOM-копию.
     atomic_save_dicom(ds, out_path)
+
+    # Preserve previous anatomical annotations even when changing a class.
+    geometry_relpath = ""
+    if geometry is not None:
+        path = geometry_sidecar(OUTPUT_ROOT, relative_path_string(source_path))
+        save_geometry(path, geometry, relative_path_string(source_path), annotator)
+        geometry_relpath = path.relative_to(OUTPUT_ROOT).as_posix()
 
     # 2. Затем atomically обновляем labels.csv + backup + history.
     relative_path = relative_path_string(source_path)
@@ -690,6 +776,9 @@ def save_annotation(
         metal=metal if label in {"LEG", "SPINE"} else "",
         fracture=fracture if label == "LEG" else "",
         spine_issue=spine_issue if label == "SPINE" else "",
+        geometry_path=geometry_relpath,
+        geometry_spine_complete=(geometry or {}).get("complete", {}).get("spine", False),
+        geometry_hip_complete=(geometry or {}).get("complete", {}).get("hip", False),
     )
 
     return out_path
@@ -975,7 +1064,8 @@ st.caption(
     "Исходные DICOM читаются только из /data. "
     "Разметка хранится в /output. "
     "labels.csv является основным реестром разметки. "
-    f"Для ног размечаются сторона, металл и перелом; для позвоночника — металл и тип проблемы. Версия: {APP_VERSION}."
+    "Сохранены прежние бинарные метки, дополнительно доступна разметка анатомии мышью. "
+    f"Версия: {APP_VERSION}."
 )
 
 if not DATA_ROOT.exists():
@@ -1308,9 +1398,10 @@ current_idx = st.session_state.current_idx
 source_path = files[current_idx]
 relative_path = relative_path_string(source_path)
 existing = read_existing_annotation(source_path, lookup)
+widget_suffix = hashlib.sha1(relative_path.encode("utf-8", errors="replace")).hexdigest()[:12]
 
 top_left, top_right = st.columns(
-    [1.05, 0.95],
+    [1.18, 0.82],
     gap="large",
 )
 
@@ -1323,13 +1414,12 @@ with top_left:
 
     try:
         image = cached_preview(str(source_path), source_path.stat().st_mtime_ns)
-        st.image(image, caption=relative_path, width="stretch")
+        image_error = None
     except Exception as e:
-        st.error(
-            "Не удалось декодировать PixelData.\n\n"
-            f"{e}\n\n"
-            "Если файл сжат, проверьте pylibjpeg."
-        )
+        image, image_error = None, str(e)
+    # The class selector lives in the right column, therefore populate this
+    # container afterwards to show only the relevant tools for that class.
+    image_panel = st.container()
 
 
 with top_right:
@@ -1350,7 +1440,6 @@ with top_right:
     class_options = {"Не определено": "UNKNOWN", "Позвоночник": "SPINE", "Нога": "LEG"}
     initial_class = "Позвоночник" if existing_label == "SPINE" else ("Нога" if existing_label == "LEG" else "Не определено")
 
-    widget_suffix = hashlib.sha1(relative_path.encode("utf-8", errors="replace")).hexdigest()[:12]
     class_ui = st.radio(
         "Класс",
         options=list(class_options.keys()),
@@ -1359,6 +1448,84 @@ with top_right:
         horizontal=True,
     )
     current_label = class_options[class_ui]
+
+    # Each source image has independent in-session geometry. The sidecar or
+    # embedded DICOM JSON is used to restore it when the session starts.
+    geometry_state_key = f"geometry_{widget_suffix}"
+    geometry_revision_key = f"geometry_revision_{widget_suffix}"
+    geometry_value = None
+    if image is not None and image.ndim == 2:
+        native_height, native_width = image.shape
+        if geometry_state_key not in st.session_state:
+            try:
+                st.session_state[geometry_state_key] = load_source_geometry(
+                    source_path, native_width, native_height
+                )
+            except Exception as e:
+                st.error(f"Не удалось восстановить геометрическую разметку: {e}")
+                st.stop()  # Prevent accidental overwrite of a damaged annotation.
+        geometry_value = st.session_state[geometry_state_key]
+
+    with image_panel:
+        if image_error:
+            st.error(f"Не удалось декодировать PixelData: {image_error}")
+        elif image is not None and image.ndim != 2:
+            st.warning("Геометрический редактор поддерживает только двумерные изображения.")
+            st.image(image, caption=relative_path, width="stretch")
+        elif image is not None:
+            try:
+                encoded, original_w, original_h, preview_w, preview_h = cached_canvas_image(
+                    str(source_path), source_path.stat().st_mtime_ns
+                )
+                returned = geometry_canvas(
+                    source_key=relative_path,
+                    region=current_label,
+                    native_width=original_w,
+                    native_height=original_h,
+                    preview_width=preview_w,
+                    preview_height=preview_h,
+                    image_png_base64=encoded,
+                    geometry=geometry_value,
+                    last_client_revision=st.session_state.get(geometry_revision_key, 0),
+                    key=f"dxa_canvas_v53_{widget_suffix}",
+                    default=None,
+                )
+                if returned is not None:
+                    # Streamlit can process a delayed component event after a
+                    # newer one. Only a strictly newer full-state snapshot may
+                    # overwrite the session's annotation for this image.
+                    last_revision = st.session_state.get(geometry_revision_key, -1)
+                    if is_newer_canvas_revision(returned, last_revision):
+                        validated = validate_geometry(returned, original_w, original_h)
+                        st.session_state[geometry_state_key] = validated
+                        st.session_state[geometry_revision_key] = returned["_client_revision"]
+                        geometry_value = validated
+            except Exception as e:
+                st.error(f"Ошибка редактора разметки: {e}")
+            st.caption(
+                "Зелёный — межпозвонковые линии; жёлтый — подвздошные кости/малый вертел; "
+                "розовый — контур кости у малого вертела; красный — посторонние предметы; "
+                "синий — точки бедра; фиолетовый — ROI. "
+                "В режиме порога бирюзовым отмечены пиксели выше выбранного уровня, "
+                "оранжевым — их граница. Порог 0–255 относится к нормализованному отображению "
+                "(не к физической минеральной плотности кости). "
+                "Координаты пересчитываются к полному разрешению исходного DICOM."
+            )
+
+    if geometry_value is not None and current_label in {"SPINE", "LEG"}:
+        region_key = "spine" if current_label == "SPINE" else "hip"
+        complete_key = f"geometry_complete_{region_key}_{widget_suffix}"
+        if complete_key not in st.session_state:
+            st.session_state[complete_key] = bool(geometry_value["complete"][region_key])
+        complete = st.checkbox(
+            "Геометрическая разметка этой области завершена",
+            key=complete_key,
+            help="Отметьте только после проверки. Отсутствие меток само по себе не означает отрицательный результат.",
+        )
+        geometry_value["complete"][region_key] = complete
+        st.caption(f"Объекты на изображении: {geometry_counts(geometry_value)}")
+    elif image is None:
+        st.warning("Геометрическая разметка недоступна без декодирования изображения.")
 
     side_options = {"Не размечено": "", "Левая": "LEFT", "Правая": "RIGHT"}
     side_reverse = {v: k for k, v in side_options.items()}
@@ -1459,6 +1626,7 @@ with top_right:
             f"Metal: {current_metal or '<not labeled>'}",
             f"Fracture: {current_fracture or '<not labeled>'}",
             f"SpineIssue: {current_spine_issue or '<not labeled>'}",
+            f"Geometry: {('ready' if geometry_value is not None else 'unavailable')}",
             f"Notes: {notes or '<empty>'}",
             f"Annotator: {annotator or '<empty>'}",
         ]),
@@ -1483,6 +1651,7 @@ with top_right:
                     metal=current_metal,
                     fracture=current_fracture,
                     spine_issue=current_spine_issue,
+                    geometry=geometry_value,
                 )
                 st.success(
                     f"Сохранено:\n{out_path}"
@@ -1506,6 +1675,7 @@ with top_right:
                     metal=current_metal,
                     fracture=current_fracture,
                     spine_issue=current_spine_issue,
+                    geometry=geometry_value,
                 )
 
                 if current_idx < len(files) - 1:

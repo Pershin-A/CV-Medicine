@@ -6,7 +6,8 @@ COPY requirements.txt .
 
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY app.py .
+COPY app.py geometry.py dataset_manifest.py export_geometry.py ./
+COPY dxa_canvas/ ./dxa_canvas/
 
 ENV DATA_ROOT=/data
 ENV OUTPUT_ROOT=/output

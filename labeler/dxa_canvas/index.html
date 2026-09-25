@@ -1,0 +1,357 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>DXA geometry canvas</title>
+<style>
+:root{font-family:system-ui,-apple-system,Segoe UI,sans-serif;color:#182b41;color-scheme:light;background:white}
+*{box-sizing:border-box}body{margin:0;padding:0 2px 8px}button,select,input{font:inherit}
+/* Постоянная геометрия панелей: смена инструмента и числа объектов не сдвигает снимок. */
+.toolbar{display:flex;gap:7px;flex-wrap:nowrap;align-items:center;margin:3px 0;min-height:43px;height:43px;overflow-x:auto;overflow-y:hidden;scrollbar-width:thin}
+.toolbar>*{flex-shrink:0}
+button,select{border:1px solid #c4ceda;border-radius:7px;background:white;color:#233347;padding:7px 9px;font-size:13px;white-space:nowrap}
+button{cursor:pointer}button:hover:not(:disabled){border-color:#3177d5;background:#eef6ff}button:disabled{opacity:.45;cursor:default}
+button[aria-pressed=true]{background:#1857a3;border-color:#1857a3;color:white}button.danger{border-color:#e8b5b5;color:#b22020}
+#foreignLabel{font-size:12px;white-space:nowrap}
+#help{height:34px;min-height:34px;overflow:hidden;font-size:12px;color:#52667c;line-height:1.4;padding:3px 0}
+#viewport{width:100%;height:820px;min-height:820px;max-height:none;overflow:auto;position:relative;border:1px solid #b8c8dc;border-radius:8px;background:#111827;overscroll-behavior:contain}
+#canvas{display:block;touch-action:none;cursor:crosshair;max-width:none;margin-inline:auto}
+#footer{height:31px;min-height:31px;font-size:12px;color:#41576b;display:flex;flex-wrap:nowrap;gap:10px;align-items:center;padding:5px 0;overflow:hidden;white-space:nowrap}
+#coords,#count{flex-shrink:0}
+#items{display:flex;gap:5px;flex-wrap:nowrap;align-items:center;height:39px;min-height:39px;max-height:39px;padding:3px 0;overflow-x:auto;overflow-y:hidden;white-space:nowrap;scrollbar-width:thin}
+.item{flex-shrink:0;font-size:12px;padding:3px 6px;border:1px solid #bfd1e6;border-radius:5px;background:#f5f9fd}
+.item button{padding:0 3px;border:0;background:transparent;color:#c02b2b}
+#status{margin-left:auto;color:#276648;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}#error{color:#a52020;white-space:pre-wrap;font-size:12px;min-height:18px}
+#viewTools{gap:12px}
+#viewTools label{display:flex;align-items:center;gap:7px;font-size:12px;white-space:nowrap}
+#threshold{width:220px;max-width:40vw;accent-color:#e48b1e;cursor:pointer}
+#thresholdValue{font-variant-numeric:tabular-nums;min-width:25px;font-weight:650}
+#thresholdNote{font-size:11px;color:#53677e;white-space:nowrap}
+</style>
+</head>
+<body>
+<div class="toolbar" id="toolsPrimary" aria-label="Основные инструменты"></div>
+<div class="toolbar" id="toolsSecondary" aria-label="Дополнительные инструменты">
+  <!-- Эти слоты остаются в той же строке даже когда соответствующий режим не выбран. -->
+  <label id="foreignLabel" style="display:none;visibility:hidden">Тип предмета
+    <select id="foreignType"><option value="metal">Металл</option><option value="clothing">Одежда</option><option value="other">Другое</option></select>
+  </label>
+</div>
+<div class="toolbar" id="actions">
+  <label style="font-size:12px">Масштаб <select id="zoom"><option value="0.75">75%</option><option value="1" selected>100%</option><option value="1.5">150%</option><option value="2">200%</option><option value="3">300%</option></select></label>
+  <button id="cancelPending">Сбросить незавершённое</button>
+  <button id="undo">↶ Отменить</button>
+  <button id="redo">↷ Повторить</button>
+  <button id="clear" class="danger">Очистить текущий слой</button>
+</div>
+<div class="toolbar" id="viewTools" aria-label="Режим просмотра и порог яркости">
+  <label>Отображение
+    <select id="viewMode"><option value="original">Оригинал</option><option value="threshold">Порог + граница</option></select>
+  </label>
+  <label>Порог яркости
+    <input id="threshold" aria-label="Порог яркости" type="range" min="0" max="255" step="1" value="128" />
+    <output id="thresholdValue" for="threshold">128</output>
+  </label>
+  <span id="thresholdNote">0–255 после нормализации DXA</span>
+</div>
+<div class="help" id="help">Выберите инструмент и размечайте изображение мышью. Координаты сохраняются в пикселях исходного DICOM.</div>
+<div id="viewport"><canvas id="canvas"></canvas></div>
+<div id="footer"><span id="coords"></span><span id="count"></span><span id="status"></span></div>
+<div id="items"></div><div id="error" role="alert"></div>
+<script>
+(()=>{
+  'use strict';
+  const $=id=>document.getElementById(id), canvas=$('canvas'),ctx=canvas.getContext('2d');
+  let image=new Image(),previewW=1,previewH=1,nativeW=1,nativeH=1,geo=null,region='UNKNOWN',sourceKey='';
+  let tool='',pending=null,mouse=null,undo=[],redo=[],zoom=1,ready=false;
+  let activeStrokePointerId=null,thresholdPrevious=null;
+  let sourceGray=null,thresholdCache=null,thresholdCacheValue=null;
+  const overlayCanvas=document.createElement('canvas'),overlayCtx=overlayCanvas.getContext('2d');
+  // The iframe owns the current edit state for as long as this image is open.
+  // Streamlit reruns may echo an *older* geometry snapshot after a newer edit.
+  // Never import that echo over the local canvas; an explicit source change
+  // (or a fresh iframe) is the only time geometry is initialized from Python.
+  let editRevision=0;
+  const clone=x=>JSON.parse(JSON.stringify(x));
+  function send(type,other={}){window.parent.postMessage({isStreamlitMessage:true,type,...other},'*')}
+  function resizeFrame(){send('streamlit:setFrameHeight',{height:Math.min(1600,document.body.scrollHeight+12)})}
+  function empty(){return {schema_version:1,coordinate_system:'original_dicom_pixels_top_left',image_width:nativeW,image_height:nativeH,spine:{disc_lines:[],iliac_crests:{image_left:null,image_right:null},foreign_objects:[]},hip:{landmarks:{greater_trochanter:null,femoral_neck:null,ischial_bone:null},lesser_trochanter:null,lesser_trochanter_traces:{trochanter:[],adjacent_bone:[]},roi_box:null},image_view:{mode:'original',threshold_8bit:128},complete:{spine:false,hip:false}}}
+  function normalizeClientGeometry(value){
+    const g=clone(value||empty());
+    if(!g.image_view)g.image_view={mode:'original',threshold_8bit:128};
+    if(!g.hip.lesser_trochanter_traces)g.hip.lesser_trochanter_traces={trochanter:[],adjacent_bone:[]};
+    for(const name of ['trochanter','adjacent_bone'])if(!Array.isArray(g.hip.lesser_trochanter_traces[name]))g.hip.lesser_trochanter_traces[name]=[];
+    return g;
+  }
+  function isTraceTool(){return tool==='trace_trochanter'||tool==='trace_bone'}
+  function currentTraceName(){return tool==='trace_trochanter'?'trochanter':'adjacent_bone'}
+  function syncViewControls(){
+    if(!geo)return;
+    $('viewMode').value=geo.image_view.mode;
+    $('threshold').value=String(geo.image_view.threshold_8bit);
+    $('thresholdValue').textContent=String(geo.image_view.threshold_8bit);
+  }
+  function err(s){$('error').textContent=s||'';resizeFrame()}
+  function commit(){
+    if(!geo)return;
+    // Use a monotonic revision also across ordinary iframe remounts. Python
+    // rejects delayed, older events instead of overwriting newer edits.
+    editRevision=Math.max(editRevision+1,Date.now()*1000);
+    const value=clone(geo);
+    value._client_revision=editRevision; // transport-only; not part of saved JSON
+    send('streamlit:setComponentValue',{value,dataType:'json'});
+    $('status').textContent='Изменения переданы форме — нажмите «Сохранить»';
+    syncViewControls();draw();populate();
+  }
+  function push(){undo.push(clone(geo));if(undo.length>60)undo.shift();redo=[]}
+  function pushSaved(snapshot){undo.push(snapshot);if(undo.length>60)undo.shift();redo=[]}
+  function point(e){const r=canvas.getBoundingClientRect();if(!r.width||!r.height)return null;const x=(e.clientX-r.left)/r.width*nativeW,y=(e.clientY-r.top)/r.height*nativeH;return [Math.max(0,Math.min(nativeW-1,Math.round(x*100)/100)),Math.max(0,Math.min(nativeH-1,Math.round(y*100)/100))]}
+  function px(p){return [p[0]*previewW/nativeW,p[1]*previewH/nativeH]}
+  function dist(a,b){return Math.hypot(a[0]-b[0],a[1]-b[1])}
+  function ds(a,b,p){const ab=[b[0]-a[0],b[1]-a[1]],d=ab[0]*ab[0]+ab[1]*ab[1];if(d===0)return dist(a,p);const t=Math.max(0,Math.min(1,((p[0]-a[0])*ab[0]+(p[1]-a[1])*ab[1])/d));return dist([a[0]+t*ab[0],a[1]+t*ab[1]],p)}
+  function lines(points,stroke,width=2,close=false,fill=null,dash=[]){if(!points||points.length<2)return;ctx.save();ctx.strokeStyle=stroke;ctx.lineWidth=width;ctx.lineJoin='round';ctx.lineCap='round';ctx.setLineDash(dash);ctx.beginPath();const a=px(points[0]);ctx.moveTo(a[0],a[1]);for(const p of points.slice(1)){const b=px(p);ctx.lineTo(b[0],b[1])}if(close)ctx.closePath();if(fill){ctx.fillStyle=fill;ctx.fill()}ctx.stroke();ctx.restore()}
+  function box(b,color,label,dash=[]){if(!b)return;const a=px(b.slice(0,2)),z=px(b.slice(2));ctx.save();ctx.strokeStyle=color;ctx.lineWidth=2;ctx.setLineDash(dash);ctx.strokeRect(a[0],a[1],z[0]-a[0],z[1]-a[1]);ctx.fillStyle=color;ctx.font='bold 13px sans-serif';ctx.fillText(label,a[0]+3,Math.max(13,a[1]-5));ctx.restore()}
+  function dot(p,color,label){if(!p)return;const a=px(p);ctx.save();ctx.fillStyle=color;ctx.strokeStyle='#111827';ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(a[0],a[1],5,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.font='bold 13px sans-serif';ctx.strokeStyle='#141414';ctx.lineWidth=3;ctx.strokeText(label,a[0]+8,a[1]-7);ctx.fillText(label,a[0]+8,a[1]-7);ctx.restore()}
+  function prepareSourceGray(){
+    const surface=document.createElement('canvas');surface.width=previewW;surface.height=previewH;
+    const c=surface.getContext('2d',{willReadFrequently:true});c.drawImage(image,0,0,previewW,previewH);
+    const data=c.getImageData(0,0,previewW,previewH).data;
+    sourceGray=new Uint8Array(previewW*previewH);
+    for(let i=0;i<sourceGray.length;i++)sourceGray[i]=data[4*i];
+    overlayCanvas.width=previewW;overlayCanvas.height=previewH;
+    thresholdCacheValue=null;thresholdCache=null;
+  }
+  function thresholdOverlay(t){
+    if(!sourceGray)return null;
+    if(thresholdCacheValue===t&&thresholdCache)return thresholdCache;
+    const w=previewW,h=previewH,mask=new Uint8Array(w*h);
+    for(let i=0;i<mask.length;i++)mask[i]=sourceGray[i]>=t?1:0;
+    const im=overlayCtx.createImageData(w,h),rgba=im.data;
+    for(let y=0;y<h;y++)for(let x=0;x<w;x++){
+      const i=y*w+x,o=i*4,inside=mask[i];
+      // Only a thin one-pixel transition line is added. The translucent fill
+      // keeps the original radiograph visible, including labels and fine detail.
+      const boundary=(x>0&&mask[i-1]!==inside)||(x<w-1&&mask[i+1]!==inside)||
+                     (y>0&&mask[i-w]!==inside)||(y<h-1&&mask[i+w]!==inside);
+      if(boundary){rgba[o]=255;rgba[o+1]=130;rgba[o+2]=42;rgba[o+3]=245;}
+      else if(inside){rgba[o]=33;rgba[o+1]=210;rgba[o+2]=165;rgba[o+3]=62;}
+    }
+    overlayCtx.putImageData(im,0,0);
+    thresholdCacheValue=t;thresholdCache=overlayCanvas;
+    return thresholdCache;
+  }
+  function draw(){if(!image.complete||!image.naturalWidth||!geo)return;ctx.clearRect(0,0,previewW,previewH);ctx.drawImage(image,0,0,previewW,previewH);
+    if(geo.image_view.mode==='threshold'){
+      const overlay=thresholdOverlay(geo.image_view.threshold_8bit);
+      if(overlay)ctx.drawImage(overlay,0,0,previewW,previewH);
+    }
+    if(region==='SPINE'){
+      geo.spine.disc_lines.forEach((v,i)=>{lines(v.points,'#27e979',2.4);dot(v.points[0],'#27e979',String(i+1));dot(v.points[1],'#27e979','')});
+      dot(geo.spine.iliac_crests.image_left,'#f6b743','Кость: слева');dot(geo.spine.iliac_crests.image_right,'#f6b743','Кость: справа');
+      geo.spine.foreign_objects.forEach((o,i)=>box(o.bbox,'#f4485c',`${o.kind} ${i+1}`));
+    }else if(region==='LEG'){
+      const l=geo.hip.landmarks;dot(l.greater_trochanter,'#15d4f4','1 · Большой вертел');dot(l.femoral_neck,'#15d4f4','2 · Шейка');dot(l.ischial_bone,'#15d4f4','3 · Седалищная');
+      // Old polygon remains readable and removable, but new freehand paths
+      // use a fine pencil line with no large point markers or forced fill.
+      lines(geo.hip.lesser_trochanter,'#faea4a',1.5,true,null,[3,2]);
+      const traces=geo.hip.lesser_trochanter_traces;
+      traces.trochanter.forEach(s=>lines(s.points,'#faea4a',1.25));
+      traces.adjacent_bone.forEach(s=>lines(s.points,'#ff76c8',1.25));
+      box(geo.hip.roi_box,'#a45bff','ROI');
+    }
+    if(pending&&pending.length){lines(pending,isTraceTool()?(tool==='trace_trochanter'?'#faea4a':'#ff76c8'):'#ffffff',isTraceTool()?1.25:2,false,null,isTraceTool()?[]:[5,3]);if(mouse&&tool==='disc')lines([pending[0],mouse],'#ffffff',1,false,null,[4,4]);}
+    if(pending&&pending.length&&mouse&&(tool==='foreign'||tool==='roi'))box([...pending[0],...mouse],'#ffffff','preview',[5,4]);
+  }
+  function layout(){if(!image.complete||!image.naturalWidth)return;const viewport=$('viewport');const usableWidth=Math.max(200,viewport.clientWidth-3);const usableHeight=810;const fittedWidth=Math.min(usableWidth,usableHeight*previewW/previewH);const width=fittedWidth*zoom;canvas.style.width=`${Math.round(width)}px`;canvas.style.height=`${Math.round(width*previewH/previewW)}px`;resizeFrame()}
+  function toolList(){const spine=[['disc','Линия между позвонками'],['iliac_left','Подвздошная слева (на снимке)'],['iliac_right','Подвздошная справа (на снимке)'],['foreign','Предмет: прямоугольник'],['erase','Удалить кликом']];
+    const hip=[['greater','1 — Большой вертел'],['neck','2 — Шейка'],['ischial','3 — Седалищная'],['trace_trochanter','Карандаш: малый вертел'],['trace_bone','Карандаш: контур кости рядом'],['roi','ROI: прямоугольник'],['erase','Удалить кликом']];
+    return region==='SPINE'?spine:region==='LEG'?hip:[];}
+  function setTool(t){
+    tool=t;pending=null;mouse=null;activeStrokePointerId=null;
+    $('clear').dataset.confirm='';$('clear').textContent='Очистить текущий слой';
+    $('foreignLabel').style.visibility=t==='foreign'?'visible':'hidden';
+    [...document.querySelectorAll('#toolsPrimary button,#toolsSecondary button[data-tool]')]
+      .forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.tool===t)));
+    $('help').textContent=(t==='disc'?'Два одиночных клика задают наклонную линию.':
+      t==='foreign'||t==='roi'?'Два одиночных клика задают противоположные углы прямоугольника.':
+      isTraceTool()?'Зажмите левую кнопку мыши и ведите тонким карандашом вдоль '+(t==='trace_trochanter'?'малого вертела.':'границы кости около малого вертела.')+' Отпустите для сохранения.':
+      t==='erase'?'Один клик по ближайшей линии, точке или рамке удаляет объект.':
+      'Один клик ставит точку; следующий клик перемещает существующую метку.');draw();
+  }
+  function setupTools(){
+    const l=toolList();$('toolsPrimary').innerHTML='';
+    $('toolsSecondary').querySelectorAll('button[data-tool]').forEach(b=>b.remove());
+    for(const [i,[value,label]] of l.entries()){
+      const b=document.createElement('button');b.textContent=label;b.dataset.tool=value;
+      b.onclick=()=>setTool(value);
+      if(i<3)$('toolsPrimary').append(b);
+      else $('toolsSecondary').insertBefore(b,$('foreignLabel'));
+    }
+    $('foreignLabel').style.display=region==='SPINE'?'':'none';
+    if(!l.length){$('help').textContent='Сначала выберите класс «Позвоночник» или «Нога» справа.';tool='';}
+    else setTool(l[0][0]);
+    resizeFrame();
+  }
+  function nearestDelete(p){let found=null,best=18*nativeW/previewW;const test=(distance,fn)=>{if(distance<best){best=distance;found=fn}};
+    if(region==='SPINE'){
+      geo.spine.disc_lines.forEach((v,i)=>test(ds(...v.points,p),()=>geo.spine.disc_lines.splice(i,1)));
+      for(let k of ['image_left','image_right']){const q=geo.spine.iliac_crests[k];if(q)test(dist(q,p),()=>{geo.spine.iliac_crests[k]=null})}
+      geo.spine.foreign_objects.forEach((v,i)=>{const b=v.bbox;if(p[0]>=b[0]&&p[0]<=b[2]&&p[1]>=b[1]&&p[1]<=b[3])test(0,()=>geo.spine.foreign_objects.splice(i,1))});
+    }else if(region==='LEG'){
+      for(const k of Object.keys(geo.hip.landmarks)){const q=geo.hip.landmarks[k];if(q)test(dist(q,p),()=>{geo.hip.landmarks[k]=null})}
+      const poly=geo.hip.lesser_trochanter;if(poly)poly.forEach((q,i)=>test(ds(q,poly[(i+1)%poly.length],p),()=>{geo.hip.lesser_trochanter=null}));
+      for(const name of ['trochanter','adjacent_bone']){
+        geo.hip.lesser_trochanter_traces[name].forEach((stroke,i)=>{
+          for(let j=1;j<stroke.points.length;j++)test(ds(stroke.points[j-1],stroke.points[j],p),()=>geo.hip.lesser_trochanter_traces[name].splice(i,1));
+        });
+      }
+      const b=geo.hip.roi_box;if(b&&p[0]>=b[0]&&p[0]<=b[2]&&p[1]>=b[1]&&p[1]<=b[3])test(0,()=>{geo.hip.roi_box=null});
+    }
+    if(found){push();found();commit()}else err('Рядом с курсором не найдена разметка для удаления.');
+  }
+  function id(){return 'a'+Date.now().toString(36)+Math.random().toString(36).slice(2,7)}
+  function addStrokePoint(p,force=false){
+    if(!pending||!p)return;
+    if(pending.length>=2048)return;
+    const previous=pending[pending.length-1];
+    // Sampling threshold expressed in display (preview) pixels, not DICOM pixels.
+    if(force||dist(px(previous),px(p))>=0.85)pending.push(p);
+  }
+  function finishStroke(e){
+    if(activeStrokePointerId===null||e.pointerId!==activeStrokePointerId)return;
+    if(e.type==='pointerup')addStrokePoint(point(e),true);
+    if(canvas.hasPointerCapture(e.pointerId))canvas.releasePointerCapture(e.pointerId);
+    activeStrokePointerId=null;
+    const points=pending;pending=null;
+    if(e.type!=='pointerup'){draw();return;}
+    if(!points||points.length<2||points.reduce((length,p,i)=>i?length+dist(points[i-1],p):0,0)<1){draw();return;}
+    const layer=geo.hip.lesser_trochanter_traces[currentTraceName()];
+    if(layer.length>=24){err('Достигнут лимит штрихов на текущем слое (24).');draw();return;}
+    push();layer.push({id:id(),points});commit();
+  }
+  // Один pointerdown = одно действие. Не используем событие click: оно может
+  // запаздывать после фокусировки iframe и не должно дублировать pointerdown.
+  function onDown(e){
+    if(!geo||region==='UNKNOWN'||e.button!==0)return;
+    e.preventDefault();
+    const p=point(e);if(!p)return;
+    mouse=p;err('');
+    if(tool==='erase'){nearestDelete(p);return;}
+    if(isTraceTool()){
+      pending=[p];activeStrokePointerId=e.pointerId;
+      canvas.setPointerCapture(e.pointerId);
+      draw();return;
+    }
+    if(tool==='foreign'||tool==='roi'||tool==='disc'){
+      if(!pending){pending=[p];draw();return;}
+      const a=pending[0];
+      if(tool==='disc'){
+        if(dist(p,a)<2){err('Линия слишком короткая.');return;}
+        push();geo.spine.disc_lines.push({id:id(),points:[a,p]});
+      }else{
+        if(Math.abs(p[0]-a[0])<2||Math.abs(p[1]-a[1])<2){err('Рамка слишком мала.');return;}
+        const b=[Math.min(a[0],p[0]),Math.min(a[1],p[1]),Math.max(a[0],p[0]),Math.max(a[1],p[1])];
+        push();
+        if(tool==='foreign')geo.spine.foreign_objects.push({id:id(),kind:$('foreignType').value,bbox:b});
+        else geo.hip.roi_box=b;
+      }
+      pending=null;commit();return;
+    }
+    if(region==='SPINE'){
+      if(tool==='iliac_left'||tool==='iliac_right'){
+        push();geo.spine.iliac_crests[tool==='iliac_left'?'image_left':'image_right']=p;commit();
+      }
+    }else if(region==='LEG'){
+      const k={greater:'greater_trochanter',neck:'femoral_neck',ischial:'ischial_bone'}[tool];
+      if(k){push();geo.hip.landmarks[k]=p;commit();}
+    }
+  }
+  function onMove(e){if(!geo)return;mouse=point(e);if(isTraceTool()&&activeStrokePointerId===e.pointerId)addStrokePoint(mouse);$('coords').textContent=mouse?`x=${Math.round(mouse[0])}, y=${Math.round(mouse[1])} · ${nativeW}×${nativeH} px`:'';draw()}
+  function clearLayer(){if(!geo)return;const msg={'disc':'все линии разделения','iliac_left':'метку подвздошной кости слева','iliac_right':'метку подвздошной кости справа','foreign':'все рамки посторонних предметов','greater':'точку большого вертела','neck':'точку шейки','ischial':'точку седалищной кости','trace_trochanter':'обводки самого малого вертела','trace_bone':'обводки кости рядом с малым вертелом','roi':'рамку ROI','erase':'ВСЮ разметку текущей анатомической области'}[tool];if($('clear').dataset.confirm!==tool){$('clear').dataset.confirm=tool;$('clear').textContent='Подтвердить: удалить '+msg;resizeFrame();return;}$('clear').dataset.confirm='';$('clear').textContent='Очистить текущий слой';push();pending=null;
+    if(tool==='erase'){if(region==='SPINE')geo.spine=empty().spine;else if(region==='LEG')geo.hip=empty().hip;}
+    else if(tool==='disc')geo.spine.disc_lines=[];else if(tool==='foreign')geo.spine.foreign_objects=[];
+    else if(tool==='iliac_left'||tool==='iliac_right')geo.spine.iliac_crests[tool==='iliac_left'?'image_left':'image_right']=null;
+    else if(tool==='roi')geo.hip.roi_box=null;
+    else if(isTraceTool())geo.hip.lesser_trochanter_traces[currentTraceName()]=[];
+    else if(['greater','neck','ischial'].includes(tool))geo.hip.landmarks[{greater:'greater_trochanter',neck:'femoral_neck',ischial:'ischial_bone'}[tool]]=null;
+    commit();}
+  function populate(){
+    if(!geo)return;
+    const n=region==='SPINE'?
+      `Линий: ${geo.spine.disc_lines.length}; подвздошных точек: ${Object.values(geo.spine.iliac_crests).filter(Boolean).length}/2; предметов: ${geo.spine.foreign_objects.length}`:
+      region==='LEG'?`Точек бедра: ${Object.values(geo.hip.landmarks).filter(Boolean).length}/3; вертел: ${geo.hip.lesser_trochanter_traces.trochanter.length}; кость: ${geo.hip.lesser_trochanter_traces.adjacent_bone.length}; ROI: ${geo.hip.roi_box?'есть':'нет'}`:'';
+    $('count').textContent=n;
+    const items=[];
+    if(region==='SPINE'){
+      geo.spine.disc_lines.forEach((v,i)=>items.push([`Линия ${i+1}`,()=>geo.spine.disc_lines.splice(i,1)]));
+      for(const [key,label] of [['image_left','Подвздошная: слева'],['image_right','Подвздошная: справа']]){
+        if(geo.spine.iliac_crests[key])items.push([label,()=>{geo.spine.iliac_crests[key]=null}]);
+      }
+      geo.spine.foreign_objects.forEach((v,i)=>items.push([`Предмет ${i+1} (${v.kind})`,()=>geo.spine.foreign_objects.splice(i,1)]));
+    }else if(region==='LEG'){
+      for(const [key,label] of [['greater_trochanter','1 — Большой вертел'],['femoral_neck','2 — Шейка'],['ischial_bone','3 — Седалищная']]){
+        if(geo.hip.landmarks[key])items.push([label,()=>{geo.hip.landmarks[key]=null}]);
+      }
+      if(geo.hip.lesser_trochanter)items.push(['Контур вертела (старая разметка)',()=>geo.hip.lesser_trochanter=null]);
+      for(const [key,label] of [['trochanter','Малый вертел'],['adjacent_bone','Кость у вертела']]){
+        geo.hip.lesser_trochanter_traces[key].forEach((stroke,i)=>items.push([`${label} · штрих ${i+1}`,()=>geo.hip.lesser_trochanter_traces[key].splice(i,1)]));
+      }
+      if(geo.hip.roi_box)items.push(['ROI',()=>geo.hip.roi_box=null]);
+    }
+    $('items').replaceChildren();
+    items.forEach(([label,fn])=>{
+      const chip=document.createElement('span');chip.className='item';chip.textContent=label+' ';
+      const del=document.createElement('button');del.textContent='×';del.title='Удалить '+label;
+      del.onclick=()=>{push();fn();commit()};chip.append(del);$('items').append(chip);
+    });
+    // Высота строки неизменна, в том числе когда нет ни одной метки.
+    resizeFrame();
+  }
+  function render(args){if(!args)return;const nextKey=String(args.source_key||''),nextRegion=String(args.region||'UNKNOWN');const nextW=Number(args.native_width),nextH=Number(args.native_height);if(!nextW||!nextH)return;const changed=nextKey!==sourceKey;
+    nativeW=nextW;nativeH=nextH;
+    editRevision=Math.max(editRevision,Number(args.last_client_revision)||0);
+    if(changed){sourceKey=nextKey;previewW=Number(args.preview_width);previewH=Number(args.preview_height);geo=normalizeClientGeometry(args.geometry);undo=[];redo=[];pending=null;activeStrokePointerId=null;thresholdPrevious=null;zoom=1;$('zoom').value='1';
+      sourceGray=null;thresholdCache=null;thresholdCacheValue=null;syncViewControls();
+      image=new Image();image.onload=()=>{canvas.width=previewW;canvas.height=previewH;prepareSourceGray();layout();draw();populate();resizeFrame()};image.onerror=()=>err('Не удалось загрузить изображение PNG');image.src='data:image/png;base64,'+args.image_png_base64;
+    }
+    // Deliberately do NOT reassign geo from args.geometry when sourceKey is
+    // unchanged: echoes can arrive out of order and resurrect deleted objects.
+    if(nextRegion!==region||changed){region=nextRegion;setupTools();draw();populate()}
+    resizeFrame();}
+  canvas.addEventListener('pointerdown',onDown);canvas.addEventListener('pointermove',onMove);
+  canvas.addEventListener('pointerup',finishStroke);canvas.addEventListener('pointercancel',finishStroke);
+  $('cancelPending').onclick=()=>{pending=null;activeStrokePointerId=null;err('');draw();populate()};
+  $('undo').onclick=()=>{if(!undo.length)return;thresholdPrevious=null;redo.push(clone(geo));geo=undo.pop();commit()};
+  $('redo').onclick=()=>{if(!redo.length)return;thresholdPrevious=null;undo.push(clone(geo));geo=redo.pop();commit()};
+  $('clear').onclick=clearLayer;
+  $('viewMode').onchange=()=>{
+    if(!geo)return;const value=$('viewMode').value;
+    if(geo.image_view.mode===value)return;
+    push();geo.image_view.mode=value;commit();
+  };
+  $('threshold').oninput=()=>{
+    if(!geo)return;
+    if(!thresholdPrevious)thresholdPrevious=clone(geo);
+    geo.image_view.threshold_8bit=Number($('threshold').value);
+    geo.image_view.mode='threshold';
+    syncViewControls();draw();
+  };
+  $('threshold').onchange=()=>{
+    if(!geo)return;
+    if(!thresholdPrevious)thresholdPrevious=clone(geo);
+    geo.image_view.threshold_8bit=Number($('threshold').value);
+    geo.image_view.mode='threshold';
+    const changed=JSON.stringify(thresholdPrevious.image_view)!==JSON.stringify(geo.image_view);
+    if(changed){pushSaved(thresholdPrevious);thresholdPrevious=null;commit();}
+    else thresholdPrevious=null;
+  };
+  $('zoom').onchange=()=>{zoom=Number($('zoom').value);layout();draw()};
+  window.addEventListener('message',ev=>{if(ev.source!==window.parent)return;if(ev.data&&ev.data.type==='streamlit:render')try{render(ev.data.args)}catch(ex){err(String(ex.stack||ex))}});
+  window.addEventListener('resize',()=>{layout();resizeFrame()});new ResizeObserver(()=>layout()).observe($('viewport'));
+  window.addEventListener('keydown',e=>{if(e.key==='Escape'){pending=null;activeStrokePointerId=null;draw()}else if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'){$('undo').click();e.preventDefault()}});
+  send('streamlit:componentReady',{apiVersion:1});resizeFrame();ready=true;
+})();
+</script>
+</body>
+</html>
