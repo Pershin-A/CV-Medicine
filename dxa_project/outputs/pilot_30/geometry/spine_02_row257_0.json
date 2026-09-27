@@ -1,0 +1,131 @@
+{
+  "schema_version": 1,
+  "coordinate_system": "original_dicom_pixels_top_left",
+  "image_width": 300,
+  "image_height": 315,
+  "spine": {
+    "disc_lines": [
+      {
+        "id": "amuiwj4la29wxq",
+        "points": [
+          [
+            0.0,
+            29.87
+          ],
+          [
+            299.0,
+            27.09
+          ]
+        ]
+      },
+      {
+        "id": "amuiwj5txccepj",
+        "points": [
+          [
+            0.0,
+            84.49
+          ],
+          [
+            299.0,
+            73.86
+          ]
+        ]
+      },
+      {
+        "id": "amuiwj72rv6zsx",
+        "points": [
+          [
+            0.0,
+            133.74
+          ],
+          [
+            299.0,
+            116.84
+          ]
+        ]
+      },
+      {
+        "id": "amuiwj88lrn7jn",
+        "points": [
+          [
+            0.0,
+            197.0
+          ],
+          [
+            299.0,
+            161.89
+          ]
+        ]
+      },
+      {
+        "id": "amuiwj9h5w17la",
+        "points": [
+          [
+            0.0,
+            242.76
+          ],
+          [
+            299.0,
+            227.42
+          ]
+        ]
+      },
+      {
+        "id": "amuiwjbbhq1rgz",
+        "points": [
+          [
+            0.0,
+            296.23
+          ],
+          [
+            299.0,
+            286.01
+          ]
+        ]
+      }
+    ],
+    "iliac_crests": {
+      "image_left": [
+        18.29,
+        277.31
+      ],
+      "image_right": [
+        260.31,
+        273.81
+      ]
+    },
+    "foreign_objects": [
+      {
+        "id": "amujh7gjaia423",
+        "kind": "other",
+        "bbox": [
+          13.71,
+          33.32,
+          69.78,
+          84.45
+        ]
+      }
+    ]
+  },
+  "hip": {
+    "landmarks": {
+      "greater_trochanter": null,
+      "femoral_neck": null,
+      "ischial_bone": null
+    },
+    "lesser_trochanter": null,
+    "lesser_trochanter_traces": {
+      "trochanter": [],
+      "adjacent_bone": []
+    },
+    "roi_box": null
+  },
+  "image_view": {
+    "mode": "threshold",
+    "threshold_8bit": 19
+  },
+  "complete": {
+    "spine": true,
+    "hip": false
+  }
+}

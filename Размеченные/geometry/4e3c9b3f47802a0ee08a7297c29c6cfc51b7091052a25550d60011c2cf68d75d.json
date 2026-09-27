@@ -776,6 +776,6 @@
   },
   "complete": {
     "spine": false,
-    "hip": false
+    "hip": true
   }
 }

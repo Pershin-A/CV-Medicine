@@ -1,7 +1,7 @@
-"""Generate geometry-aware DXA DICOM augmentations after annotation is complete.
+"""Generate geometry-aware DXA DICOM augmentations from completed annotations.
 
-This module has no import-time side effects. Run `python -m augmentation.generate --help`
-from dxa_project/ to inspect options; do not run against the dataset prematurely.
+Run ``python -m dxa_project.augmentation.generate --help`` from the
+workspace root to inspect options.
 """
 from __future__ import annotations
 
@@ -16,9 +16,10 @@ from collections import Counter, defaultdict
 
 import numpy as np
 
-from .core import (Transform, hip_position_ok, hip_roi_ok, spine_axis_angle,
-                   spine_position_ok, transform_geometry, transformed_spacing,
-                   warp_image)
+from .core import (Transform, hip_position_ok, hip_roi_ok,
+                   lesser_trochanter_between_area, prepare_geometry,
+                   spine_axis_angle, spine_position_ok, transform_geometry,
+                   transformed_spacing, warp_image)
 
 
 REGIONS = ("SPINE", "LEG_LEFT", "LEG_RIGHT")
@@ -40,13 +41,16 @@ def _read_rows(path: Path):
         return list(csv.DictReader(stream))
 
 
-def _read_sources(workspace: Path, manifest_path: Path):
+def _read_sources(workspace: Path, manifest_path: Path,
+                  annotations_root: Path | None = None):
     manifest = {row["relative_path"].replace("\\", "/"): row
                 for row in _read_rows(manifest_path)}
     entries = {}
     quarantined = set()
     problems = Counter()
-    for root in sorted(workspace.glob("Размеченные*")):
+    # Other Размеченные* folders are old copies and must never silently
+    # override or conflict with the authoritative finished annotation folder.
+    for root in [annotations_root or workspace / "Размеченные"]:
         registry = root / "labels.csv"
         if not registry.is_file():
             continue
@@ -71,6 +75,7 @@ def _read_sources(workspace: Path, manifest_path: Path):
             from .core import validate_geometry
             try:
                 geometry = validate_geometry(geometry, int(item["columns"]), int(item["rows"]))
+                geometry = prepare_geometry(geometry, region)
             except (ValueError, KeyError, TypeError):
                 problems["invalid_geometry"] += 1
                 continue
@@ -217,8 +222,14 @@ def _labels(region, geometry, info, image, spacing, source_row):
                 "spine_axis_angle_deg": angle, "spine_artifact": artifact}
     side = region.removeprefix("LEG_")
     roi = hip_roi_ok(geometry, info["roi_fully_visible"], side, spacing)
+    area, crossings = lesser_trochanter_between_area(geometry)
+    box = geometry["hip"]["roi_box"]
+    roi_area = (box[2] - box[0]) * (box[3] - box[1]) if box else 0
     return {"hip_position": int(not hip_position_ok(geometry)),
             "hip_roi": None if roi is None else int(not roi),
+            "trochanter_between_area_px2": area,
+            "trochanter_curve_crossings": crossings,
+            "trochanter_area_fraction_roi": area / roi_area if roi_area > 0 else None,
             "hip_rotation": None}  # Rotation needs manual re-review if the tubercle was cropped.
 
 
@@ -253,12 +264,12 @@ def _write_dicom(ds, image, transform, destination: Path, uid_seed: str):
 
 def generate(workspace: Path, manifest_path: Path, output: Path,
              seed: int = 20260926, target_per_group=None, max_attempts_per_image=300,
-             proxy_spacing=True):
+             proxy_spacing=True, annotations_root: Path | None = None):
     """Generate only from completed geometry; report every unmet quota."""
     if output.exists() and any(output.iterdir()):
         raise FileExistsError(f"Output directory is not empty: {output}")
     rng = random.Random(seed)
-    sources, problems = _read_sources(workspace, manifest_path)
+    sources, problems = _read_sources(workspace, manifest_path, annotations_root)
     by_region = defaultdict(list)
     for item in sources:
         by_region[item["region"]].append(item)
@@ -320,7 +331,7 @@ def generate(workspace: Path, manifest_path: Path, output: Path,
                     problems["transform_exceeds_source"] += 1
                     continue
                 try:
-                    moved_geometry, info = transform_geometry(geometry, transform)
+                    moved_geometry, info = transform_geometry(geometry, transform, region=region)
                     moved_image = warp_image(image, transform)
                 except (ValueError, IndexError):
                     problems["invalid_transform_or_geometry"] += 1
@@ -370,7 +381,8 @@ def generate(workspace: Path, manifest_path: Path, output: Path,
               "region", "generation_group", "variant", "scale", "rotation_deg",
               "source_center_x", "source_center_y", "spacing_basis", "dropped_annotations",
               "spine_position", "spine_axis", "spine_axis_angle_deg", "spine_artifact",
-              "hip_position", "hip_roi", "hip_rotation"]
+              "hip_position", "hip_roi", "hip_rotation", "trochanter_between_area_px2",
+              "trochanter_curve_crossings", "trochanter_area_fraction_roi"]
     with (output / "manifest.csv").open("w", encoding="utf-8-sig", newline="") as stream:
         writer = csv.DictWriter(stream, fieldnames=fields)
         writer.writeheader()
@@ -385,12 +397,15 @@ def main():
     project = Path(__file__).resolve().parents[1]
     parser.add_argument("--workspace", type=Path, default=project.parent)
     parser.add_argument("--manifest", type=Path, default=project / "outputs" / "manifest.csv")
+    parser.add_argument("--annotations-root", type=Path,
+                        default=project.parent / "Размеченные")
     parser.add_argument("--output", type=Path, default=project / "outputs" / "augmented_dataset")
     parser.add_argument("--seed", type=int, default=20260926)
     parser.add_argument("--no-roi-proxy", action="store_true")
     args = parser.parse_args()
     report = generate(args.workspace, args.manifest, args.output, args.seed,
-                      proxy_spacing=not args.no_roi_proxy)
+                      proxy_spacing=not args.no_roi_proxy,
+                      annotations_root=args.annotations_root)
     print(json.dumps(report, ensure_ascii=False, indent=2))
 
 

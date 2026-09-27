@@ -8,7 +8,7 @@ from pathlib import Path
 import sys
 
 import numpy as np
-from scipy.ndimage import affine_transform
+from scipy.ndimage import affine_transform, label
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from labeler.geometry import validate_geometry  # noqa: E402
@@ -123,8 +123,111 @@ def _area(points):
                    for a, b in zip(points, points[1:] + points[:1]))) / 2
 
 
+def prepare_geometry(geometry: dict, region: str) -> dict:
+    """Normalize annotation conventions without changing the saved source JSON.
+
+    Spine line endpoints encode orientation, not length. For hips the
+    image-left edge is arbitrary on the left leg, image-right on the right.
+    """
+    out = deepcopy(geometry)
+    w, h = out["image_width"], out["image_height"]
+    if region == "SPINE":
+        for line in out["spine"]["disc_lines"]:
+            a, b = [np.asarray(p, dtype=float) for p in line["points"]]
+            dx = b[0] - a[0]
+            if abs(dx) < 1e-9:
+                # A vertical segment cannot encode a left/right disc boundary.
+                raise ValueError("Vertical spine separation line cannot be extended horizontally")
+            slope = (b[1] - a[1]) / dx
+            left = [0.0, float(a[1] - slope * a[0])]
+            right = [float(w - 1), float(a[1] + slope * (w - 1 - a[0]))]
+            clipped, _ = _clip_segment(left, right, w, h)
+            if clipped is None or math.dist(*clipped) < 1:
+                raise ValueError("Extended spine line misses the image")
+            line["points"] = clipped
+    elif region in ("LEG_LEFT", "LEG_RIGHT"):
+        box = out["hip"]["roi_box"]
+        if box is not None:
+            if region == "LEG_LEFT":
+                box[0] = 0.0
+            else:
+                box[2] = float(w - 1)
+    else:
+        raise ValueError(f"Unknown region: {region}")
+    return validate_geometry(out, w, h)
+
+
+def _cross2(a, b):
+    return a[..., 0] * b[..., 1] - a[..., 1] * b[..., 0]
+
+
+def _curve_intersections(first, second) -> list[list[float]]:
+    """Distinct intersections of two freehand polylines in pixel coordinates."""
+    a = np.asarray(first, dtype=float)
+    b = np.asarray(second, dtype=float)
+    b0, bd = b[:-1], np.diff(b, axis=0)
+    found = []
+    for p, d in zip(a[:-1], np.diff(a, axis=0)):
+        denominator = _cross2(d, bd)
+        difference = b0 - p
+        valid = np.abs(denominator) > 1e-9
+        t = np.divide(_cross2(difference, bd), denominator,
+                      out=np.zeros_like(denominator), where=valid)
+        u = np.divide(_cross2(difference, d), denominator,
+                      out=np.zeros_like(denominator), where=valid)
+        for point in (p + t[j] * d for j in np.flatnonzero(
+                valid & (t >= -1e-6) & (t <= 1 + 1e-6) &
+                (u >= -1e-6) & (u <= 1 + 1e-6))):
+            if not any(np.linalg.norm(point - old) < 0.75 for old in found):
+                found.append(point)
+    return [p.tolist() for p in found]
+
+
+def lesser_trochanter_between_area(geometry: dict) -> tuple[int, int]:
+    """Raster area enclosed by both freehand contour layers.
+
+    At least two distinct crossings are required for a closed lens. An
+    isolated or non-intersecting pair of open curves has zero enclosed area.
+    """
+    layers = geometry["hip"]["lesser_trochanter_traces"]
+    first = [stroke["points"] for stroke in layers["trochanter"]]
+    second = [stroke["points"] for stroke in layers["adjacent_bone"]]
+    intersections = []
+    for a in first:
+        for b in second:
+            for point in _curve_intersections(a, b):
+                if not any(math.dist(point, old) < 0.75 for old in intersections):
+                    intersections.append(point)
+    if len(intersections) < 2:
+        return 0, len(intersections)
+    h, w = geometry["image_height"], geometry["image_width"]
+    masks = [np.zeros((h, w), dtype=bool) for _ in range(2)]
+    for mask, strokes in zip(masks, (first, second)):
+        for stroke in strokes:
+            for start, end in zip(stroke, stroke[1:]):
+                n = max(2, int(math.ceil(4 * max(abs(end[0] - start[0]),
+                                                  abs(end[1] - start[1])))))
+                x = np.clip(np.rint(np.linspace(start[0], end[0], n)).astype(int), 0, w - 1)
+                y = np.clip(np.rint(np.linspace(start[1], end[1], n)).astype(int), 0, h - 1)
+                mask[y, x] = True
+    components, count = label(~(masks[0] | masks[1]))  # 4-connected background
+    exterior = set(np.unique(np.concatenate((components[0], components[-1],
+                                             components[:, 0], components[:, -1]))))
+    area = 0
+    for component in range(1, count + 1):
+        if component not in exterior:
+            region = components == component
+            # The boundary must contain pixels from both annotated curves.
+            from scipy.ndimage import binary_dilation
+            boundary = binary_dilation(region) & ~region
+            if np.any(boundary & masks[0]) and np.any(boundary & masks[1]):
+                area += int(region.sum())
+    return area, len(intersections)
+
+
 def transform_geometry(geometry: dict, transform: Transform,
-                       min_visible: float = 0.5) -> tuple[dict, dict]:
+                       min_visible: float = 0.5,
+                       region: str | None = None) -> tuple[dict, dict]:
     """Transform annotations, removing mostly invisible objects, then validate."""
     w, h = transform.width, transform.height
     out = deepcopy(geometry)
@@ -163,11 +266,22 @@ def transform_geometry(geometry: dict, transform: Transform,
     if box is not None:
         x1, y1, x2, y2 = box
         poly = [transform.point(p) for p in ((x1, y1), (x2, y1), (x2, y2), (x1, y2))]
-        roi_fully_visible = all(_inside(p, w, h) for p in poly)
+        if region == "LEG_LEFT":
+            roi_fully_visible = all(_inside(p, w, h) for p in (poly[1], poly[2]))
+        elif region == "LEG_RIGHT":
+            roi_fully_visible = all(_inside(p, w, h) for p in (poly[0], poly[3]))
+        else:
+            roi_fully_visible = all(_inside(p, w, h) for p in poly)
         clipped = _clip_polygon(poly, w, h)
-        if clipped and _area(clipped) / max(_area(poly), 1e-9) >= min_visible:
+        if clipped and _area(clipped) >= 1 and (
+                region in ("LEG_LEFT", "LEG_RIGHT") or
+                _area(clipped) / max(_area(poly), 1e-9) >= min_visible):
             xs, ys = [p[0] for p in clipped], [p[1] for p in clipped]
             out["hip"]["roi_box"] = [min(xs), min(ys), max(xs), max(ys)]
+            if region == "LEG_LEFT":
+                out["hip"]["roi_box"][0] = 0.0
+            elif region == "LEG_RIGHT":
+                out["hip"]["roi_box"][2] = float(w - 1)
         else:
             out["hip"]["roi_box"] = None
             dropped["roi_box"] += 1
@@ -260,7 +374,7 @@ def spine_position_ok(geometry: dict, top_ratio_range=(0.25, 0.75),
                       crest_margin_fraction=0.025) -> bool:
     lines = sorted(geometry["spine"]["disc_lines"],
                    key=lambda l: sum(p[1] for p in l["points"]) / 2)
-    if len(lines) not in (5, 6):
+    if len(lines) not in (4, 5, 6, 7):
         return False
     mids = [np.mean(line["points"], axis=0) for line in lines]
     gaps = np.diff([m[1] for m in mids])

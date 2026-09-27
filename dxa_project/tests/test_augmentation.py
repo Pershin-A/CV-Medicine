@@ -7,6 +7,7 @@ import numpy as np
 import pytest
 
 from dxa_project.augmentation.core import (Transform, hip_position_ok, hip_roi_ok,
+                               lesser_trochanter_between_area, prepare_geometry,
                                spine_axis_angle, spine_position_ok,
                                transform_geometry, transformed_spacing, warp_image)
 from dxa_project.augmentation.generate import (_check_group, _hip_variant,
@@ -106,6 +107,43 @@ def test_no_extrapolation_for_rotation():
         warp_image(np.zeros((300, 300), dtype=np.uint16), t)
 
 
+def test_spine_lines_extend_to_frame_and_seven_lines_are_allowed():
+    g = spine_fixture()
+    g["spine"]["disc_lines"].append({"id": "d6", "points": [[90, 292], [210, 292]]})
+    prepared = prepare_geometry(g, "SPINE")
+    assert spine_position_ok(prepared)
+    assert g["spine"]["disc_lines"][0]["points"] == [[90, 22], [210, 22]]
+    assert all(line["points"][0][0] == 0 and line["points"][1][0] == 299
+               for line in prepared["spine"]["disc_lines"])
+
+
+def test_roi_arbitrary_edge_is_extended_and_can_be_clipped():
+    for region, side, arbitrary_index in (("LEG_LEFT", "LEFT", 0),
+                                          ("LEG_RIGHT", "RIGHT", 2)):
+        g = hip_fixture()
+        prepared = prepare_geometry(g, region)
+        assert prepared["hip"]["roi_box"][arbitrary_index] == (0 if side == "LEFT" else 299)
+        assert g["hip"]["roi_box"] == [40, 45, 235, 255]
+        spacing = _roi_proxy_spacing(prepared, side)
+        assert hip_roi_ok(prepared, True, side, spacing)
+        t = Transform(300, 300, 1.12)
+        moved, info = transform_geometry(prepared, t, region=region)
+        assert info["roi_fully_visible"]
+        assert moved["hip"]["roi_box"][arbitrary_index] == (0 if side == "LEFT" else 299)
+
+
+def test_trochanter_area_requires_two_crossings():
+    g = hip_fixture()
+    g["hip"]["lesser_trochanter_traces"] = {
+        "trochanter": [{"id": "t", "points": [[10, 20], [70, 20]]}],
+        "adjacent_bone": [{"id": "b", "points": [[10, 30], [30, 10], [50, 10], [70, 30]]}],
+    }
+    area, crossings = lesser_trochanter_between_area(g)
+    assert crossings == 2 and area > 0
+    g["hip"]["lesser_trochanter_traces"]["adjacent_bone"][0]["points"] = [[10, 35], [70, 35]]
+    assert lesser_trochanter_between_area(g) == (0, 0)
+
+
 def test_candidate_sampler_reaches_each_requested_group():
     rng = random.Random(17)
     spine = spine_fixture()
@@ -126,7 +164,7 @@ def test_candidate_sampler_reaches_each_requested_group():
                     t, _ = _hip_variant(geometry, group, rng, "LEFT")
                 if not t.covers_output():
                     continue
-                moved, info = transform_geometry(geometry, t)
+                moved, info = transform_geometry(geometry, t, region=region)
                 labels = _labels(region, moved, info, warp_image(pixels, t),
                                  transformed_spacing(spacing, t), {"spine_artifact": "0"})
                 successes += _check_group(region, group, labels)

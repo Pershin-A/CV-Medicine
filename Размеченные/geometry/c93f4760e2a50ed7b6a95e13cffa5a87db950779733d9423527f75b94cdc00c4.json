@@ -114,7 +114,7 @@
     "threshold_8bit": 54
   },
   "complete": {
-    "spine": false,
+    "spine": true,
     "hip": false
   }
 }
