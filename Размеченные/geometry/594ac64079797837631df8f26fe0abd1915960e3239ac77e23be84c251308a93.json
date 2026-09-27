@@ -94,7 +94,18 @@
         273.81
       ]
     },
-    "foreign_objects": []
+    "foreign_objects": [
+      {
+        "id": "amujh7gjaia423",
+        "kind": "other",
+        "bbox": [
+          13.71,
+          33.32,
+          69.78,
+          84.45
+        ]
+      }
+    ]
   },
   "hip": {
     "landmarks": {
@@ -110,8 +121,8 @@
     "roi_box": null
   },
   "image_view": {
-    "mode": "original",
-    "threshold_8bit": 128
+    "mode": "threshold",
+    "threshold_8bit": 19
   },
   "complete": {
     "spine": false,

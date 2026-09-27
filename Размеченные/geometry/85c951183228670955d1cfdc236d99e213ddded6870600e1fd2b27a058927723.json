@@ -94,7 +94,38 @@
         267.28
       ]
     },
-    "foreign_objects": []
+    "foreign_objects": [
+      {
+        "id": "amujg7kpun0b3w",
+        "kind": "clothing",
+        "bbox": [
+          8.8,
+          0.18,
+          53.41,
+          12.86
+        ]
+      },
+      {
+        "id": "amujg7my3t5wag",
+        "kind": "clothing",
+        "bbox": [
+          120.53,
+          0.18,
+          147.54,
+          34.54
+        ]
+      },
+      {
+        "id": "amujg97ut1dahn",
+        "kind": "clothing",
+        "bbox": [
+          154.91,
+          1.41,
+          203.21,
+          22.27
+        ]
+      }
+    ]
   },
   "hip": {
     "landmarks": {

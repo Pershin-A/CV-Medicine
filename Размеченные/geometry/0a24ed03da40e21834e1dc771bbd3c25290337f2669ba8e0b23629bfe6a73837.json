@@ -1,0 +1,138 @@
+{
+  "schema_version": 1,
+  "coordinate_system": "original_dicom_pixels_top_left",
+  "image_width": 300,
+  "image_height": 285,
+  "spine": {
+    "disc_lines": [
+      {
+        "id": "amujkxv8rwjs00",
+        "points": [
+          [
+            83.7,
+            31.3
+          ],
+          [
+            199.93,
+            29.25
+          ]
+        ]
+      },
+      {
+        "id": "amujkxwl2uvree",
+        "points": [
+          [
+            90.25,
+            86.58
+          ],
+          [
+            201.98,
+            82.08
+          ]
+        ]
+      },
+      {
+        "id": "amujkxyb165x2e",
+        "points": [
+          [
+            91.47,
+            141.45
+          ],
+          [
+            204.84,
+            136.13
+          ]
+        ]
+      },
+      {
+        "id": "amujky3nrz1t4s",
+        "points": [
+          [
+            92.29,
+            190.59
+          ],
+          [
+            209.35,
+            187.72
+          ]
+        ]
+      },
+      {
+        "id": "amujky6bms1yht",
+        "points": [
+          [
+            81.24,
+            254.06
+          ],
+          [
+            211.8,
+            257.33
+          ]
+        ]
+      }
+    ],
+    "iliac_crests": {
+      "image_left": [
+        41.95,
+        268.39
+      ],
+      "image_right": [
+        258.87,
+        233.99
+      ]
+    },
+    "foreign_objects": [
+      {
+        "id": "amujkymaqypenz",
+        "kind": "clothing",
+        "bbox": [
+          9.62,
+          1.41,
+          82.88,
+          49.32
+        ]
+      },
+      {
+        "id": "amujkyo36odppw",
+        "kind": "clothing",
+        "bbox": [
+          162.28,
+          3.05,
+          271.15,
+          34.17
+        ]
+      },
+      {
+        "id": "amujkyq9n0kfar",
+        "kind": "clothing",
+        "bbox": [
+          91.06,
+          0.0,
+          134.45,
+          16.56
+        ]
+      }
+    ]
+  },
+  "hip": {
+    "landmarks": {
+      "greater_trochanter": null,
+      "femoral_neck": null,
+      "ischial_bone": null
+    },
+    "lesser_trochanter": null,
+    "lesser_trochanter_traces": {
+      "trochanter": [],
+      "adjacent_bone": []
+    },
+    "roi_box": null
+  },
+  "image_view": {
+    "mode": "threshold",
+    "threshold_8bit": 33
+  },
+  "complete": {
+    "spine": false,
+    "hip": false
+  }
+}

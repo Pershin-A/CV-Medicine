@@ -81,7 +81,58 @@
         238.8
       ]
     },
-    "foreign_objects": []
+    "foreign_objects": [
+      {
+        "id": "amujgj1gbzekrf",
+        "kind": "clothing",
+        "bbox": [
+          10.85,
+          2.64,
+          112.35,
+          24.33
+        ]
+      },
+      {
+        "id": "amujgj40e9llf3",
+        "kind": "clothing",
+        "bbox": [
+          179.47,
+          0.0,
+          201.98,
+          48.08
+        ]
+      },
+      {
+        "id": "amujgj7kl27qek",
+        "kind": "clothing",
+        "bbox": [
+          112.35,
+          71.01,
+          138.13,
+          101.71
+        ]
+      },
+      {
+        "id": "amujgjaauy0qpv",
+        "kind": "clothing",
+        "bbox": [
+          147.95,
+          56.68,
+          173.74,
+          93.53
+        ]
+      },
+      {
+        "id": "amujgjdcxs5oox",
+        "kind": "clothing",
+        "bbox": [
+          232.26,
+          1.82,
+          278.92,
+          22.7
+        ]
+      }
+    ]
   },
   "hip": {
     "landmarks": {
@@ -97,8 +148,8 @@
     "roi_box": null
   },
   "image_view": {
-    "mode": "original",
-    "threshold_8bit": 128
+    "mode": "threshold",
+    "threshold_8bit": 41
   },
   "complete": {
     "spine": false,

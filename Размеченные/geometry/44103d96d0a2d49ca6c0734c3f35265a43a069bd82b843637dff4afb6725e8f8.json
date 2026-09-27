@@ -1,0 +1,107 @@
+{
+  "schema_version": 1,
+  "coordinate_system": "original_dicom_pixels_top_left",
+  "image_width": 300,
+  "image_height": 317,
+  "spine": {
+    "disc_lines": [
+      {
+        "id": "amujjujhyeleg1",
+        "points": [
+          [
+            21.9,
+            63.99
+          ],
+          [
+            163.1,
+            45.58
+          ]
+        ]
+      },
+      {
+        "id": "amujjul0oq1rf8",
+        "points": [
+          [
+            41.95,
+            121.66
+          ],
+          [
+            180.29,
+            94.26
+          ]
+        ]
+      },
+      {
+        "id": "amujjumopk0um6",
+        "points": [
+          [
+            39.09,
+            182.2
+          ],
+          [
+            190.52,
+            150.7
+          ]
+        ]
+      },
+      {
+        "id": "amujjuozl7paw1",
+        "points": [
+          [
+            48.09,
+            238.64
+          ],
+          [
+            201.57,
+            213.28
+          ]
+        ]
+      },
+      {
+        "id": "amujjurqa9vh5q",
+        "points": [
+          [
+            46.86,
+            296.32
+          ],
+          [
+            222.85,
+            286.5
+          ]
+        ]
+      }
+    ],
+    "iliac_crests": {
+      "image_left": [
+        5.12,
+        306.54
+      ],
+      "image_right": [
+        270.74,
+        287.73
+      ]
+    },
+    "foreign_objects": []
+  },
+  "hip": {
+    "landmarks": {
+      "greater_trochanter": null,
+      "femoral_neck": null,
+      "ischial_bone": null
+    },
+    "lesser_trochanter": null,
+    "lesser_trochanter_traces": {
+      "trochanter": [],
+      "adjacent_bone": []
+    },
+    "roi_box": null
+  },
+  "image_view": {
+    "mode": "threshold",
+    "threshold_8bit": 38
+  },
+  "complete": {
+    "spine": false,
+    "hip": false
+  }
+}

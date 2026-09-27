@@ -97,8 +97,8 @@
     "roi_box": null
   },
   "image_view": {
-    "mode": "original",
-    "threshold_8bit": 128
+    "mode": "threshold",
+    "threshold_8bit": 53
   },
   "complete": {
     "spine": false,

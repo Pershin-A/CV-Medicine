@@ -113,16 +113,6 @@
         ]
       },
       {
-        "id": "amuidsq0h6rhsh",
-        "kind": "clothing",
-        "bbox": [
-          140.59,
-          57.91,
-          169.24,
-          122.18
-        ]
-      },
-      {
         "id": "amuidsrd5eq59w",
         "kind": "clothing",
         "bbox": [
@@ -130,6 +120,16 @@
           64.46,
           138.95,
           102.12
+        ]
+      },
+      {
+        "id": "amujgbvg5tivul",
+        "kind": "clothing",
+        "bbox": [
+          142.22,
+          52.58,
+          172.51,
+          101.3
         ]
       }
     ]

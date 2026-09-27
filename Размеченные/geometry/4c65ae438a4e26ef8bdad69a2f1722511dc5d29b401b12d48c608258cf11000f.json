@@ -1,0 +1,118 @@
+{
+  "schema_version": 1,
+  "coordinate_system": "original_dicom_pixels_top_left",
+  "image_width": 300,
+  "image_height": 317,
+  "spine": {
+    "disc_lines": [
+      {
+        "id": "amujkbkqqf1tyj",
+        "points": [
+          [
+            69.78,
+            34.13
+          ],
+          [
+            197.89,
+            25.13
+          ]
+        ]
+      },
+      {
+        "id": "amujkbmoihmkom",
+        "points": [
+          [
+            83.29,
+            81.58
+          ],
+          [
+            202.8,
+            74.21
+          ]
+        ]
+      },
+      {
+        "id": "amujkborbim3rf",
+        "points": [
+          [
+            81.24,
+            136.8
+          ],
+          [
+            201.57,
+            128.21
+          ]
+        ]
+      },
+      {
+        "id": "amujkbr79rls5a",
+        "points": [
+          [
+            78.79,
+            191.2
+          ],
+          [
+            206.07,
+            183.02
+          ]
+        ]
+      },
+      {
+        "id": "amujkbtc3qwgo9",
+        "points": [
+          [
+            82.47,
+            247.23
+          ],
+          [
+            210.16,
+            239.87
+          ]
+        ]
+      }
+    ],
+    "iliac_crests": {
+      "image_left": [
+        53.0,
+        279.55
+      ],
+      "image_right": [
+        251.5,
+        270.14
+      ]
+    },
+    "foreign_objects": [
+      {
+        "id": "amujkc8z84s689",
+        "kind": "clothing",
+        "bbox": [
+          1.84,
+          0.59,
+          96.38,
+          25.54
+        ]
+      }
+    ]
+  },
+  "hip": {
+    "landmarks": {
+      "greater_trochanter": null,
+      "femoral_neck": null,
+      "ischial_bone": null
+    },
+    "lesser_trochanter": null,
+    "lesser_trochanter_traces": {
+      "trochanter": [],
+      "adjacent_bone": []
+    },
+    "roi_box": null
+  },
+  "image_view": {
+    "mode": "threshold",
+    "threshold_8bit": 42
+  },
+  "complete": {
+    "spine": false,
+    "hip": false
+  }
+}

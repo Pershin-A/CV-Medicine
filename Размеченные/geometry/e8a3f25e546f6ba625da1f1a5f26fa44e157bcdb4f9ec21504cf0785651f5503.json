@@ -107,7 +107,18 @@
         272.63
       ]
     },
-    "foreign_objects": []
+    "foreign_objects": [
+      {
+        "id": "amujfj6abautwp",
+        "kind": "clothing",
+        "bbox": [
+          167.6,
+          0.0,
+          241.27,
+          30.04
+        ]
+      }
+    ]
   },
   "hip": {
     "landmarks": {

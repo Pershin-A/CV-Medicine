@@ -596,15 +596,15 @@
       ]
     },
     "roi_box": [
-      51.38,
-      73.93,
-      237.79,
-      203.87
+      49.85,
+      73.55,
+      238.55,
+      177.12
     ]
   },
   "image_view": {
-    "mode": "original",
-    "threshold_8bit": 128
+    "mode": "threshold",
+    "threshold_8bit": 37
   },
   "complete": {
     "spine": false,

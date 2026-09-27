@@ -1,0 +1,164 @@
+{
+  "schema_version": 1,
+  "coordinate_system": "original_dicom_pixels_top_left",
+  "image_width": 300,
+  "image_height": 318,
+  "spine": {
+    "disc_lines": [
+      {
+        "id": "amujlo149wend7",
+        "points": [
+          [
+            101.3,
+            7.96
+          ],
+          [
+            206.48,
+            8.77
+          ]
+        ]
+      },
+      {
+        "id": "amujlo32os8g5h",
+        "points": [
+          [
+            99.66,
+            57.48
+          ],
+          [
+            207.3,
+            57.89
+          ]
+        ]
+      },
+      {
+        "id": "amujlo45kc05mx",
+        "points": [
+          [
+            100.07,
+            104.13
+          ],
+          [
+            204.43,
+            104.13
+          ]
+        ]
+      },
+      {
+        "id": "amujlo846efjp2",
+        "points": [
+          [
+            104.57,
+            154.47
+          ],
+          [
+            211.8,
+            154.06
+          ]
+        ]
+      },
+      {
+        "id": "amujlo9ce0eqjs",
+        "points": [
+          [
+            98.43,
+            212.18
+          ],
+          [
+            220.8,
+            212.59
+          ]
+        ]
+      },
+      {
+        "id": "amujlobpxg1me7",
+        "points": [
+          [
+            101.71,
+            250.24
+          ],
+          [
+            219.58,
+            252.7
+          ]
+        ]
+      },
+      {
+        "id": "amujloe396w9u3",
+        "points": [
+          [
+            91.47,
+            298.94
+          ],
+          [
+            214.67,
+            298.94
+          ]
+        ]
+      }
+    ],
+    "iliac_crests": {
+      "image_left": [
+        43.18,
+        281.75
+      ],
+      "image_right": [
+        262.55,
+        267.02
+      ]
+    },
+    "foreign_objects": [
+      {
+        "id": "amujlopdh32esj",
+        "kind": "other",
+        "bbox": [
+          67.74,
+          34.97,
+          93.11,
+          64.02
+        ]
+      },
+      {
+        "id": "amujlose0vqf0q",
+        "kind": "clothing",
+        "bbox": [
+          14.94,
+          2.23,
+          85.33,
+          30.87
+        ]
+      },
+      {
+        "id": "amujlou5s2kgld",
+        "kind": "clothing",
+        "bbox": [
+          246.18,
+          0.18,
+          285.88,
+          19.41
+        ]
+      }
+    ]
+  },
+  "hip": {
+    "landmarks": {
+      "greater_trochanter": null,
+      "femoral_neck": null,
+      "ischial_bone": null
+    },
+    "lesser_trochanter": null,
+    "lesser_trochanter_traces": {
+      "trochanter": [],
+      "adjacent_bone": []
+    },
+    "roi_box": null
+  },
+  "image_view": {
+    "mode": "threshold",
+    "threshold_8bit": 54
+  },
+  "complete": {
+    "spine": false,
+    "hip": false
+  }
+}

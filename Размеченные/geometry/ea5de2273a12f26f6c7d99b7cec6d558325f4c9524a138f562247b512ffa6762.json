@@ -1,0 +1,131 @@
+{
+  "schema_version": 1,
+  "coordinate_system": "original_dicom_pixels_top_left",
+  "image_width": 300,
+  "image_height": 317,
+  "spine": {
+    "disc_lines": [
+      {
+        "id": "amujlupjyc6ahy",
+        "points": [
+          [
+            91.47,
+            25.13
+          ],
+          [
+            186.43,
+            5.91
+          ]
+        ]
+      },
+      {
+        "id": "amujlurjbc2cah",
+        "points": [
+          [
+            100.89,
+            80.35
+          ],
+          [
+            210.57,
+            48.44
+          ]
+        ]
+      },
+      {
+        "id": "amujlutjekotfr",
+        "points": [
+          [
+            109.89,
+            120.84
+          ],
+          [
+            236.77,
+            97.53
+          ]
+        ]
+      },
+      {
+        "id": "amujluvhu4ghnm",
+        "points": [
+          [
+            113.57,
+            162.97
+          ],
+          [
+            237.18,
+            159.29
+          ]
+        ]
+      },
+      {
+        "id": "amujlux6xbw1wv",
+        "points": [
+          [
+            116.03,
+            207.15
+          ],
+          [
+            229.4,
+            218.19
+          ]
+        ]
+      },
+      {
+        "id": "amujlv0lhg4c4u",
+        "points": [
+          [
+            105.8,
+            252.55
+          ],
+          [
+            220.4,
+            280.37
+          ]
+        ]
+      }
+    ],
+    "iliac_crests": {
+      "image_left": [
+        19.85,
+        269.32
+      ],
+      "image_right": [
+        262.55,
+        255.42
+      ]
+    },
+    "foreign_objects": [
+      {
+        "id": "amujlvfd5y6cm9",
+        "kind": "clothing",
+        "bbox": [
+          15.35,
+          1.0,
+          87.38,
+          32.08
+        ]
+      }
+    ]
+  },
+  "hip": {
+    "landmarks": {
+      "greater_trochanter": null,
+      "femoral_neck": null,
+      "ischial_bone": null
+    },
+    "lesser_trochanter": null,
+    "lesser_trochanter_traces": {
+      "trochanter": [],
+      "adjacent_bone": []
+    },
+    "roi_box": null
+  },
+  "image_view": {
+    "mode": "threshold",
+    "threshold_8bit": 24
+  },
+  "complete": {
+    "spine": false,
+    "hip": false
+  }
+}
