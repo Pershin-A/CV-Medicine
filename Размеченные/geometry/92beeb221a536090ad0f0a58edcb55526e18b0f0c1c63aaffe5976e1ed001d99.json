@@ -1,0 +1,120 @@
+{
+  "schema_version": 1,
+  "coordinate_system": "original_dicom_pixels_top_left",
+  "image_width": 300,
+  "image_height": 287,
+  "spine": {
+    "disc_lines": [
+      {
+        "id": "amuiw5bxecbifu",
+        "points": [
+          [
+            100.94,
+            31.56
+          ],
+          [
+            194.81,
+            36.17
+          ]
+        ]
+      },
+      {
+        "id": "amuiw5d9qeswb5",
+        "points": [
+          [
+            99.88,
+            81.52
+          ],
+          [
+            193.39,
+            86.48
+          ]
+        ]
+      },
+      {
+        "id": "amuiw5erus7ud4",
+        "points": [
+          [
+            88.19,
+            130.06
+          ],
+          [
+            201.18,
+            138.57
+          ]
+        ]
+      },
+      {
+        "id": "amuiw5jk6cc1ew",
+        "points": [
+          [
+            87.84,
+            173.29
+          ],
+          [
+            196.22,
+            189.24
+          ]
+        ]
+      },
+      {
+        "id": "amuiw5krb0mh0y",
+        "points": [
+          [
+            80.05,
+            210.49
+          ],
+          [
+            191.97,
+            229.98
+          ]
+        ]
+      },
+      {
+        "id": "amuiw5lrxiuuqb",
+        "points": [
+          [
+            58.44,
+            254.08
+          ],
+          [
+            190.2,
+            265.41
+          ]
+        ]
+      }
+    ],
+    "iliac_crests": {
+      "image_left": [
+        4.96,
+        261.52
+      ],
+      "image_right": [
+        274.85,
+        248.41
+      ]
+    },
+    "foreign_objects": []
+  },
+  "hip": {
+    "landmarks": {
+      "greater_trochanter": null,
+      "femoral_neck": null,
+      "ischial_bone": null
+    },
+    "lesser_trochanter": null,
+    "lesser_trochanter_traces": {
+      "trochanter": [],
+      "adjacent_bone": []
+    },
+    "roi_box": null
+  },
+  "image_view": {
+    "mode": "original",
+    "threshold_8bit": 128
+  },
+  "complete": {
+    "spine": false,
+    "hip": false
+  }
+}

@@ -1,0 +1,47 @@
+{
+  "studies": 100,
+  "targets": {
+    "spine_position": {
+      "normal_0": 93,
+      "violation_1": 6,
+      "missing": 1
+    },
+    "spine_axis": {
+      "normal_0": 89,
+      "violation_1": 10,
+      "missing": 1
+    },
+    "spine_artifact": {
+      "normal_0": 82,
+      "violation_1": 17,
+      "missing": 1
+    },
+    "right_hip_rotation": {
+      "normal_0": 55,
+      "violation_1": 17,
+      "missing": 28
+    },
+    "right_hip_roi": {
+      "normal_0": 69,
+      "violation_1": 3,
+      "missing": 28
+    },
+    "left_hip_rotation": {
+      "normal_0": 59,
+      "violation_1": 19,
+      "missing": 22
+    },
+    "left_hip_roi": {
+      "normal_0": 74,
+      "violation_1": 4,
+      "missing": 22
+    }
+  },
+  "geometry": {
+    "exported_images": 1,
+    "spine_complete": 0,
+    "hip_complete": 0,
+    "disc_lines": 6,
+    "hip_landmarks": 0
+  }
+}

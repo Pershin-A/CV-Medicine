@@ -1,0 +1,15 @@
+{
+  "encoder": "frozen ImageNet ResNet18 (512 features)",
+  "head": "L2 logistic regression, C=0.1",
+  "pooling": "mean embedding across images of the same study and region",
+  "evaluation": "stratified study-level out-of-fold, threshold=0.5",
+  "seed": 42,
+  "feature_signature": {
+    "manifest_sha256": "514a62fd4b51e81fb829d15467fa6754458adea58780ac83d0f6249d40e7689e",
+    "labels_sha256": "6d8a4c13cfa7cdb67f2fcf8f28e2adfd1065681445a61ee6551cbb2baac8a07b",
+    "images_fingerprint": "3dd6d290cdb31ecb268a62488574dd67ce91bfdafc9ef049e7208a104ade9993",
+    "image_count": 499,
+    "weights": "ResNet18_Weights.IMAGENET1K_V1",
+    "preprocessing": "modality/VOI LUT; percentile 0.5/99.5; 224x224 ImageNet RGB"
+  }
+}

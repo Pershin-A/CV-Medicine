@@ -1,0 +1,151 @@
+{
+  "schema_version": 1,
+  "coordinate_system": "original_dicom_pixels_top_left",
+  "image_width": 300,
+  "image_height": 320,
+  "spine": {
+    "disc_lines": [
+      {
+        "id": "amuib2zcpp7vy0",
+        "points": [
+          [
+            79.6,
+            48.87
+          ],
+          [
+            198.29,
+            50.51
+          ]
+        ]
+      },
+      {
+        "id": "amuib31ukt1pmt",
+        "points": [
+          [
+            64.87,
+            100.03
+          ],
+          [
+            205.66,
+            96.34
+          ]
+        ]
+      },
+      {
+        "id": "amuib36gvwx9b3",
+        "points": [
+          [
+            71.42,
+            155.68
+          ],
+          [
+            214.26,
+            142.99
+          ]
+        ]
+      },
+      {
+        "id": "amuib3966cziih",
+        "points": [
+          [
+            80.01,
+            213.79
+          ],
+          [
+            228.99,
+            197.42
+          ]
+        ]
+      },
+      {
+        "id": "amuib3bglkv4x1",
+        "points": [
+          [
+            74.69,
+            255.12
+          ],
+          [
+            230.63,
+            253.48
+          ]
+        ]
+      },
+      {
+        "id": "amuib445sg09pg",
+        "points": [
+          [
+            68.55,
+            288.26
+          ],
+          [
+            238.81,
+            292.35
+          ]
+        ]
+      }
+    ],
+    "iliac_crests": {
+      "image_left": [
+        29.67,
+        255.52
+      ],
+      "image_right": [
+        266.64,
+        254.71
+      ]
+    },
+    "foreign_objects": [
+      {
+        "id": "amuib4n6a01kvz",
+        "kind": "metal",
+        "bbox": [
+          110.71,
+          161.82,
+          140.18,
+          205.6
+        ]
+      },
+      {
+        "id": "amuib4ph9f8fet",
+        "kind": "metal",
+        "bbox": [
+          98.84,
+          53.79,
+          129.95,
+          85.29
+        ]
+      },
+      {
+        "id": "amuib4sd9saiv0",
+        "kind": "metal",
+        "bbox": [
+          148.36,
+          61.15,
+          171.28,
+          87.75
+        ]
+      }
+    ]
+  },
+  "hip": {
+    "landmarks": {
+      "greater_trochanter": null,
+      "femoral_neck": null,
+      "ischial_bone": null
+    },
+    "lesser_trochanter": null,
+    "lesser_trochanter_traces": {
+      "trochanter": [],
+      "adjacent_bone": []
+    },
+    "roi_box": null
+  },
+  "image_view": {
+    "mode": "threshold",
+    "threshold_8bit": 43
+  },
+  "complete": {
+    "spine": false,
+    "hip": false
+  }
+}

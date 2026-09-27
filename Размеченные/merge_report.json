@@ -1,0 +1,14 @@
+{
+  "first": "C:\\Users\\Андрей\\Desktop\\Хакатон\\Размеченные_Илья",
+  "second": "C:\\Users\\Андрей\\Desktop\\Хакатон\\Размеченные_27_09_2",
+  "range_unit": "image",
+  "ranges": [
+    "1-200"
+  ],
+  "first_units": 499,
+  "from_first": 200,
+  "from_second": 299,
+  "total_scans": 499,
+  "geometry_sidecars": 200,
+  "output": "C:\\Users\\Андрей\\Desktop\\Хакатон\\Размеченные_merged"
+}

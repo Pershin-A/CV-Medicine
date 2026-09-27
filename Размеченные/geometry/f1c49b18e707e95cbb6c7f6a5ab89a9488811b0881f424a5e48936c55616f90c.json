@@ -1,0 +1,117 @@
+{
+  "schema_version": 1,
+  "coordinate_system": "original_dicom_pixels_top_left",
+  "image_width": 300,
+  "image_height": 320,
+  "spine": {
+    "disc_lines": [
+      {
+        "id": "amui97gkpqbvxh",
+        "points": [
+          [
+            104.57,
+            40.69
+          ],
+          [
+            235.13,
+            49.28
+          ]
+        ]
+      },
+      {
+        "id": "amui97ivl93ty6",
+        "points": [
+          [
+            107.44,
+            83.66
+          ],
+          [
+            236.36,
+            89.39
+          ]
+        ]
+      },
+      {
+        "id": "amui97nzytgu9y",
+        "points": [
+          [
+            104.16,
+            122.12
+          ],
+          [
+            222.85,
+            127.44
+          ]
+        ]
+      },
+      {
+        "id": "amui97q300dshi",
+        "points": [
+          [
+            103.75,
+            164.27
+          ],
+          [
+            233.49,
+            168.36
+          ]
+        ]
+      },
+      {
+        "id": "amui97sqcn0wyq",
+        "points": [
+          [
+            103.75,
+            214.19
+          ],
+          [
+            235.54,
+            219.1
+          ]
+        ]
+      },
+      {
+        "id": "amui97vppspwpl",
+        "points": [
+          [
+            93.11,
+            267.39
+          ],
+          [
+            226.53,
+            278.85
+          ]
+        ]
+      }
+    ],
+    "iliac_crests": {
+      "image_left": [
+        17.39,
+        290.31
+      ],
+      "image_right": null
+    },
+    "foreign_objects": []
+  },
+  "hip": {
+    "landmarks": {
+      "greater_trochanter": null,
+      "femoral_neck": null,
+      "ischial_bone": null
+    },
+    "lesser_trochanter": null,
+    "lesser_trochanter_traces": {
+      "trochanter": [],
+      "adjacent_bone": []
+    },
+    "roi_box": null
+  },
+  "image_view": {
+    "mode": "threshold",
+    "threshold_8bit": 23
+  },
+  "complete": {
+    "spine": false,
+    "hip": false
+  }
+}

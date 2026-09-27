@@ -1,0 +1,158 @@
+{
+  "schema_version": 1,
+  "coordinate_system": "original_dicom_pixels_top_left",
+  "image_width": 300,
+  "image_height": 287,
+  "spine": {
+    "disc_lines": [
+      {
+        "id": "amuie1cmh6cuxc",
+        "points": [
+          [
+            105.39,
+            16.97
+          ],
+          [
+            196.66,
+            30.07
+          ]
+        ]
+      },
+      {
+        "id": "amuie1j7k7l8i0",
+        "points": [
+          [
+            100.07,
+            66.5
+          ],
+          [
+            182.74,
+            70.19
+          ]
+        ]
+      },
+      {
+        "id": "amuie1kzhjxid4",
+        "points": [
+          [
+            88.61,
+            122.59
+          ],
+          [
+            181.51,
+            125.46
+          ]
+        ]
+      },
+      {
+        "id": "amuie1mpzbrj52",
+        "points": [
+          [
+            86.56,
+            178.27
+          ],
+          [
+            179.47,
+            174.59
+          ]
+        ]
+      },
+      {
+        "id": "amuie1o1ffbhuu",
+        "points": [
+          [
+            86.56,
+            246.24
+          ],
+          [
+            202.39,
+            219.22
+          ]
+        ]
+      }
+    ],
+    "iliac_crests": {
+      "image_left": [
+        9.21,
+        252.79
+      ],
+      "image_right": [
+        290.79,
+        249.92
+      ]
+    },
+    "foreign_objects": [
+      {
+        "id": "amuie1vu47qpw9",
+        "kind": "clothing",
+        "bbox": [
+          138.13,
+          57.09,
+          169.65,
+          102.94
+        ]
+      },
+      {
+        "id": "amuie1xdulx35h",
+        "kind": "clothing",
+        "bbox": [
+          116.03,
+          59.95,
+          132.81,
+          100.08
+        ]
+      },
+      {
+        "id": "amuie2006p4cgv",
+        "kind": "clothing",
+        "bbox": [
+          178.65,
+          0.59,
+          201.57,
+          49.31
+        ]
+      },
+      {
+        "id": "amuie22srd48x2",
+        "kind": "clothing",
+        "bbox": [
+          222.85,
+          0.59,
+          275.65,
+          21.06
+        ]
+      },
+      {
+        "id": "amuie2523xihou",
+        "kind": "clothing",
+        "bbox": [
+          12.07,
+          1.0,
+          119.3,
+          25.15
+        ]
+      }
+    ]
+  },
+  "hip": {
+    "landmarks": {
+      "greater_trochanter": null,
+      "femoral_neck": null,
+      "ischial_bone": null
+    },
+    "lesser_trochanter": null,
+    "lesser_trochanter_traces": {
+      "trochanter": [],
+      "adjacent_bone": []
+    },
+    "roi_box": null
+  },
+  "image_view": {
+    "mode": "threshold",
+    "threshold_8bit": 37
+  },
+  "complete": {
+    "spine": false,
+    "hip": false
+  }
+}

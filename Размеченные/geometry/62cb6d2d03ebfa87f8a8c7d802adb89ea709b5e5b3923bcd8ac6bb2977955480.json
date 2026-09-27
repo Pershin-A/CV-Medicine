@@ -1,0 +1,117 @@
+{
+  "schema_version": 1,
+  "coordinate_system": "original_dicom_pixels_top_left",
+  "image_width": 300,
+  "image_height": 320,
+  "spine": {
+    "disc_lines": [
+      {
+        "id": "amui9as72ob1ke",
+        "points": [
+          [
+            95.16,
+            39.05
+          ],
+          [
+            239.63,
+            48.87
+          ]
+        ]
+      },
+      {
+        "id": "amui9aunfcx3ng",
+        "points": [
+          [
+            106.62,
+            80.38
+          ],
+          [
+            235.54,
+            89.39
+          ]
+        ]
+      },
+      {
+        "id": "amui9awoa3cbao",
+        "points": [
+          [
+            100.48,
+            121.3
+          ],
+          [
+            235.13,
+            128.67
+          ]
+        ]
+      },
+      {
+        "id": "amui9b05sqlj5a",
+        "points": [
+          [
+            87.79,
+            168.36
+          ],
+          [
+            234.72,
+            176.14
+          ]
+        ]
+      },
+      {
+        "id": "amui9b2vj15qv1",
+        "points": [
+          [
+            90.65,
+            209.69
+          ],
+          [
+            240.04,
+            220.74
+          ]
+        ]
+      },
+      {
+        "id": "amui9b53d0dqyu",
+        "points": [
+          [
+            86.97,
+            270.26
+          ],
+          [
+            235.13,
+            276.8
+          ]
+        ]
+      }
+    ],
+    "iliac_crests": {
+      "image_left": [
+        18.62,
+        293.99
+      ],
+      "image_right": null
+    },
+    "foreign_objects": []
+  },
+  "hip": {
+    "landmarks": {
+      "greater_trochanter": null,
+      "femoral_neck": null,
+      "ischial_bone": null
+    },
+    "lesser_trochanter": null,
+    "lesser_trochanter_traces": {
+      "trochanter": [],
+      "adjacent_bone": []
+    },
+    "roi_box": null
+  },
+  "image_view": {
+    "mode": "threshold",
+    "threshold_8bit": 29
+  },
+  "complete": {
+    "spine": false,
+    "hip": false
+  }
+}

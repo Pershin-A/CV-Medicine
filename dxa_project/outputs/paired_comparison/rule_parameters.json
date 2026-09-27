@@ -1,0 +1,211 @@
+[
+  {
+    "task": "spine_position",
+    "rule_spec": [
+      "low",
+      "separator_median_gap_px"
+    ],
+    "folds": [
+      {
+        "fold": 0,
+        "threshold": 41.0
+      },
+      {
+        "fold": 1,
+        "threshold": 42.0
+      },
+      {
+        "fold": 2,
+        "threshold": 43.0
+      },
+      {
+        "fold": 3,
+        "threshold": 37.92
+      },
+      {
+        "fold": 4,
+        "threshold": 42.02
+      }
+    ]
+  },
+  {
+    "task": "spine_axis",
+    "rule_spec": [
+      "fixed_5_degrees",
+      "axis_deviation_vertical_deg_boundary"
+    ],
+    "folds": [
+      {
+        "fold": 0,
+        "angle_degrees": 5
+      },
+      {
+        "fold": 1,
+        "angle_degrees": 5
+      },
+      {
+        "fold": 2,
+        "angle_degrees": 5
+      },
+      {
+        "fold": 3,
+        "angle_degrees": 5
+      },
+      {
+        "fold": 4,
+        "angle_degrees": 5
+      }
+    ]
+  },
+  {
+    "task": "spine_artifact",
+    "rule_spec": [
+      "artifact_or"
+    ],
+    "folds": [
+      {
+        "fold": 0,
+        "artifact_extra_component_fraction": 0.00012746331236896042,
+        "artifact_outside_bright_fraction": 0.00012746331236896042,
+        "artifact_border_bright_fraction": 0.0007504307561753504,
+        "artifact_orientation_concentration": 0.3417912619593291
+      },
+      {
+        "fold": 1,
+        "artifact_extra_component_fraction": 0.0,
+        "artifact_outside_bright_fraction": 0.0,
+        "artifact_border_bright_fraction": 0.00087752058613752,
+        "artifact_orientation_concentration": 0.3265766501219086
+      },
+      {
+        "fold": 2,
+        "artifact_extra_component_fraction": 0.00023773584905657948,
+        "artifact_outside_bright_fraction": 0.0003207547169810991,
+        "artifact_border_bright_fraction": 0.0008514399205560302,
+        "artifact_orientation_concentration": 0.3265766501219086
+      },
+      {
+        "fold": 3,
+        "artifact_extra_component_fraction": 0.0,
+        "artifact_outside_bright_fraction": 0.0,
+        "artifact_border_bright_fraction": 0.0006729758149316,
+        "artifact_orientation_concentration": 0.3417912619593291
+      },
+      {
+        "fold": 4,
+        "artifact_extra_component_fraction": 0.0,
+        "artifact_outside_bright_fraction": 0.0,
+        "artifact_border_bright_fraction": 0.00087404093453496,
+        "artifact_orientation_concentration": 0.332704435941043
+      }
+    ]
+  },
+  {
+    "task": "right_hip_rotation",
+    "rule_spec": [
+      "high",
+      "trochanter_best_offset_ratio"
+    ],
+    "folds": [
+      {
+        "fold": 0,
+        "threshold": -0.06415805471124619
+      },
+      {
+        "fold": 1,
+        "threshold": -0.10768692158691441
+      },
+      {
+        "fold": 2,
+        "threshold": -0.08368362967504597
+      },
+      {
+        "fold": 3,
+        "threshold": -0.10394743935309973
+      },
+      {
+        "fold": 4,
+        "threshold": -0.10394743935309973
+      }
+    ]
+  },
+  {
+    "task": "right_hip_roi",
+    "rule_spec": [
+      "or_low",
+      "roi_bottom_margin_ratio",
+      "roi_lateral_margin_ratio"
+    ],
+    "folds": [
+      {
+        "fold": 0,
+        "first": 0.3343217990339694,
+        "second": 0.2535714285714285
+      },
+      {
+        "fold": 1,
+        "first": 0.3452647720302596,
+        "second": 0.2417142857142857
+      },
+      {
+        "fold": 2,
+        "first": 0.2973107357315225,
+        "second": 0.17414285714285713
+      }
+    ]
+  },
+  {
+    "task": "left_hip_rotation",
+    "rule_spec": [
+      "high",
+      "trochanter_best_offset_ratio"
+    ],
+    "folds": [
+      {
+        "fold": 0,
+        "threshold": -0.0717022441160372
+      },
+      {
+        "fold": 1,
+        "threshold": -0.07230159372219075
+      },
+      {
+        "fold": 2,
+        "threshold": 0.06118820022612807
+      },
+      {
+        "fold": 3,
+        "threshold": -0.047428571428571334
+      },
+      {
+        "fold": 4,
+        "threshold": -0.036322188449848025
+      }
+    ]
+  },
+  {
+    "task": "left_hip_roi",
+    "rule_spec": [
+      "or_low",
+      "roi_bottom_margin_ratio",
+      "roi_lateral_margin_ratio"
+    ],
+    "folds": [
+      {
+        "fold": 0,
+        "first": 0.3744680851063829,
+        "second": 0.1857142857142857
+      },
+      {
+        "fold": 1,
+        "first": 0.4904214559386973,
+        "second": 0.1714285714285714
+      },
+      {
+        "fold": 2,
+        "first": 0.329492539319801,
+        "second": 0.15442857142857136
+      }
+    ]
+  }
+]

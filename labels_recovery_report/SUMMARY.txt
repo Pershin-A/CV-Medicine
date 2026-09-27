@@ -1,0 +1,12 @@
+Original DICOM count: 499
+Original unique SOPInstanceUID: 499
+
+Размеченные: physical=499, csv_rows=499, resolved_csv=499, unresolved_csv=0, unique_uid=499, LEG=331, SPINE=165, UNKNOWN=3
+Размеченные_244_Илья: physical=244, csv_rows=244, resolved_csv=244, unresolved_csv=0, unique_uid=244, LEG=164, SPINE=80, UNKNOWN=0
+Размеченные_499_Илья: physical=499, csv_rows=499, resolved_csv=499, unresolved_csv=0, unique_uid=499, LEG=333, SPINE=166, UNKNOWN=0
+Размеченные_old: physical=3, csv_rows=3, resolved_csv=3, unresolved_csv=0, unique_uid=3, LEG=0, SPINE=0, UNKNOWN=3
+
+Union annotated UID: 499
+Intersection all non-empty sources: 0
+Hard LEG/SPINE conflicts: 0
+Usable master LEG/SPINE: 499

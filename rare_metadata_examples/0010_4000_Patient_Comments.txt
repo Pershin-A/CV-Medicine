@@ -1,0 +1,105 @@
+TAG: (0010,4000)
+NAME: Patient Comments
+FILES WITH TAG: 1
+UNIQUE VALUES: 1
+
+========================================================================================================================
+VALUE DISTRIBUTION
+========================================================================================================================
+
+    1 × Anonymized
+
+
+########################################################################################################################
+EXAMPLE 1
+########################################################################################################################
+
+FILE:
+C:\Users\Андрей\Downloads\Датасет\Исследования\2.25.59542620917302828428419211045951914336\series_001_2_CR\A2504303391 DXA\CR DXA\CR000000.dcm
+
+TARGET TAG:
+(0010,4000) — Patient Comments
+
+TARGET VALUE:
+Anonymized
+
+========================================================================================================================
+FILE META INFORMATION
+========================================================================================================================
+(0002,0000)    | UL   | File Meta Information Group Length            | 206
+(0002,0001)    | OB   | File Meta Information Version                 | <binary data: 2 bytes>
+(0002,0002)    | UI   | Media Storage SOP Class UID                   | 1.2.840.10008.5.1.4.1.1.1
+(0002,0003)    | UI   | Media Storage SOP Instance UID                | 1.2.643.5.1.13.13.12.2.77.8252.07101010011513020401030213080905
+(0002,0010)    | UI   | Transfer Syntax UID                           | 1.2.840.10008.1.2
+(0002,0012)    | UI   | Implementation Class UID                      | 1.2.276.0.7230010.3.0.3.6.8
+(0002,0013)    | SH   | Implementation Version Name                   | OFFIS_DCMTK_368
+
+========================================================================================================================
+DICOM DATASET
+========================================================================================================================
+(0008,0005)    | CS   | Specific Character Set                        | ISO_IR 144
+(0008,0016)    | UI   | SOP Class UID                                 | 1.2.840.10008.5.1.4.1.1.1
+(0008,0018)    | UI   | SOP Instance UID                              | 1.2.643.5.1.13.13.12.2.77.8252.07101010011513020401030213080905
+(0008,0020)    | DA   | Study Date                                    | Anonymized
+(0008,0022)    | DA   | Acquisition Date                              | Anonymized
+(0008,0030)    | TM   | Study Time                                    | Anonymized
+(0008,0032)    | TM   | Acquisition Time                              | Anonymized
+(0008,0050)    | SH   | Accession Number                              | Anonymized
+(0008,0060)    | CS   | Modality                                      | CR
+(0008,0070)    | LO   | Manufacturer                                  | GE Healthcare
+(0008,0080)    | LO   | Institution Name                              | Anonymized
+(0008,0081)    | ST   | Institution Address                           | Anonymized
+(0008,0090)    | PN   | Referring Physician's Name                    | Anonymized
+(0008,1010)    | SH   | Station Name                                  | Anonymized
+(0008,1030)    | LO   | Study Description                             | DXA Обследование
+(0008,103E)    | LO   | Series Description                            | Изображения DXA
+(0008,1050)    | PN   | Performing Physician's Name                   | Anonymized
+(0008,1070)    | PN   | Operators' Name                               | Anonymized
+(0008,1090)    | LO   | Manufacturer's Model Name                     | Lunar Prodigy Advance
+(0010,0010)    | PN   | Patient's Name                                | Anonymized
+(0010,0020)    | LO   | Patient ID                                    | Anonymized
+(0010,0030)    | DA   | Patient's Birth Date                          | Anonymized
+(0010,0040)    | CS   | Patient's Sex                                 | Anonymized
+(0010,1010)    | AS   | Patient's Age                                 | Anonymized
+(0010,2160)    | SH   | Ethnic Group                                  | Anonymized
+(0010,4000)    | LT   | Patient Comments                              | Anonymized
+(0012,0062)    | CS   | Patient Identity Removed                      | YES
+(0012,0063)    | LO   | De-identification Method                      | De-identification is implemented according to DICOM PS3.15 2021b part E1.1 Table E.1-1 Basic Profile.
+(0018,0015)    | CS   | Body Part Examined                            | 
+(0018,1000)    | LO   | Device Serial Number                          | Anonymized
+(0018,1020)    | LO   | Software Versions                             | 18.41.005
+(0018,1030)    | LO   | Protocol Name                                 | Anonymized
+(0018,5101)    | CS   | View Position                                 | 
+(0020,000D)    | UI   | Study Instance UID                            | 1.2.643.5.1.13.13.12.2.77.8252.13101512050003031109001004060403
+(0020,000E)    | UI   | Series Instance UID                           | 1.2.643.5.1.13.13.12.2.77.8252.06071414091308091103060512110104
+(0020,0010)    | SH   | Study ID                                      | Anonymized
+(0020,0011)    | IS   | Series Number                                 | 2
+(0020,0013)    | IS   | Instance Number                               | 1
+(0020,0020)    | CS   | Patient Orientation                           | ['L', 'F']
+(0020,0060)    | CS   | Laterality                                    | 
+(0028,0002)    | US   | Samples per Pixel                             | 1
+(0028,0004)    | CS   | Photometric Interpretation                    | MONOCHROME2
+(0028,0010)    | US   | Rows                                          | 315
+(0028,0011)    | US   | Columns                                       | 300
+(0028,0100)    | US   | Bits Allocated                                | 8
+(0028,0101)    | US   | Bits Stored                                   | 8
+(0028,0102)    | US   | High Bit                                      | 7
+(0028,0103)    | US   | Pixel Representation                          | 0
+(0040,0244)    | DA   | Performed Procedure Step Start Date           | Anonymized
+(0040,0245)    | TM   | Performed Procedure Step Start Time           | Anonymized
+(0040,0254)    | LO   | Performed Procedure Step Description          | Anonymized
+(0040,0301)    | US   | Total Number of Exposures                     | 2
+(0040,0303)    | US   | Exposed Area                                  | [180, 191]
+(0040,030E)    | SQ   | Exposure Dose Sequence                        | [(0018,0060) KVP                                 DS: '76.0'
+(0018,1150) Exposure Time                       IS: '28003'
+(0018,8151) X-Ray Tube Current in uA            DS: '3000'(0018,0060) KVP                                 DS: '76.0'
+(0018,1150) Exposure Time                       IS: '41824'
+(0018,8151) X-Ray Tube Current in uA            DS: '3000']
+(0018,0060)    | DS   | KVP                                           | 76.0
+(0018,1150)    | IS   | Exposure Time                                 | 28003
+(0018,8151)    | DS   | X-Ray Tube Current in uA                      | 3000
+(0018,0060)    | DS   | KVP                                           | 76.0
+(0018,1150)    | IS   | Exposure Time                                 | 41824
+(0018,8151)    | DS   | X-Ray Tube Current in uA                      | 3000
+(0040,8302)    | DS   | Entrance Dose in mGy                          | 0.074000
+(7FE0,0010)    | OW   | Pixel Data                                    | <PIXEL DATA OMITTED>

@@ -1,0 +1,5 @@
+﻿source,folder_exists,physical_dicom_count,labels_csv_rows,csv_rows_resolved,csv_rows_unresolved,unique_annotated_uids,LEG,SPINE,UNKNOWN,internal_conflicts
+Размеченные,True,499,499,499,0,499,331,165,3,1
+Размеченные_244_Илья,True,244,244,244,0,244,164,80,0,0
+Размеченные_499_Илья,True,499,499,499,0,499,333,166,0,0
+Размеченные_old,True,3,3,3,0,3,0,0,3,0
