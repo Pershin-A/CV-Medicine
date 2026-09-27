@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "coordinate_system": "original_dicom_pixels_top_left",
+  "image_width": 300,
+  "image_height": 300,
+  "spine": {
+    "disc_lines": [],
+    "iliac_crests": {
+      "image_left": null,
+      "image_right": null
+    },
+    "foreign_objects": []
+  },
+  "hip": {
+    "landmarks": {
+      "greater_trochanter": [
+        62.97,
+        103.28
+      ],
+      "femoral_neck": [
+        145.95,
+        118.84
+      ],
+      "ischial_bone": [
+        218.55,
+        175.89
+      ]
+    },
+    "lesser_trochanter": [
+      [
+        47.41,
+        124.03
+      ],
+      [
+        62.97,
+        124.03
+      ],
+      [
+        62.97,
+        139.58
+      ],
+      [
+        47.41,
+        139.58
+      ]
+    ],
+    "lesser_trochanter_traces": {
+      "trochanter": [],
+      "adjacent_bone": []
+    },
+    "lesser_trochanter_pixels": [],
+    "lesser_trochanter_mask_ready": true,
+    "lesser_trochanter_partial": false,
+    "roi_box": [
+      0.0,
+      46.24,
+      234.11,
+      264.05
+    ]
+  },
+  "image_view": {
+    "mode": "original",
+    "threshold_8bit": 128
+  },
+  "complete": {
+    "spine": false,
+    "hip": true
+  }
+}

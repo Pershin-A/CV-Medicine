@@ -392,7 +392,12 @@
         }
       ]
     },
-    "roi_box": null
+    "roi_box": [
+      80.6,
+      72.9,
+      278.28,
+      177.05
+    ]
   },
   "image_view": {
     "mode": "threshold",

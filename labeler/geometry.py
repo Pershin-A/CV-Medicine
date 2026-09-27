@@ -59,6 +59,10 @@ def empty_geometry(width: int, height: int) -> dict:
                 "trochanter": [],
                 "adjacent_bone": [],
             },
+            # Derived pixel mask, stored separately from the editable strokes.
+            "lesser_trochanter_pixels": [],
+            "lesser_trochanter_mask_ready": False,
+            "lesser_trochanter_partial": False,
             "roi_box": None,
         },
         # Threshold is applied to the 8-bit display image, after the application's
@@ -180,6 +184,29 @@ def validate_geometry(raw: dict | None, width: int, height: int) -> dict:
             out["hip"]["lesser_trochanter_traces"][name].append({
                 "id": _as_id(stroke.get("id")), "points": normalized,
             })
+    pixels = hip.get("lesser_trochanter_pixels") or []
+    if not isinstance(pixels, list) or len(pixels) > width * height:
+        raise ValueError("Lesser-trochanter pixels must be a list within image size")
+    seen_pixels = set()
+    for pixel in pixels:
+        if not isinstance(pixel, (list, tuple)) or len(pixel) != 2:
+            raise ValueError("Lesser-trochanter pixel must contain [x, y]")
+        x, y = pixel
+        if (isinstance(x, bool) or isinstance(y, bool) or
+                not isinstance(x, (int, float)) or not isinstance(y, (int, float)) or
+                not math.isfinite(x) or not math.isfinite(y) or
+                int(x) != x or int(y) != y or
+                not (0 <= x < width and 0 <= y < height)):
+            raise ValueError("Lesser-trochanter pixel lies outside image or is not integral")
+        pair = (int(x), int(y))
+        if pair not in seen_pixels:
+            out["hip"]["lesser_trochanter_pixels"].append([*pair])
+            seen_pixels.add(pair)
+    for field in ("lesser_trochanter_mask_ready", "lesser_trochanter_partial"):
+        value = hip.get(field, False)
+        if not isinstance(value, bool):
+            raise ValueError(f"{field} must be boolean")
+        out["hip"][field] = value
     view = raw.get("image_view") or {}
     if not isinstance(view, dict):
         raise ValueError("Image view settings must be an object")
@@ -254,6 +281,7 @@ def geometry_counts(geometry: dict) -> dict:
         "lesser_trochanter": int(geometry["hip"]["lesser_trochanter"] is not None or t_count > 0),
         "trochanter_traces": t_count,
         "bone_contour_traces": b_count,
+        "trochanter_pixels": len(geometry["hip"].get("lesser_trochanter_pixels") or []),
         "hip_roi": int(geometry["hip"]["roi_box"] is not None),
         "threshold_8bit": geometry.get("image_view", {}).get("threshold_8bit", 128),
     }

@@ -16,7 +16,7 @@ from collections import Counter, defaultdict
 
 import numpy as np
 
-from .core import (Transform, hip_position_ok, hip_roi_ok,
+from .core import (Transform, hip_position_ok, hip_roi_ok, hip_roi_margins_mm,
                    lesser_trochanter_between_area, prepare_geometry,
                    spine_axis_angle, spine_position_ok, transform_geometry,
                    transformed_spacing, warp_image)
@@ -26,6 +26,7 @@ REGIONS = ("SPINE", "LEG_LEFT", "LEG_RIGHT")
 GROUPS = ("positive", "negative_position", "negative_axis_or_roi")
 TARGET_PER_GROUP = {"positive": 500, "negative_position": 250,
                     "negative_axis_or_roi": 250}
+SCANNER_NOMINAL_SPACING_MM = (1.05, 0.6)  # (row/Y, column/X), supplied by user
 
 
 def _region(label: str, side: str) -> str | None:
@@ -102,6 +103,13 @@ def _dicom_spacing(ds):
     return None, "missing"
 
 
+def _source_spacing(ds, allow_nominal=True):
+    spacing, basis = _dicom_spacing(ds)
+    if spacing is None and allow_nominal:
+        return SCANNER_NOMINAL_SPACING_MM, "scanner_nominal_user_supplied"
+    return spacing, basis
+
+
 def _roi_proxy_spacing(geometry: dict, side: str):
     """Weak fallback from a *correctly drawn* reference ROI, with 10% slack."""
     box = geometry["hip"]["roi_box"]
@@ -124,8 +132,7 @@ def _spine_variant(geometry, group, rng, base_angle):
     gap = float(np.median(np.diff([m[1] for m in mids])))
     cx, cy = (w - 1) / 2, (h - 1) / 2
     if group == "negative_axis_or_roi":
-        target = rng.choice((rng.uniform(-20, -6), rng.uniform(-4, 4),
-                             rng.uniform(6, 20)))
+        target = rng.choice((rng.uniform(-20, -6), rng.uniform(6, 20)))
         angle = base_angle - target
         scale = max(1.02, abs(math.cos(math.radians(angle)))
                     + abs(math.sin(math.radians(angle))) + 0.025)
@@ -144,6 +151,8 @@ def _spine_variant(geometry, group, rng, base_angle):
     variant = rng.choice(("crop_Th12", "crop_Th12_and_next",
                           "crop_left_crest", "crop_right_crest", "crop_both_crests_bottom"))
     scale = rng.uniform(1.18, 1.65)
+    axis_target = rng.uniform(-4, 4)
+    angle = base_angle - axis_target
     src_x, src_y = cx, cy
     if variant == "crop_Th12":
         src_y = float(mids[0][1] + (cy - rng.uniform(-0.3, 0.15) * gap * scale) / scale)
@@ -160,17 +169,44 @@ def _spine_variant(geometry, group, rng, base_angle):
         if all(p is not None for p in crests):
             y_top = min(p[1] for p in crests)
             src_y = y_top + (cy - (h + rng.uniform(2, 20))) / scale
-    return Transform(w, h, scale, 0, src_x, src_y), variant
+    return Transform(w, h, scale, angle, src_x, src_y), variant
 
 
-def _hip_variant(geometry, group, rng, side):
+def _positive_roi_center_intervals(geometry, side, scale, spacing_mm, slack_mm=0.0):
+    """Safe source-center ranges from ROI-to-frame distances in millimeters."""
+    w, h = geometry["image_width"], geometry["image_height"]
+    x1, y1, x2, y2 = geometry["hip"]["roi_box"]
+    cx, cy = (w - 1) / 2, (h - 1) / 2
+    row_mm, col_mm = spacing_mm
+    vertical_px = (30 + slack_mm) * scale / row_mm
+    lateral_px = (20 + slack_mm) * scale / col_mm
+    x_low, x_high = cx / scale, w - 1 - cx / scale
+    y_low, y_high = cy / scale, h - 1 - cy / scale
+    y_low = max(y_low, y2 - (h - 1 - vertical_px - cy) / scale)
+    y_high = min(y_high, y1 - (vertical_px - cy) / scale)
+    if side == "LEFT":
+        x_low = max(x_low, x2 - (w - 1 - lateral_px - cx) / scale)
+    else:
+        x_high = min(x_high, x1 - (lateral_px - cx) / scale)
+    return (x_low, x_high), (y_low, y_high)
+
+
+def _hip_variant(geometry, group, rng, side, spacing_mm=None):
     w, h = geometry["image_width"], geometry["image_height"]
     cx, cy = (w - 1) / 2, (h - 1) / 2
     box = geometry["hip"]["roi_box"]
     points = list(geometry["hip"]["landmarks"].values())
+    spacing_mm = spacing_mm or SCANNER_NOMINAL_SPACING_MM
     if group == "positive":
-        return Transform(w, h, rng.uniform(1.01, 1.06), 0,
-                         cx + rng.uniform(-2, 2), cy + rng.uniform(-2, 2)), "hip_safe_zoom"
+        scale = rng.uniform(1.005, 1.08)
+        x_range, y_range = _positive_roi_center_intervals(
+            geometry, side, scale, spacing_mm, slack_mm=0.5)
+        if x_range[0] > x_range[1] or y_range[0] > y_range[1]:
+            # The caller rejects this candidate and samples another scale.
+            return Transform(w, h, scale, 0, -w, -h), "roi_positive_no_slack"
+        x = rng.uniform(*x_range)
+        y = rng.uniform(*y_range)
+        return Transform(w, h, scale, 0, x, y), "roi_positive_distances"
     if group == "negative_position":
         p = rng.choice(points)
         edge = rng.choice(("top", "bottom", "left", "right"))
@@ -184,18 +220,30 @@ def _hip_variant(geometry, group, rng, side):
                          p[1] + (cy - target[1]) / scale), f"landmark_{edge}"
     x1, y1, x2, y2 = box
     edge = rng.choice(("top", "bottom", "lateral"))
-    anchor = {"top": (cx, y1), "bottom": (cx, y2),
-              "lateral": (x2 if side == "LEFT" else x1, cy)}[edge]
-    scale = rng.uniform(1.12, 1.55)
+    scale = rng.uniform(1.02, 1.30)
+    x_range, y_range = _positive_roi_center_intervals(
+        geometry, side, scale, spacing_mm, slack_mm=0.5)
+    row_mm, col_mm = spacing_mm
+    if edge in ("top", "bottom") and x_range[0] > x_range[1]:
+        return Transform(w, h, scale, 0, -w, -h), "roi_no_safe_lateral_shift"
+    if edge == "lateral" and y_range[0] > y_range[1]:
+        return Transform(w, h, scale, 0, -w, -h), "roi_no_safe_vertical_shift"
     if edge == "top":
-        target = (cx, rng.uniform(1, 20))
+        target_mm = rng.uniform(22, 29)
+        y = y1 + (cy - target_mm * scale / row_mm) / scale
+        x = rng.uniform(*x_range)
     elif edge == "bottom":
-        target = (cx, h - 1 - rng.uniform(1, 20))
+        target_mm = rng.uniform(22, 29)
+        target_y = h - 1 - target_mm * scale / row_mm
+        y = y2 + (cy - target_y) / scale
+        x = rng.uniform(*x_range)
     else:
-        target = (w - 1 - rng.uniform(1, 15) if side == "LEFT" else rng.uniform(1, 15), cy)
-    return Transform(w, h, scale, 0,
-                     anchor[0] + (cx - target[0]) / scale,
-                     anchor[1] + (cy - target[1]) / scale), f"roi_{edge}"
+        target_mm = rng.uniform(13, 19)
+        target_x = (w - 1 - target_mm * scale / col_mm if side == "LEFT"
+                    else target_mm * scale / col_mm)
+        x = (x2 if side == "LEFT" else x1) + (cx - target_x) / scale
+        y = rng.uniform(*y_range)
+    return Transform(w, h, scale, 0, x, y), f"roi_{edge}_{target_mm:.1f}mm"
 
 
 def _check_group(region, group, labels):
@@ -204,10 +252,20 @@ def _check_group(region, group, labels):
     else:
         position, other = labels["hip_position"], labels["hip_roi"]
     if group == "positive":
+        if region == "SPINE":
+            angle = labels["spine_axis_angle_deg"]
+            return position == 0 and angle is not None and -4 <= angle <= 4
         return position == 0 and other == 0
     if group == "negative_position":
+        if region == "SPINE":
+            angle = labels["spine_axis_angle_deg"]
+            return position == 1 and angle is not None and -4 <= angle <= 4
         return position == 1
-    return other == 1
+    if region == "SPINE":
+        angle = labels["spine_axis_angle_deg"]
+        return angle is not None and (
+            -20 <= angle <= -6 or 6 <= angle <= 20)
+    return position == 0 and other == 1
 
 
 def _labels(region, geometry, info, image, spacing, source_row):
@@ -222,15 +280,25 @@ def _labels(region, geometry, info, image, spacing, source_row):
                 "spine_axis_angle_deg": angle, "spine_artifact": artifact}
     side = region.removeprefix("LEG_")
     roi = hip_roi_ok(geometry, info["roi_fully_visible"], side, spacing)
+    margins = (hip_roi_margins_mm(geometry, side, spacing)
+               if spacing is not None and geometry["hip"]["roi_box"] is not None else None)
     area, crossings = lesser_trochanter_between_area(geometry)
     box = geometry["hip"]["roi_box"]
     roi_area = (box[2] - box[0]) * (box[3] - box[1]) if box else 0
+    source_rotation = source_row.get(f"{side.lower()}_hip_rotation", "")
+    rotation = (0 if source_rotation in ("0", "0.0") else
+                1 if source_rotation in ("1", "1.0") else None)
+    partial = bool(geometry["hip"].get("lesser_trochanter_partial", False))
     return {"hip_position": int(not hip_position_ok(geometry)),
             "hip_roi": None if roi is None else int(not roi),
+            "hip_roi_top_cm": margins["top"] / 10 if margins else None,
+            "hip_roi_bottom_cm": margins["bottom"] / 10 if margins else None,
+            "hip_roi_lateral_cm": margins["lateral"] / 10 if margins else None,
             "trochanter_between_area_px2": area,
             "trochanter_curve_crossings": crossings,
             "trochanter_area_fraction_roi": area / roi_area if roi_area > 0 else None,
-            "hip_rotation": None}  # Rotation needs manual re-review if the tubercle was cropped.
+            "trochanter_partial": int(partial),
+            "hip_rotation": rotation if area > 0 and not partial else 1}
 
 
 def _read_dicom(path):
@@ -242,7 +310,9 @@ def _read_dicom(path):
     return ds, image
 
 
-def _write_dicom(ds, image, transform, destination: Path, uid_seed: str):
+def _write_dicom(ds, image, transform, destination: Path, uid_seed: str,
+                 geometry: dict | None = None, labels: dict | None = None,
+                 region: str | None = None):
     import copy
     import pydicom
     from pydicom.uid import ExplicitVRLittleEndian, generate_uid
@@ -255,6 +325,17 @@ def _write_dicom(ds, image, transform, destination: Path, uid_seed: str):
     out.file_meta.MediaStorageSOPInstanceUID = out.SOPInstanceUID
     out.ImageType = ["DERIVED", "SECONDARY"]
     out.DerivationDescription = "Geometry-aware zoom/rotation for DXA quality research"
+    if geometry is not None:
+        block = out.private_block(0x0011, "DXA_MANUAL_LABELER", create=True)
+        out.add_new(block.get_tag(0x09), "UT",
+                    json.dumps(geometry, ensure_ascii=True, separators=(",", ":")))
+        out.add_new(block.get_tag(0x0A), "UT",
+                    json.dumps(labels or {}, ensure_ascii=True, separators=(",", ":")))
+        if region:
+            out.add_new(block.get_tag(0x01), "CS",
+                        "SPINE" if region == "SPINE" else "LEG")
+            out.add_new(block.get_tag(0x05), "CS",
+                        region.removeprefix("LEG_") if region.startswith("LEG_") else "")
     spacing, _ = _dicom_spacing(ds)
     if spacing is not None:
         out.PixelSpacing = list(transformed_spacing(spacing, transform))
@@ -264,7 +345,7 @@ def _write_dicom(ds, image, transform, destination: Path, uid_seed: str):
 
 def generate(workspace: Path, manifest_path: Path, output: Path,
              seed: int = 20260926, target_per_group=None, max_attempts_per_image=300,
-             proxy_spacing=True, annotations_root: Path | None = None):
+             allow_nominal_spacing=True, annotations_root: Path | None = None):
     """Generate only from completed geometry; report every unmet quota."""
     if output.exists() and any(output.iterdir()):
         raise FileExistsError(f"Output directory is not empty: {output}")
@@ -297,10 +378,7 @@ def generate(workspace: Path, manifest_path: Path, output: Path,
                 if not hip_position_ok(item["geometry"]) or item["geometry"]["hip"]["roi_box"] is None:
                     problems["source_not_valid_hip_positive"] += 1
                     continue
-                spacing, basis = _dicom_spacing(ds)
-                if spacing is None and proxy_spacing:
-                    spacing = _roi_proxy_spacing(item["geometry"], region.removeprefix("LEG_"))
-                    basis = "roi_proxy" if spacing else "missing"
+                spacing, basis = _source_spacing(ds, allow_nominal_spacing)
                 if spacing is None or hip_roi_ok(item["geometry"], True,
                                                  region.removeprefix("LEG_"), spacing) is not True:
                     problems["source_roi_not_calibrated_or_valid"] += 1
@@ -326,7 +404,8 @@ def generate(workspace: Path, manifest_path: Path, output: Path,
                 if region == "SPINE":
                     transform, variant = _spine_variant(geometry, group, rng, item["base_angle"])
                 else:
-                    transform, variant = _hip_variant(geometry, group, rng, region.removeprefix("LEG_"))
+                    transform, variant = _hip_variant(geometry, group, rng,
+                                                      region.removeprefix("LEG_"), item["spacing"])
                 if not transform.covers_output():
                     problems["transform_exceeds_source"] += 1
                     continue
@@ -346,7 +425,8 @@ def generate(workspace: Path, manifest_path: Path, output: Path,
                 image_rel = f"images/{region}/{digest}.dcm"
                 geometry_rel = f"geometry/{digest}.json"
                 output.mkdir(parents=True, exist_ok=True)
-                _write_dicom(ds, moved_image, transform, output / image_rel, digest)
+                _write_dicom(ds, moved_image, transform, output / image_rel, digest,
+                             moved_geometry, labels, region)
                 (output / "geometry").mkdir(exist_ok=True)
                 (output / geometry_rel).write_text(
                     json.dumps(moved_geometry, ensure_ascii=False, indent=2), encoding="utf-8")
@@ -359,6 +439,8 @@ def generate(workspace: Path, manifest_path: Path, output: Path,
                                     "source_center_x": round(transform.source_center[0], 4),
                                     "source_center_y": round(transform.source_center[1], 4),
                                     "spacing_basis": item["spacing_basis"],
+                                    "row_spacing_mm": spacing[0] if spacing else None,
+                                    "col_spacing_mm": spacing[1] if spacing else None,
                                     "dropped_annotations": json.dumps(info["dropped"]),
                                     **labels})
                 counts[group] += 1
@@ -379,10 +461,13 @@ def generate(workspace: Path, manifest_path: Path, output: Path,
     output.mkdir(parents=True, exist_ok=True)
     fields = ["image_path", "geometry_path", "source_relative_path", "source_study_uid",
               "region", "generation_group", "variant", "scale", "rotation_deg",
-              "source_center_x", "source_center_y", "spacing_basis", "dropped_annotations",
+              "source_center_x", "source_center_y", "spacing_basis",
+              "row_spacing_mm", "col_spacing_mm", "dropped_annotations",
               "spine_position", "spine_axis", "spine_axis_angle_deg", "spine_artifact",
-              "hip_position", "hip_roi", "hip_rotation", "trochanter_between_area_px2",
-              "trochanter_curve_crossings", "trochanter_area_fraction_roi"]
+              "hip_position", "hip_roi", "hip_rotation", "hip_roi_top_cm",
+              "hip_roi_bottom_cm", "hip_roi_lateral_cm",
+              "trochanter_between_area_px2", "trochanter_curve_crossings",
+              "trochanter_area_fraction_roi", "trochanter_partial"]
     with (output / "manifest.csv").open("w", encoding="utf-8-sig", newline="") as stream:
         writer = csv.DictWriter(stream, fieldnames=fields)
         writer.writeheader()
@@ -401,10 +486,11 @@ def main():
                         default=project.parent / "Размеченные")
     parser.add_argument("--output", type=Path, default=project / "outputs" / "augmented_dataset")
     parser.add_argument("--seed", type=int, default=20260926)
-    parser.add_argument("--no-roi-proxy", action="store_true")
+    parser.add_argument("--require-dicom-spacing", action="store_true",
+                        help="Skip hips without measured DICOM pixel spacing")
     args = parser.parse_args()
     report = generate(args.workspace, args.manifest, args.output, args.seed,
-                      proxy_spacing=not args.no_roi_proxy,
+                      allow_nominal_spacing=not args.require_dicom_spacing,
                       annotations_root=args.annotations_root)
     print(json.dumps(report, ensure_ascii=False, indent=2))
 

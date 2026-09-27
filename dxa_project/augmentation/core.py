@@ -8,7 +8,8 @@ from pathlib import Path
 import sys
 
 import numpy as np
-from scipy.ndimage import affine_transform, label
+from scipy.ndimage import affine_transform, gaussian_filter1d, median_filter
+from scipy.signal import find_peaks
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from labeler.geometry import validate_geometry  # noqa: E402
@@ -154,6 +155,15 @@ def prepare_geometry(geometry: dict, region: str) -> dict:
                 box[2] = float(w - 1)
     else:
         raise ValueError(f"Unknown region: {region}")
+    if region in ("LEG_LEFT", "LEG_RIGHT"):
+        mask = (_pixels_mask(out) if out["hip"].get("lesser_trochanter_mask_ready")
+                else build_lesser_trochanter_mask(out))
+        out["hip"]["lesser_trochanter_pixels"] = _mask_pixels(mask)
+        out["hip"]["lesser_trochanter_mask_ready"] = True
+        out["hip"]["lesser_trochanter_partial"] = bool(
+            out["hip"].get("lesser_trochanter_partial") or
+            (mask.any() and (mask[0].any() or mask[-1].any() or
+                             mask[:, 0].any() or mask[:, -1].any())))
     return validate_geometry(out, w, h)
 
 
@@ -183,46 +193,114 @@ def _curve_intersections(first, second) -> list[list[float]]:
     return [p.tolist() for p in found]
 
 
-def lesser_trochanter_between_area(geometry: dict) -> tuple[int, int]:
-    """Raster area enclosed by both freehand contour layers.
+def _scanline_positions(strokes, height: int) -> list[list[float]]:
+    """Subpixel x intersections of freehand segments with image pixel rows."""
+    positions = [[] for _ in range(height)]
+    for stroke in strokes:
+        for first, second in zip(stroke["points"], stroke["points"][1:]):
+            x1, y1 = first
+            x2, y2 = second
+            if abs(y2 - y1) < 1e-9:
+                row = int(round((y1 + y2) / 2))
+                if 0 <= row < height:
+                    positions[row].append((x1 + x2) / 2)
+                continue
+            low = max(0, int(math.ceil(min(y1, y2) - 0.5)))
+            high = min(height - 1, int(math.floor(max(y1, y2) - 0.5)))
+            for row in range(low, high + 1):
+                y = row + 0.5
+                positions[row].append(x1 + (y - y1) * (x2 - x1) / (y2 - y1))
+    return positions
 
-    At least two distinct crossings are required for a closed lens. An
-    isolated or non-intersecting pair of open curves has zero enclosed area.
+
+def build_lesser_trochanter_mask(geometry: dict) -> np.ndarray:
+    """Fill an interior widening bounded by narrow contour separations.
+
+    The median x of each trace gives the horizontal gap on every common row.
+    A visible tubercle is a smoothed interior peak at least 5 px wide, with
+    a narrow (at most 2.5–5 px) shoulder on both sides, at least 10 rows long
+    and 50 px² in integrated width. Choose the largest qualifying bulge.
+    In particular, a U-shaped profile with wide ends has no interior peak.
     """
+    h, w = geometry["image_height"], geometry["image_width"]
+    mask = np.zeros((h, w), dtype=bool)
     layers = geometry["hip"]["lesser_trochanter_traces"]
-    first = [stroke["points"] for stroke in layers["trochanter"]]
-    second = [stroke["points"] for stroke in layers["adjacent_bone"]]
+    if not layers["trochanter"] or not layers["adjacent_bone"]:
+        return mask
+    first = _scanline_positions(layers["trochanter"], h)
+    second = _scanline_positions(layers["adjacent_bone"], h)
+    max_gap = 0.25 * min(w, h)
+    samples = []
+    for y, (a, b) in enumerate(zip(first, second)):
+        if not a or not b:
+            continue
+        left_curve, right_curve = float(np.median(a)), float(np.median(b))
+        gap = abs(right_curve - left_curve)
+        if gap > max_gap:
+            continue
+        left = max(0, int(math.ceil(min(left_curve, right_curve))))
+        right = min(w - 1, int(math.floor(max(left_curve, right_curve))))
+        samples.append((y, left, right, gap))
+    if len(samples) < 10:
+        return mask
+    widths = np.asarray([sample[3] for sample in samples], dtype=float)
+    smooth = gaussian_filter1d(median_filter(widths, size=5), sigma=1.5)
+    peaks, properties = find_peaks(smooth, prominence=2.0, distance=8)
+    best = None
+    for peak, prominence in zip(peaks, properties["prominences"]):
+        height = float(smooth[peak])
+        if height < 4 or prominence < 2:
+            continue
+        shoulder = min(5.0, max(2.5, 0.25 * height))
+        left = np.flatnonzero(smooth[:peak] <= shoulder)
+        right = np.flatnonzero(smooth[peak + 1:] <= shoulder)
+        if not len(left) or not len(right):
+            continue
+        start, end = int(left[-1]), int(peak + 1 + right[0])
+        length = samples[end][0] - samples[start][0] + 1
+        area = float(widths[start:end + 1].sum())
+        if length < 10 or area < 50:
+            continue
+        # A gap in either pencil trace cannot be filled by interpolation.
+        if any(samples[i + 1][0] - samples[i][0] > 2
+               for i in range(start, end)):
+            continue
+        if best is None or area > best[0]:
+            best = (area, start, end)
+    if best is None:
+        return mask
+    for y, left, right, _ in samples[best[1]:best[2] + 1]:
+        if right >= left:
+            mask[y, left:right + 1] = True
+    return mask
+
+
+def _mask_pixels(mask: np.ndarray) -> list[list[int]]:
+    return [[int(x), int(y)] for y, x in np.argwhere(mask)]
+
+
+def _pixels_mask(geometry: dict) -> np.ndarray:
+    h, w = geometry["image_height"], geometry["image_width"]
+    mask = np.zeros((h, w), dtype=bool)
+    pixels = geometry["hip"].get("lesser_trochanter_pixels") or []
+    if pixels:
+        xy = np.asarray(pixels, dtype=int)
+        mask[xy[:, 1], xy[:, 0]] = True
+    elif not geometry["hip"].get("lesser_trochanter_mask_ready", False):
+        mask = build_lesser_trochanter_mask(geometry)
+    return mask
+
+
+def lesser_trochanter_between_area(geometry: dict) -> tuple[int, int]:
+    """Return pixel mask area and diagnostic count of curve crossings."""
+    layers = geometry["hip"]["lesser_trochanter_traces"]
     intersections = []
-    for a in first:
-        for b in second:
-            for point in _curve_intersections(a, b):
+    for first in layers["trochanter"]:
+        for second in layers["adjacent_bone"]:
+            for point in _curve_intersections(first["points"], second["points"]):
                 if not any(math.dist(point, old) < 0.75 for old in intersections):
                     intersections.append(point)
-    if len(intersections) < 2:
-        return 0, len(intersections)
-    h, w = geometry["image_height"], geometry["image_width"]
-    masks = [np.zeros((h, w), dtype=bool) for _ in range(2)]
-    for mask, strokes in zip(masks, (first, second)):
-        for stroke in strokes:
-            for start, end in zip(stroke, stroke[1:]):
-                n = max(2, int(math.ceil(4 * max(abs(end[0] - start[0]),
-                                                  abs(end[1] - start[1])))))
-                x = np.clip(np.rint(np.linspace(start[0], end[0], n)).astype(int), 0, w - 1)
-                y = np.clip(np.rint(np.linspace(start[1], end[1], n)).astype(int), 0, h - 1)
-                mask[y, x] = True
-    components, count = label(~(masks[0] | masks[1]))  # 4-connected background
-    exterior = set(np.unique(np.concatenate((components[0], components[-1],
-                                             components[:, 0], components[:, -1]))))
-    area = 0
-    for component in range(1, count + 1):
-        if component not in exterior:
-            region = components == component
-            # The boundary must contain pixels from both annotated curves.
-            from scipy.ndimage import binary_dilation
-            boundary = binary_dilation(region) & ~region
-            if np.any(boundary & masks[0]) and np.any(boundary & masks[1]):
-                area += int(region.sum())
-    return area, len(intersections)
+    return int(_pixels_mask(geometry).sum()), len(intersections)
 
 
 def transform_geometry(geometry: dict, transform: Transform,
@@ -232,7 +310,8 @@ def transform_geometry(geometry: dict, transform: Transform,
     w, h = transform.width, transform.height
     out = deepcopy(geometry)
     dropped = {"disc_lines": 0, "foreign_objects": 0, "landmarks": 0,
-               "roi_box": 0, "trochanter": 0, "traces": 0}
+               "roi_box": 0, "trochanter": 0, "traces": 0,
+               "trochanter_pixels": 0}
     lines = []
     for line in out["spine"]["disc_lines"]:
         endpoints, fraction = _clip_segment(*(transform.point(p) for p in line["points"]), w, h)
@@ -299,30 +378,51 @@ def transform_geometry(geometry: dict, transform: Transform,
         for stroke in out["hip"]["lesser_trochanter_traces"][layer]:
             moved = [transform.point(p) for p in stroke["points"]]
             segments = [_clip_segment(a, b, w, h) for a, b in zip(moved, moved[1:])]
-            visible = sum(math.dist(*seg) for seg, _ in segments if seg)
-            total = sum(math.dist(a, b) for a, b in zip(moved, moved[1:]))
-            if total > 0 and visible / total >= min_visible:
-                # Longest contiguous visible run becomes one valid freehand stroke.
-                runs, run = [], []
-                for seg, _ in segments:
-                    if seg:
-                        if run and math.dist(run[-1], seg[0]) > 1e-4:
-                            runs.append(run)
-                            run = []
-                        if not run:
-                            run.append(seg[0])
-                        run.append(seg[1])
-                    elif run:
+            runs, run = [], []
+            for seg, _ in segments:
+                if seg:
+                    if run and math.dist(run[-1], seg[0]) > 1e-4:
                         runs.append(run)
                         run = []
-                if run:
+                    if not run:
+                        run.append(seg[0])
+                    run.append(seg[1])
+                elif run:
                     runs.append(run)
-                run = max(runs, key=lambda r: sum(math.dist(a, b) for a, b in zip(r, r[1:])))
-                if math.dist(run[0], run[-1]) >= 1:
-                    strokes.append({**stroke, "points": run})
-                    continue
-            dropped["traces"] += 1
+                    run = []
+            if run:
+                runs.append(run)
+            for index, visible_run in enumerate(runs):
+                if sum(math.dist(a, b) for a, b in zip(visible_run, visible_run[1:])) >= 1:
+                    item = {**stroke, "points": visible_run}
+                    if index:
+                        item["id"] = f"{stroke['id'][:56]}_{index}"
+                    strokes.append(item)
+            if not runs:
+                dropped["traces"] += 1
         out["hip"]["lesser_trochanter_traces"][layer] = strokes
+    source_mask = _pixels_mask(geometry)
+    source_partial = bool(geometry["hip"].get("lesser_trochanter_partial", False))
+    if source_mask.any():
+        yx = np.argwhere(source_mask)
+        xy = yx[:, ::-1].astype(float)
+        mapped = (transform.matrix @ (xy - transform.source_center).T).T + transform.output_center
+        newly_clipped = bool(np.any((mapped[:, 0] < 0) | (mapped[:, 0] > w - 1) |
+                                    (mapped[:, 1] < 0) | (mapped[:, 1] > h - 1)))
+        inverse = np.linalg.inv(transform.matrix)
+        offset_xy = transform.source_center - inverse @ transform.output_center
+        moved_mask = affine_transform(source_mask, inverse[::-1, ::-1],
+                                      offset_xy[::-1], output_shape=(h, w),
+                                      order=0, mode="constant", cval=0,
+                                      prefilter=False)
+        out["hip"]["lesser_trochanter_pixels"] = _mask_pixels(moved_mask)
+        estimated_total = int(round(int(source_mask.sum()) * transform.scale ** 2))
+        dropped["trochanter_pixels"] = max(0, estimated_total - int(moved_mask.sum()))
+        out["hip"]["lesser_trochanter_partial"] = source_partial or newly_clipped
+    else:
+        out["hip"]["lesser_trochanter_pixels"] = []
+        out["hip"]["lesser_trochanter_partial"] = source_partial
+    out["hip"]["lesser_trochanter_mask_ready"] = True
     # A clipped ROI must never be mistaken for a valid physical ROI.
     meta = {"dropped": dropped, "roi_fully_visible": roi_fully_visible}
     out = validate_geometry(out, w, h)
@@ -404,6 +504,18 @@ def hip_roi_ok(geometry: dict, fully_visible: bool, side: str,
         return False
     if spacing_mm is None:
         return None
+    margins = hip_roi_margins_mm(geometry, side, spacing_mm, lateral_edge)
+    return (margins["top"] >= 30 and margins["bottom"] >= 30 and
+            margins["lateral"] >= 20)
+
+
+def hip_roi_margins_mm(geometry: dict, side: str,
+                      spacing_mm: tuple[float, float],
+                      lateral_edge: dict[str, str] | None = None) -> dict[str, float]:
+    """Distances from the three meaningful ROI sides to the image frame."""
+    box = geometry["hip"]["roi_box"]
+    if box is None:
+        raise ValueError("ROI is missing")
     lateral_edge = lateral_edge or {"LEFT": "right", "RIGHT": "left"}
     edge = lateral_edge[side]
     x1, y1, x2, y2 = box
@@ -412,7 +524,8 @@ def hip_roi_ok(geometry: dict, fully_visible: bool, side: str,
     top = y1 * row_mm
     bottom = (h - 1 - y2) * row_mm
     lateral = (w - 1 - x2 if edge == "right" else x1) * col_mm
-    return top >= 30 and bottom >= 30 and lateral >= 20
+    return {"top": float(top), "bottom": float(bottom),
+            "lateral": float(lateral)}
 
 
 def transformed_spacing(spacing_mm, transform: Transform):

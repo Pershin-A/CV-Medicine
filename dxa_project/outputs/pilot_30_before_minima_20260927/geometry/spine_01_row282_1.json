@@ -1,0 +1,119 @@
+{
+  "schema_version": 1,
+  "coordinate_system": "original_dicom_pixels_top_left",
+  "image_width": 300,
+  "image_height": 287,
+  "spine": {
+    "disc_lines": [
+      {
+        "id": "amuiwspodfp8zg",
+        "points": [
+          [
+            0.0,
+            34.77
+          ],
+          [
+            299.0,
+            24.15
+          ]
+        ]
+      },
+      {
+        "id": "amuiwsqsgn1k8m",
+        "points": [
+          [
+            0.0,
+            86.99
+          ],
+          [
+            299.0,
+            69.2
+          ]
+        ]
+      },
+      {
+        "id": "amuiwss81cblvx",
+        "points": [
+          [
+            0.0,
+            138.08
+          ],
+          [
+            299.0,
+            121.77
+          ]
+        ]
+      },
+      {
+        "id": "amuiwstcjjudks",
+        "points": [
+          [
+            0.0,
+            185.57
+          ],
+          [
+            299.0,
+            183.93
+          ]
+        ]
+      },
+      {
+        "id": "amuiwsutbpsl0t",
+        "points": [
+          [
+            0.0,
+            237.4
+          ],
+          [
+            299.0,
+            230.96
+          ]
+        ]
+      }
+    ],
+    "iliac_crests": {
+      "image_left": [
+        7.9,
+        258.24
+      ],
+      "image_right": [
+        272.11,
+        274.23
+      ]
+    },
+    "foreign_objects": [
+      {
+        "id": "amuiwt1cibns7u",
+        "kind": "clothing",
+        "bbox": [
+          53.49,
+          62.87,
+          114.36,
+          122.27
+        ]
+      }
+    ]
+  },
+  "hip": {
+    "landmarks": {
+      "greater_trochanter": null,
+      "femoral_neck": null,
+      "ischial_bone": null
+    },
+    "lesser_trochanter": null,
+    "lesser_trochanter_traces": {
+      "trochanter": [],
+      "adjacent_bone": []
+    },
+    "lesser_trochanter_pixels": [],
+    "roi_box": null
+  },
+  "image_view": {
+    "mode": "threshold",
+    "threshold_8bit": 24
+  },
+  "complete": {
+    "spine": true,
+    "hip": false
+  }
+}

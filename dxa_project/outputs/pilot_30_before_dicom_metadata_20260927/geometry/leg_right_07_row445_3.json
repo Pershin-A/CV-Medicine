@@ -1,0 +1,158 @@
+{
+  "schema_version": 1,
+  "coordinate_system": "original_dicom_pixels_top_left",
+  "image_width": 280,
+  "image_height": 289,
+  "spine": {
+    "disc_lines": [],
+    "iliac_crests": {
+      "image_left": null,
+      "image_right": null
+    },
+    "foreign_objects": []
+  },
+  "hip": {
+    "landmarks": {
+      "greater_trochanter": null,
+      "femoral_neck": [
+        92.42,
+        215.76
+      ],
+      "ischial_bone": null
+    },
+    "lesser_trochanter": null,
+    "lesser_trochanter_traces": {
+      "trochanter": [
+        {
+          "id": "amujns9ptwnh8u",
+          "points": [
+            [
+              57.22,
+              288.0
+            ],
+            [
+              56.71,
+              287.15
+            ],
+            [
+              55.34,
+              284.39
+            ],
+            [
+              54.64,
+              283.71
+            ]
+          ]
+        }
+      ],
+      "adjacent_bone": [
+        {
+          "id": "amujnsctrp9ycz",
+          "points": [
+            [
+              78.74,
+              288.0
+            ],
+            [
+              79.39,
+              287.15
+            ],
+            [
+              80.07,
+              285.08
+            ],
+            [
+              81.44,
+              283.03
+            ],
+            [
+              82.82,
+              281.66
+            ],
+            [
+              85.55,
+              279.59
+            ],
+            [
+              87.62,
+              278.23
+            ],
+            [
+              90.37,
+              276.16
+            ],
+            [
+              92.42,
+              273.41
+            ],
+            [
+              93.81,
+              272.72
+            ],
+            [
+              96.56,
+              270.67
+            ],
+            [
+              99.99,
+              269.29
+            ],
+            [
+              102.04,
+              267.92
+            ],
+            [
+              104.8,
+              267.24
+            ],
+            [
+              106.86,
+              266.56
+            ],
+            [
+              108.23,
+              265.17
+            ],
+            [
+              110.3,
+              264.49
+            ],
+            [
+              112.35,
+              263.81
+            ],
+            [
+              113.73,
+              262.44
+            ],
+            [
+              115.1,
+              261.74
+            ],
+            [
+              115.1,
+              261.74
+            ]
+          ]
+        }
+      ]
+    },
+    "lesser_trochanter_pixels": [],
+    "lesser_trochanter_mask_ready": true,
+    "lesser_trochanter_partial": true,
+    "roi_box": [
+      0.0,
+      137.48,
+      279.0,
+      288.0
+    ]
+  },
+  "image_view": {
+    "mode": "threshold",
+    "threshold_8bit": 54
+  },
+  "complete": {
+    "spine": false,
+    "hip": true
+  }
+}

@@ -111,7 +111,7 @@ def complete(root: Path, apply: bool = False, allow_partial_hip: bool = False) -
         geometry = json.loads(geometry_path.read_text(encoding="utf-8"))
         ds = pydicom.dcmread(dicom_path, force=True)
         geometry = validate_geometry(geometry, int(ds.Columns), int(ds.Rows))
-        if _read_embedded(ds) != geometry:
+        if validate_geometry(_read_embedded(ds), int(ds.Columns), int(ds.Rows)) != geometry:
             raise ValueError(f"DICOM and JSON disagree at row {index}")
         key = "spine" if region == "SPINE" else "hip"
         if geometry["complete"][key] and row.get(f"geometry_{key}_complete") == "1":

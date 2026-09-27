@@ -86,6 +86,11 @@ button[aria-pressed=true]{background:#1857a3;border-color:#1857a3;color:white}bu
   }
   function isTraceTool(){return tool==='trace_trochanter'||tool==='trace_bone'}
   function currentTraceName(){return tool==='trace_trochanter'?'trochanter':'adjacent_bone'}
+  function invalidateTrochanterMask(){
+    geo.hip.lesser_trochanter_pixels=[];
+    geo.hip.lesser_trochanter_mask_ready=false;
+    geo.hip.lesser_trochanter_partial=false;
+  }
   function syncViewControls(){
     if(!geo)return;
     $('viewMode').value=geo.image_view.mode;
@@ -203,7 +208,7 @@ button[aria-pressed=true]{background:#1857a3;border-color:#1857a3;color:white}bu
       const poly=geo.hip.lesser_trochanter;if(poly)poly.forEach((q,i)=>test(ds(q,poly[(i+1)%poly.length],p),()=>{geo.hip.lesser_trochanter=null}));
       for(const name of ['trochanter','adjacent_bone']){
         geo.hip.lesser_trochanter_traces[name].forEach((stroke,i)=>{
-          for(let j=1;j<stroke.points.length;j++)test(ds(stroke.points[j-1],stroke.points[j],p),()=>geo.hip.lesser_trochanter_traces[name].splice(i,1));
+          for(let j=1;j<stroke.points.length;j++)test(ds(stroke.points[j-1],stroke.points[j],p),()=>{geo.hip.lesser_trochanter_traces[name].splice(i,1);invalidateTrochanterMask()});
         });
       }
       const b=geo.hip.roi_box;if(b&&p[0]>=b[0]&&p[0]<=b[2]&&p[1]>=b[1]&&p[1]<=b[3])test(0,()=>{geo.hip.roi_box=null});
@@ -228,7 +233,7 @@ button[aria-pressed=true]{background:#1857a3;border-color:#1857a3;color:white}bu
     if(!points||points.length<2||points.reduce((length,p,i)=>i?length+dist(points[i-1],p):0,0)<1){draw();return;}
     const layer=geo.hip.lesser_trochanter_traces[currentTraceName()];
     if(layer.length>=24){err('Достигнут лимит штрихов на текущем слое (24).');draw();return;}
-    push();layer.push({id:id(),points});commit();
+    push();layer.push({id:id(),points});invalidateTrochanterMask();commit();
   }
   // Один pointerdown = одно действие. Не используем событие click: оно может
   // запаздывать после фокусировки iframe и не должно дублировать pointerdown.
@@ -273,7 +278,7 @@ button[aria-pressed=true]{background:#1857a3;border-color:#1857a3;color:white}bu
     else if(tool==='disc')geo.spine.disc_lines=[];else if(tool==='foreign')geo.spine.foreign_objects=[];
     else if(tool==='iliac_left'||tool==='iliac_right')geo.spine.iliac_crests[tool==='iliac_left'?'image_left':'image_right']=null;
     else if(tool==='roi')geo.hip.roi_box=null;
-    else if(isTraceTool())geo.hip.lesser_trochanter_traces[currentTraceName()]=[];
+    else if(isTraceTool()){geo.hip.lesser_trochanter_traces[currentTraceName()]=[];invalidateTrochanterMask()}
     else if(['greater','neck','ischial'].includes(tool))geo.hip.landmarks[{greater:'greater_trochanter',neck:'femoral_neck',ischial:'ischial_bone'}[tool]]=null;
     commit();}
   function populate(){
@@ -295,7 +300,7 @@ button[aria-pressed=true]{background:#1857a3;border-color:#1857a3;color:white}bu
       }
       if(geo.hip.lesser_trochanter)items.push(['Контур вертела (старая разметка)',()=>geo.hip.lesser_trochanter=null]);
       for(const [key,label] of [['trochanter','Малый вертел'],['adjacent_bone','Кость у вертела']]){
-        geo.hip.lesser_trochanter_traces[key].forEach((stroke,i)=>items.push([`${label} · штрих ${i+1}`,()=>geo.hip.lesser_trochanter_traces[key].splice(i,1)]));
+        geo.hip.lesser_trochanter_traces[key].forEach((stroke,i)=>items.push([`${label} · штрих ${i+1}`,()=>{geo.hip.lesser_trochanter_traces[key].splice(i,1);invalidateTrochanterMask()}]));
       }
       if(geo.hip.roi_box)items.push(['ROI',()=>geo.hip.roi_box=null]);
     }

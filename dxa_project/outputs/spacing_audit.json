@@ -1,0 +1,306 @@
+{
+  "scanner_nominal_mm_row_col": [
+    1.05,
+    0.6
+  ],
+  "folders": {
+    "Исследования": {
+      "dicom_count": 499,
+      "spacing_basis_counts": {
+        "missing": 499
+      },
+      "metadata_tag_presence": {
+        "ExposedArea": 499
+      },
+      "distinct_dimensions": 43,
+      "min_rows": 180,
+      "max_rows": 405,
+      "min_cols": 248,
+      "max_cols": 300
+    },
+    "Размеченные": {
+      "dicom_count": 499,
+      "spacing_basis_counts": {
+        "missing": 499
+      },
+      "metadata_tag_presence": {
+        "ExposedArea": 499
+      },
+      "distinct_dimensions": 43,
+      "min_rows": 180,
+      "max_rows": 405,
+      "min_cols": 248,
+      "max_cols": 300
+    }
+  },
+  "roi_reference_comparison": {
+    "checked": 328,
+    "mismatch_count": 24,
+    "mismatches": [
+      {
+        "label_row": 81,
+        "relative_path": "2.25.127126130998341190348103034690069487890/series_002_2_CR/A250428736 DXA/CR DXA/CR000005.dcm",
+        "reference_violation": 1,
+        "nominal_violation": 0,
+        "margins_cm": {
+          "top": 7.486,
+          "bottom": 4.076,
+          "lateral": 4.798
+        }
+      },
+      {
+        "label_row": 104,
+        "relative_path": "2.25.13325817932854000792938662637654885530/series_002_2_CR/A2507365486 DXA/CR DXA/CR000001.dcm",
+        "reference_violation": 1,
+        "nominal_violation": 0,
+        "margins_cm": {
+          "top": 6.397,
+          "bottom": 5.655,
+          "lateral": 2.037
+        }
+      },
+      {
+        "label_row": 105,
+        "relative_path": "2.25.13325817932854000792938662637654885530/series_002_2_CR/A2507365486 DXA/CR DXA/CR000002.dcm",
+        "reference_violation": 1,
+        "nominal_violation": 0,
+        "margins_cm": {
+          "top": 6.557,
+          "bottom": 5.535,
+          "lateral": 2.106
+        }
+      },
+      {
+        "label_row": 106,
+        "relative_path": "2.25.13325817932854000792938662637654885530/series_002_2_CR/A2507365486 DXA/CR DXA/CR000003.dcm",
+        "reference_violation": 1,
+        "nominal_violation": 0,
+        "margins_cm": {
+          "top": 6.597,
+          "bottom": 5.574,
+          "lateral": 2.037
+        }
+      },
+      {
+        "label_row": 107,
+        "relative_path": "2.25.13325817932854000792938662637654885530/series_002_2_CR/A2507365486 DXA/CR DXA/CR000004.dcm",
+        "reference_violation": 1,
+        "nominal_violation": 0,
+        "margins_cm": {
+          "top": 6.438,
+          "bottom": 5.414,
+          "lateral": 2.06
+        }
+      },
+      {
+        "label_row": 244,
+        "relative_path": "2.25.168317503020329569414190677927680518621/series_004_2_CR/A2507557128 DXA/CR DXA/CR000000.dcm",
+        "reference_violation": 0,
+        "nominal_violation": 1,
+        "margins_cm": {
+          "top": 6.905,
+          "bottom": 9.467,
+          "lateral": 1.931
+        }
+      },
+      {
+        "label_row": 262,
+        "relative_path": "2.25.173753313169335820519632380691065649420/series_003_2_CR/A2504265499 DXA/CR DXA/CR000000.dcm",
+        "reference_violation": 1,
+        "nominal_violation": 0,
+        "margins_cm": {
+          "top": 6.715,
+          "bottom": 3.126,
+          "lateral": 3.449
+        }
+      },
+      {
+        "label_row": 263,
+        "relative_path": "2.25.173753313169335820519632380691065649420/series_003_2_CR/A2504265499 DXA/CR DXA/CR000001.dcm",
+        "reference_violation": 1,
+        "nominal_violation": 0,
+        "margins_cm": {
+          "top": 6.755,
+          "bottom": 3.045,
+          "lateral": 3.564
+        }
+      },
+      {
+        "label_row": 266,
+        "relative_path": "2.25.173753313169335820519632380691065649420/series_003_2_CR/A2504265499 DXA/CR DXA/CR000004.dcm",
+        "reference_violation": 1,
+        "nominal_violation": 0,
+        "margins_cm": {
+          "top": 6.715,
+          "bottom": 3.005,
+          "lateral": 3.701
+        }
+      },
+      {
+        "label_row": 268,
+        "relative_path": "2.25.173753313169335820519632380691065649420/series_003_2_CR/A2504265499 DXA/CR DXA/CR000006.dcm",
+        "reference_violation": 1,
+        "nominal_violation": 0,
+        "margins_cm": {
+          "top": 6.634,
+          "bottom": 3.086,
+          "lateral": 3.541
+        }
+      },
+      {
+        "label_row": 278,
+        "relative_path": "2.25.175903805423871105435148927871625232853/series_001_2_CR/A2507159447 DXA/CR DXA/CR000001.dcm",
+        "reference_violation": 0,
+        "nominal_violation": 1,
+        "margins_cm": {
+          "top": 6.335,
+          "bottom": 11.618,
+          "lateral": 1.883
+        }
+      },
+      {
+        "label_row": 283,
+        "relative_path": "2.25.17706555930735581384953296958427669848/series_004_3_CR/A2504146513 DXA/CR DXA/CR000003.dcm",
+        "reference_violation": 0,
+        "nominal_violation": 1,
+        "margins_cm": {
+          "top": 6.972,
+          "bottom": 10.584,
+          "lateral": 1.778
+        }
+      },
+      {
+        "label_row": 284,
+        "relative_path": "2.25.17706555930735581384953296958427669848/series_004_3_CR/A2504146513 DXA/CR DXA/CR000004.dcm",
+        "reference_violation": 0,
+        "nominal_violation": 1,
+        "margins_cm": {
+          "top": 6.871,
+          "bottom": 10.651,
+          "lateral": 1.663
+        }
+      },
+      {
+        "label_row": 293,
+        "relative_path": "2.25.181196659018348153828200695057897449628/series_004_2_CR/A2507370620 DXA/CR DXA/CR000000.dcm",
+        "reference_violation": 0,
+        "nominal_violation": 1,
+        "margins_cm": {
+          "top": 8.604,
+          "bottom": 10.001,
+          "lateral": 1.601
+        }
+      },
+      {
+        "label_row": 299,
+        "relative_path": "2.25.181196659018348153828200695057897449628/series_004_2_CR/A2507370620 DXA/CR DXA/CR000006.dcm",
+        "reference_violation": 0,
+        "nominal_violation": 1,
+        "margins_cm": {
+          "top": 8.377,
+          "bottom": 10.228,
+          "lateral": 1.514
+        }
+      },
+      {
+        "label_row": 300,
+        "relative_path": "2.25.181196659018348153828200695057897449628/series_004_2_CR/A2507370620 DXA/CR DXA/CR000007.dcm",
+        "reference_violation": 0,
+        "nominal_violation": 1,
+        "margins_cm": {
+          "top": 8.265,
+          "bottom": 10.039,
+          "lateral": 1.665
+        }
+      },
+      {
+        "label_row": 301,
+        "relative_path": "2.25.181196659018348153828200695057897449628/series_004_2_CR/A2507370620 DXA/CR DXA/CR000008.dcm",
+        "reference_violation": 0,
+        "nominal_violation": 1,
+        "margins_cm": {
+          "top": 8.377,
+          "bottom": 10.039,
+          "lateral": 1.471
+        }
+      },
+      {
+        "label_row": 303,
+        "relative_path": "2.25.181196659018348153828200695057897449628/series_004_2_CR/A2507370620 DXA/CR DXA/CR000010.dcm",
+        "reference_violation": 0,
+        "nominal_violation": 1,
+        "margins_cm": {
+          "top": 8.377,
+          "bottom": 10.115,
+          "lateral": 1.493
+        }
+      },
+      {
+        "label_row": 325,
+        "relative_path": "2.25.190331309633057244929837507901317950031/series_001_2_CR/A250791815 DXA/CR DXA/CR000004.dcm",
+        "reference_violation": 0,
+        "nominal_violation": 1,
+        "margins_cm": {
+          "top": 8.167,
+          "bottom": 2.848,
+          "lateral": 5.38
+        }
+      },
+      {
+        "label_row": 328,
+        "relative_path": "2.25.190331309633057244929837507901317950031/series_001_2_CR/A250791815 DXA/CR DXA/CR000007.dcm",
+        "reference_violation": 0,
+        "nominal_violation": 1,
+        "margins_cm": {
+          "top": 8.167,
+          "bottom": 2.878,
+          "lateral": 5.206
+        }
+      },
+      {
+        "label_row": 331,
+        "relative_path": "2.25.190331309633057244929837507901317950031/series_001_2_CR/A250791815 DXA/CR DXA/CR000010.dcm",
+        "reference_violation": 0,
+        "nominal_violation": 1,
+        "margins_cm": {
+          "top": 8.015,
+          "bottom": 2.848,
+          "lateral": 5.362
+        }
+      },
+      {
+        "label_row": 360,
+        "relative_path": "2.25.234651502352368356456298825489565282446/series_002_2_CR/A2504307193 DXA/CR DXA/CR000009.dcm",
+        "reference_violation": 0,
+        "nominal_violation": 1,
+        "margins_cm": {
+          "top": 7.356,
+          "bottom": 2.844,
+          "lateral": 3.504
+        }
+      },
+      {
+        "label_row": 387,
+        "relative_path": "2.25.277752758923974029595977676354128739670/series_002_2_CR/A2504223752 DXA/CR DXA/CR000001.dcm",
+        "reference_violation": 1,
+        "nominal_violation": 0,
+        "margins_cm": {
+          "top": 6.718,
+          "bottom": 8.865,
+          "lateral": 5.017
+        }
+      },
+      {
+        "label_row": 388,
+        "relative_path": "2.25.277752758923974029595977676354128739670/series_002_2_CR/A2504223752 DXA/CR DXA/CR000002.dcm",
+        "reference_violation": 1,
+        "nominal_violation": 0,
+        "margins_cm": {
+          "top": 6.477,
+          "bottom": 8.785,
+          "lateral": 4.902
+        }
+      }
+    ]
+  }
+}

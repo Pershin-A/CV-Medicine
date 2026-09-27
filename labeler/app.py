@@ -22,9 +22,13 @@ from geometry import (
     empty_geometry, validate_geometry, geometry_sidecar,
     read_geometry, save_geometry, geometry_counts, is_newer_canvas_revision,
 )
+from annotation_filters import (
+    FILTER_OPTIONS, augmentation_index, build_summaries, geometry_path_for,
+    matches_filter,
+)
 
 
-APP_VERSION = "5.3-freehand-threshold"
+APP_VERSION = "5.4-geometry-filters"
 
 warnings.filterwarnings(
     "ignore",
@@ -42,6 +46,7 @@ warnings.filterwarnings(
 DATA_ROOT = Path(os.getenv("DATA_ROOT", "/data"))
 OUTPUT_ROOT = Path(os.getenv("OUTPUT_ROOT", "/output"))
 REFERENCE_XLSX = Path(os.getenv("REFERENCE_XLSX", "/reference/разметка.xlsx"))
+AUGMENTATION_MANIFEST = os.getenv("AUGMENTATION_MANIFEST", "").strip()
 
 EXPECTED_DICOM_COUNT = int(os.getenv("EXPECTED_DICOM_COUNT", "0") or 0)
 EXPECTED_DATASET_FINGERPRINT = os.getenv(
@@ -491,6 +496,7 @@ def annotation_from_dicom(source_path: Path):
 def read_existing_annotation(
     source_path: Path,
     lookup: dict,
+    augmented: dict | None = None,
 ):
     """
     labels.csv считается главным источником состояния.
@@ -516,6 +522,13 @@ def read_existing_annotation(
         }
 
     result = annotation_from_dicom(source_path)
+    augmented_entry = (augmented or {}).get(rel)
+    if augmented_entry and result["label"] == "UNKNOWN":
+        region = augmented_entry["region"]
+        result["label"] = "SPINE" if region == "SPINE" else "LEG"
+        result["side"] = region.removeprefix("LEG_") if region.startswith("LEG_") else ""
+        result["source"] = "manifest.csv"
+        return result
     result["source"] = "DICOM"
     return result
 
@@ -592,8 +605,9 @@ def cached_canvas_image(path_str: str, mtime_ns: int, max_side=1400):
 
 
 def load_source_geometry(source_path: Path, width: int, height: int):
-    path = geometry_sidecar(OUTPUT_ROOT, relative_path_string(source_path))
-    if path.exists():
+    path = geometry_path_for(relative_path_string(source_path), OUTPUT_ROOT,
+                             AUGMENTED_INDEX)
+    if path is not None:
         return read_geometry(path, width, height)
     # Backwards-compatible fallback: DICOM metadata, if sidecar was moved/lost.
     old = annotation_from_dicom(source_path).get("geometry_json", "")
@@ -1100,6 +1114,10 @@ if not files:
 
 labels_df = read_labels_df()
 lookup = labels_lookup(labels_df)
+manifest_path = (Path(AUGMENTATION_MANIFEST) if AUGMENTATION_MANIFEST else
+                 DATA_ROOT.parent / "manifest.csv" if DATA_ROOT.name == "images" else None)
+AUGMENTED_INDEX = augmentation_index(manifest_path)
+filter_summaries = build_summaries(relative_options, OUTPUT_ROOT, lookup, AUGMENTED_INDEX)
 
 current_paths = set(relative_options)
 
@@ -1227,6 +1245,14 @@ with st.sidebar:
         st.cache_data.clear()
         st.rerun()
 
+    filter_label = st.selectbox(
+        "Показать изображения",
+        options=list(FILTER_OPTIONS),
+        key="geometry_filter",
+        help="Фильтры используют JSON разметки; для аугментаций — starter JSON из manifest.csv.",
+    )
+    filter_code = FILTER_OPTIONS[filter_label]
+
     search_query = st.text_input(
         "Поиск по имени файла",
         key="file_search",
@@ -1237,14 +1263,16 @@ with st.sidebar:
         ),
     ).strip().casefold()
 
+    candidates = [rel for rel in relative_options
+                  if matches_filter(filter_summaries[rel], filter_code)]
     if search_query:
         filtered_options = [
-            rel for rel in relative_options
+            rel for rel in candidates
             if search_query in Path(rel).name.casefold()
             or search_query in rel.casefold()
         ]
     else:
-        filtered_options = relative_options
+        filtered_options = candidates
 
     if not filtered_options:
         st.warning("Совпадений не найдено.")
@@ -1261,13 +1289,14 @@ with st.sidebar:
         on_change=on_file_selected,
     )
 
-    if search_query:
-        st.caption(f"Найдено: {len(filtered_options)}")
+    st.caption(f"В фильтре: {len(candidates)}; после поиска: {len(filtered_options)}")
 
     idx = st.session_state.current_idx
 
     st.write(
-        f"Файл **{idx + 1} / {len(files)}**"
+        f"Файл **{idx + 1} / {len(files)}** · "
+        f"в фильтре **{filtered_options.index(st.session_state.file_select) + 1} / "
+        f"{len(filtered_options)}**"
     )
 
     prev_col, next_col = st.columns(2)
@@ -1276,10 +1305,11 @@ with st.sidebar:
         if st.button(
             "← Пред.",
             width="stretch",
-            disabled=(idx == 0),
+            disabled=(filtered_options.index(st.session_state.file_select) == 0),
         ):
             move_to(
-                idx - 1,
+                relative_options.index(filtered_options[
+                    filtered_options.index(st.session_state.file_select) - 1]),
                 files,
             )
             st.rerun()
@@ -1288,10 +1318,12 @@ with st.sidebar:
         if st.button(
             "След. →",
             width="stretch",
-            disabled=(idx >= len(files) - 1),
+            disabled=(filtered_options.index(st.session_state.file_select) >=
+                      len(filtered_options) - 1),
         ):
             move_to(
-                idx + 1,
+                relative_options.index(filtered_options[
+                    filtered_options.index(st.session_state.file_select) + 1]),
                 files,
             )
             st.rerun()
@@ -1397,7 +1429,7 @@ if not dataset_ok:
 current_idx = st.session_state.current_idx
 source_path = files[current_idx]
 relative_path = relative_path_string(source_path)
-existing = read_existing_annotation(source_path, lookup)
+existing = read_existing_annotation(source_path, lookup, AUGMENTED_INDEX)
 widget_suffix = hashlib.sha1(relative_path.encode("utf-8", errors="replace")).hexdigest()[:12]
 
 top_left, top_right = st.columns(
@@ -1487,7 +1519,7 @@ with top_right:
                     image_png_base64=encoded,
                     geometry=geometry_value,
                     last_client_revision=st.session_state.get(geometry_revision_key, 0),
-                    key=f"dxa_canvas_v53_{widget_suffix}",
+                    key=f"dxa_canvas_v54_{widget_suffix}",
                     default=None,
                 )
                 if returned is not None:

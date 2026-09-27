@@ -1,0 +1,4 @@
+relative_path,path,study_uid,rows,columns,spine_artifact
+study_0/image.dcm,C:\Users\Андрей\Desktop\Хакатон\dxa_project\tests\.tmp_new_rules_20260927\test_end_to_end_synthetic_gene0\source\image_0.dcm,1.2.826.0.1.3680043.8.498.97980177977706090773737792563463278931,300,300,0
+study_1/image.dcm,C:\Users\Андрей\Desktop\Хакатон\dxa_project\tests\.tmp_new_rules_20260927\test_end_to_end_synthetic_gene0\source\image_1.dcm,1.2.826.0.1.3680043.8.498.50893636017540701960463237186099387017,300,300,0
+study_2/image.dcm,C:\Users\Андрей\Desktop\Хакатон\dxa_project\tests\.tmp_new_rules_20260927\test_end_to_end_synthetic_gene0\source\image_2.dcm,1.2.826.0.1.3680043.8.498.73249256028996151517748020646705505489,300,300,0

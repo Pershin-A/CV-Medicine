@@ -1,0 +1,121 @@
+{
+  "schema_version": 1,
+  "coordinate_system": "original_dicom_pixels_top_left",
+  "image_width": 300,
+  "image_height": 318,
+  "spine": {
+    "disc_lines": [
+      {
+        "id": "amuh904i5c1z3u",
+        "points": [
+          [
+            0.0,
+            30.68
+          ],
+          [
+            299.0,
+            19.63
+          ]
+        ]
+      },
+      {
+        "id": "amuh906x9w6ve7",
+        "points": [
+          [
+            0.0,
+            85.68
+          ],
+          [
+            299.0,
+            68.76
+          ]
+        ]
+      },
+      {
+        "id": "amuh90cqbf0f48",
+        "points": [
+          [
+            0.0,
+            132.85
+          ],
+          [
+            299.0,
+            115.26
+          ]
+        ]
+      },
+      {
+        "id": "amuh90eylc1q3m",
+        "points": [
+          [
+            0.0,
+            192.44
+          ],
+          [
+            299.0,
+            170.64
+          ]
+        ]
+      },
+      {
+        "id": "amuh90mez78fqi",
+        "points": [
+          [
+            0.0,
+            241.88
+          ],
+          [
+            299.0,
+            221.91
+          ]
+        ]
+      },
+      {
+        "id": "amuh90rfg3fb1n",
+        "points": [
+          [
+            0.0,
+            307.95
+          ],
+          [
+            299.0,
+            285.94
+          ]
+        ]
+      }
+    ],
+    "iliac_crests": {
+      "image_left": [
+        35.45,
+        298.36
+      ],
+      "image_right": [
+        283.87,
+        264.25
+      ]
+    },
+    "foreign_objects": []
+  },
+  "hip": {
+    "landmarks": {
+      "greater_trochanter": null,
+      "femoral_neck": null,
+      "ischial_bone": null
+    },
+    "lesser_trochanter": null,
+    "lesser_trochanter_traces": {
+      "trochanter": [],
+      "adjacent_bone": []
+    },
+    "lesser_trochanter_pixels": [],
+    "roi_box": null
+  },
+  "image_view": {
+    "mode": "threshold",
+    "threshold_8bit": 37
+  },
+  "complete": {
+    "spine": true,
+    "hip": false
+  }
+}

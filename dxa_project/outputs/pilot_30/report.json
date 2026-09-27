@@ -10,34 +10,34 @@
   },
   "target_coverage": {
     "spine_position": {
-      "negative": 39,
-      "positive": 21,
+      "negative": 38,
+      "positive": 22,
       "unknown": 120
     },
     "spine_axis": {
-      "negative": 23,
-      "positive": 37,
+      "negative": 20,
+      "positive": 40,
       "unknown": 120
     },
     "spine_artifact": {
-      "negative": 8,
+      "negative": 10,
       "positive": 48,
-      "unknown": 124
+      "unknown": 122
     },
     "hip_position": {
-      "negative": 43,
-      "positive": 77,
+      "negative": 40,
+      "positive": 80,
       "unknown": 60
     },
     "hip_roi": {
-      "negative": 80,
-      "positive": 40,
+      "negative": 79,
+      "positive": 41,
       "unknown": 60
     },
     "hip_rotation": {
-      "negative": 5,
-      "positive": 41,
-      "unknown": 134
+      "negative": 70,
+      "positive": 50,
+      "unknown": 60
     }
   },
   "failures": {
@@ -105,64 +105,64 @@
       "board_path": "boards/spine_10_row008.png"
     },
     {
-      "source_row": 181,
+      "source_row": 455,
       "region": "LEG_LEFT",
-      "sample_id": "leg_left_01_row181",
-      "board_path": "boards/leg_left_01_row181.png"
+      "sample_id": "leg_left_01_row455",
+      "board_path": "boards/leg_left_01_row455.png"
     },
     {
-      "source_row": 360,
+      "source_row": 54,
       "region": "LEG_LEFT",
-      "sample_id": "leg_left_02_row360",
-      "board_path": "boards/leg_left_02_row360.png"
+      "sample_id": "leg_left_02_row054",
+      "board_path": "boards/leg_left_02_row054.png"
     },
     {
-      "source_row": 416,
+      "source_row": 236,
       "region": "LEG_LEFT",
-      "sample_id": "leg_left_03_row416",
-      "board_path": "boards/leg_left_03_row416.png"
+      "sample_id": "leg_left_03_row236",
+      "board_path": "boards/leg_left_03_row236.png"
+    },
+    {
+      "source_row": 362,
+      "region": "LEG_LEFT",
+      "sample_id": "leg_left_04_row362",
+      "board_path": "boards/leg_left_04_row362.png"
+    },
+    {
+      "source_row": 44,
+      "region": "LEG_LEFT",
+      "sample_id": "leg_left_05_row044",
+      "board_path": "boards/leg_left_05_row044.png"
+    },
+    {
+      "source_row": 410,
+      "region": "LEG_LEFT",
+      "sample_id": "leg_left_06_row410",
+      "board_path": "boards/leg_left_06_row410.png"
+    },
+    {
+      "source_row": 407,
+      "region": "LEG_LEFT",
+      "sample_id": "leg_left_07_row407",
+      "board_path": "boards/leg_left_07_row407.png"
+    },
+    {
+      "source_row": 167,
+      "region": "LEG_LEFT",
+      "sample_id": "leg_left_08_row167",
+      "board_path": "boards/leg_left_08_row167.png"
+    },
+    {
+      "source_row": 227,
+      "region": "LEG_LEFT",
+      "sample_id": "leg_left_09_row227",
+      "board_path": "boards/leg_left_09_row227.png"
     },
     {
       "source_row": 496,
       "region": "LEG_LEFT",
-      "sample_id": "leg_left_04_row496",
-      "board_path": "boards/leg_left_04_row496.png"
-    },
-    {
-      "source_row": 280,
-      "region": "LEG_LEFT",
-      "sample_id": "leg_left_05_row280",
-      "board_path": "boards/leg_left_05_row280.png"
-    },
-    {
-      "source_row": 419,
-      "region": "LEG_LEFT",
-      "sample_id": "leg_left_06_row419",
-      "board_path": "boards/leg_left_06_row419.png"
-    },
-    {
-      "source_row": 478,
-      "region": "LEG_LEFT",
-      "sample_id": "leg_left_07_row478",
-      "board_path": "boards/leg_left_07_row478.png"
-    },
-    {
-      "source_row": 453,
-      "region": "LEG_LEFT",
-      "sample_id": "leg_left_08_row453",
-      "board_path": "boards/leg_left_08_row453.png"
-    },
-    {
-      "source_row": 330,
-      "region": "LEG_LEFT",
-      "sample_id": "leg_left_09_row330",
-      "board_path": "boards/leg_left_09_row330.png"
-    },
-    {
-      "source_row": 261,
-      "region": "LEG_LEFT",
-      "sample_id": "leg_left_10_row261",
-      "board_path": "boards/leg_left_10_row261.png"
+      "sample_id": "leg_left_10_row496",
+      "board_path": "boards/leg_left_10_row496.png"
     },
     {
       "source_row": 358,
@@ -171,60 +171,60 @@
       "board_path": "boards/leg_right_01_row358.png"
     },
     {
-      "source_row": 328,
+      "source_row": 56,
       "region": "LEG_RIGHT",
-      "sample_id": "leg_right_02_row328",
-      "board_path": "boards/leg_right_02_row328.png"
+      "sample_id": "leg_right_02_row056",
+      "board_path": "boards/leg_right_02_row056.png"
     },
     {
-      "source_row": 448,
+      "source_row": 65,
       "region": "LEG_RIGHT",
-      "sample_id": "leg_right_03_row448",
-      "board_path": "boards/leg_right_03_row448.png"
+      "sample_id": "leg_right_03_row065",
+      "board_path": "boards/leg_right_03_row065.png"
+    },
+    {
+      "source_row": 252,
+      "region": "LEG_RIGHT",
+      "sample_id": "leg_right_04_row252",
+      "board_path": "boards/leg_right_04_row252.png"
+    },
+    {
+      "source_row": 248,
+      "region": "LEG_RIGHT",
+      "sample_id": "leg_right_05_row248",
+      "board_path": "boards/leg_right_05_row248.png"
+    },
+    {
+      "source_row": 442,
+      "region": "LEG_RIGHT",
+      "sample_id": "leg_right_06_row442",
+      "board_path": "boards/leg_right_06_row442.png"
     },
     {
       "source_row": 445,
       "region": "LEG_RIGHT",
-      "sample_id": "leg_right_04_row445",
-      "board_path": "boards/leg_right_04_row445.png"
+      "sample_id": "leg_right_07_row445",
+      "board_path": "boards/leg_right_07_row445.png"
     },
     {
-      "source_row": 499,
+      "source_row": 206,
       "region": "LEG_RIGHT",
-      "sample_id": "leg_right_05_row499",
-      "board_path": "boards/leg_right_05_row499.png"
+      "sample_id": "leg_right_08_row206",
+      "board_path": "boards/leg_right_08_row206.png"
     },
     {
-      "source_row": 311,
+      "source_row": 30,
       "region": "LEG_RIGHT",
-      "sample_id": "leg_right_06_row311",
-      "board_path": "boards/leg_right_06_row311.png"
+      "sample_id": "leg_right_09_row030",
+      "board_path": "boards/leg_right_09_row030.png"
     },
     {
-      "source_row": 273,
+      "source_row": 37,
       "region": "LEG_RIGHT",
-      "sample_id": "leg_right_07_row273",
-      "board_path": "boards/leg_right_07_row273.png"
-    },
-    {
-      "source_row": 411,
-      "region": "LEG_RIGHT",
-      "sample_id": "leg_right_08_row411",
-      "board_path": "boards/leg_right_08_row411.png"
-    },
-    {
-      "source_row": 342,
-      "region": "LEG_RIGHT",
-      "sample_id": "leg_right_09_row342",
-      "board_path": "boards/leg_right_09_row342.png"
-    },
-    {
-      "source_row": 452,
-      "region": "LEG_RIGHT",
-      "sample_id": "leg_right_10_row452",
-      "board_path": "boards/leg_right_10_row452.png"
+      "sample_id": "leg_right_10_row037",
+      "board_path": "boards/leg_right_10_row037.png"
     }
   ],
   "target_convention": "1=нарушение, 0=норма, ?=неизвестно",
-  "roi_spacing_note": "roi_proxy is inferred from the original ROI, not measured DICOM spacing"
+  "roi_spacing_note": "1.05 mm/Y and 0.6 mm/X are user-supplied scanner nominal values; no spacing tags in these DICOMs"
 }

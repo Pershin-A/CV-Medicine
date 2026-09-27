@@ -1,0 +1,3 @@
+﻿relative_path,output_path,geometry_path,label,geometry_spine_complete,geometry_hip_complete
+0.dcm,0.dcm,geometry/0.json,SPINE,1,0
+1.dcm,1.dcm,geometry/1.json,LEG,0,1

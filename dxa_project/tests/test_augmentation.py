@@ -12,7 +12,8 @@ from dxa_project.augmentation.core import (Transform, hip_position_ok, hip_roi_o
                                transform_geometry, transformed_spacing, warp_image)
 from dxa_project.augmentation.generate import (_check_group, _hip_variant,
                                                _labels, _roi_proxy_spacing,
-                                               _spine_variant, _write_dicom, generate)
+                                               _source_spacing, _spine_variant,
+                                               _write_dicom, generate)
 from labeler.geometry import empty_geometry, validate_geometry
 
 
@@ -132,16 +133,111 @@ def test_roi_arbitrary_edge_is_extended_and_can_be_clipped():
         assert moved["hip"]["roi_box"][arbitrary_index] == (0 if side == "LEFT" else 299)
 
 
-def test_trochanter_area_requires_two_crossings():
+def test_trochanter_pixels_need_overlap_in_height_not_curve_crossings():
     g = hip_fixture()
     g["hip"]["lesser_trochanter_traces"] = {
-        "trochanter": [{"id": "t", "points": [[10, 20], [70, 20]]}],
-        "adjacent_bone": [{"id": "b", "points": [[10, 30], [30, 10], [50, 10], [70, 30]]}],
+        "trochanter": [{"id": "t", "points": [[100, 40], [118, 60], [100, 80]]}],
+        "adjacent_bone": [{"id": "b", "points": [[98, 30], [98, 90]]}],
     }
-    area, crossings = lesser_trochanter_between_area(g)
-    assert crossings == 2 and area > 0
-    g["hip"]["lesser_trochanter_traces"]["adjacent_bone"][0]["points"] = [[10, 35], [70, 35]]
+    prepared = prepare_geometry(g, "LEG_LEFT")
+    area, crossings = lesser_trochanter_between_area(prepared)
+    assert crossings == 0 and area > 0
+    assert len(prepared["hip"]["lesser_trochanter_pixels"]) == area
+    assert g["hip"]["lesser_trochanter_pixels"] == []
+    zoom = Transform(300, 300, 2, 0, 150, 150)
+    assert zoom.covers_output()
+    moved, _ = transform_geometry(prepared, zoom, region="LEG_LEFT")
+    assert 0 < len(moved["hip"]["lesser_trochanter_pixels"]) < area * 4
+    assert moved["hip"]["lesser_trochanter_partial"]
+    assert moved["hip"]["lesser_trochanter_traces"] != {}
+    g["hip"]["lesser_trochanter_traces"]["adjacent_bone"][0]["points"] = [[90, 160], [98, 200]]
     assert lesser_trochanter_between_area(g) == (0, 0)
+
+
+def test_rotation_copies_source_if_pixels_remain_otherwise_violation():
+    g = hip_fixture()
+    g["hip"]["lesser_trochanter_traces"] = {
+        "trochanter": [{"id": "t", "points": [[100, 40], [118, 60], [100, 80]]}],
+        "adjacent_bone": [{"id": "b", "points": [[98, 30], [98, 90]]}],
+    }
+    prepared = prepare_geometry(g, "LEG_RIGHT")
+    source = {"right_hip_rotation": "0.0"}
+    image = np.zeros((300, 300), dtype=np.uint16)
+    labels = _labels("LEG_RIGHT", prepared, {"roi_fully_visible": True},
+                     image, (1, 1), source)
+    assert labels["hip_rotation"] == 0
+    prepared["hip"]["lesser_trochanter_pixels"] = []
+    prepared["hip"]["lesser_trochanter_traces"] = {
+        "trochanter": [], "adjacent_bone": []}
+    labels = _labels("LEG_RIGHT", prepared, {"roi_fully_visible": True},
+                     image, (1, 1), source)
+    assert labels["hip_rotation"] == 1
+
+
+def test_one_width_minimum_has_no_trochanter_pixels_but_keeps_contour():
+    g = hip_fixture()
+    g["hip"]["lesser_trochanter_traces"] = {
+        "trochanter": [{"id": "t", "points": [[120, 40], [100, 60], [120, 80]]}],
+        "adjacent_bone": [{"id": "b", "points": [[98, 30], [98, 90]]}],
+    }
+    prepared = prepare_geometry(g, "LEG_LEFT")
+    assert prepared["hip"]["lesser_trochanter_pixels"] == []
+    assert prepared["hip"]["lesser_trochanter_mask_ready"]
+    moved, _ = transform_geometry(prepared, Transform(300, 300, 2, 0, 150, 150),
+                                  region="LEG_LEFT")
+    assert moved["hip"]["lesser_trochanter_pixels"] == []
+    assert moved["hip"]["lesser_trochanter_traces"]["trochanter"]
+    assert _labels("LEG_LEFT", moved, {"roi_fully_visible": True},
+                   np.zeros((300, 300)), (1.05 / 2, 0.6 / 2),
+                   {"left_hip_rotation": "0"})["hip_rotation"] == 1
+
+
+def test_small_interior_widening_is_filled_without_two_local_minima():
+    g = hip_fixture()
+    g["hip"]["lesser_trochanter_traces"] = {
+        "trochanter": [{"id": "t", "points": [[97, 40], [100, 55],
+                                           [100, 60], [97, 75]]}],
+        "adjacent_bone": [{"id": "b", "points": [[95, 35], [95, 80]]}],
+    }
+    prepared = prepare_geometry(g, "LEG_LEFT")
+    rows = [point[1] for point in prepared["hip"]["lesser_trochanter_pixels"]]
+    assert rows and 40 < min(rows) < 55 and 60 < max(rows) < 75
+
+
+def test_partial_visible_trochanter_forces_rotation_violation():
+    g = hip_fixture()
+    g["hip"]["lesser_trochanter_traces"] = {
+        "trochanter": [{"id": "t", "points": [[100, 40], [118, 60], [100, 80]]}],
+        "adjacent_bone": [{"id": "b", "points": [[98, 30], [98, 90]]}],
+    }
+    prepared = prepare_geometry(g, "LEG_LEFT")
+    moved, _ = transform_geometry(prepared, Transform(300, 300, 2, 0, 150, 150),
+                                  region="LEG_LEFT")
+    assert len(moved["hip"]["lesser_trochanter_pixels"]) > 0
+    assert moved["hip"]["lesser_trochanter_partial"]
+    prepared_again = prepare_geometry(moved, "LEG_LEFT")
+    assert prepared_again["hip"]["lesser_trochanter_pixels"] == moved["hip"]["lesser_trochanter_pixels"]
+    assert prepared_again["hip"]["lesser_trochanter_partial"]
+    labels = _labels("LEG_LEFT", moved, {"roi_fully_visible": True},
+                     np.zeros((300, 300)), (1.05 / 2, 0.6 / 2),
+                     {"left_hip_rotation": "0"})
+    assert labels["hip_rotation"] == 1
+
+
+def test_nominal_spacing_and_strict_axis_intervals():
+    from pydicom.dataset import Dataset
+    spacing, basis = _source_spacing(Dataset())
+    assert spacing == (1.05, 0.6)
+    assert basis == "scanner_nominal_user_supplied"
+    assert _source_spacing(Dataset(), allow_nominal=False) == (None, "missing")
+    for angle in (-20, -6, 6, 20):
+        assert _check_group("SPINE", "negative_axis_or_roi",
+                            {"spine_position": 0, "spine_axis": 1,
+                             "spine_axis_angle_deg": angle})
+    for angle in (-5, 4.6, 4.1, 5):
+        assert not _check_group("SPINE", "negative_axis_or_roi",
+                                {"spine_position": 0, "spine_axis": 0,
+                                 "spine_axis_angle_deg": angle})
 
 
 def test_candidate_sampler_reaches_each_requested_group():
@@ -197,12 +293,17 @@ def test_synthetic_dicom_roundtrip(tmp_path):
     t = Transform(100, 100, 1.2)
     expected = warp_image(image, t)
     destination = tmp_path / "synthetic.dcm"
-    _write_dicom(ds, expected, t, destination, "synthetic-seed")
+    _write_dicom(ds, expected, t, destination, "synthetic-seed",
+                 {"hip": {"roi_box": [0, 2, 10, 20]}},
+                 {"hip_roi": 1}, "LEG_LEFT")
     reread = pydicom.dcmread(destination)
     np.testing.assert_array_equal(reread.pixel_array, expected)
     assert reread.pixel_array.shape == image.shape
     assert tuple(float(v) for v in reread.PixelSpacing) == pytest.approx((0.5 / 1.2,) * 2)
     assert reread.SOPInstanceUID != ds.SOPInstanceUID
+    block = reread.private_block(0x0011, "DXA_MANUAL_LABELER")
+    assert json.loads(reread[block.get_tag(0x09)].value)["hip"]["roi_box"] == [0, 2, 10, 20]
+    assert json.loads(reread[block.get_tag(0x0A)].value)["hip_roi"] == 1
 
 
 def test_end_to_end_synthetic_generation(tmp_path):

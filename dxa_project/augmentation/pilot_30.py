@@ -21,8 +21,8 @@ from PIL import Image, ImageDraw, ImageFont, ImageOps
 from .core import (hip_position_ok, hip_roi_ok,
                    spine_axis_angle, spine_position_ok, transform_geometry,
                    transformed_spacing, warp_image)
-from .generate import (_check_group, _dicom_spacing, _hip_variant, _labels,
-                       _read_dicom, _read_rows, _read_sources, _roi_proxy_spacing,
+from .generate import (_check_group, _source_spacing, _hip_variant, _labels,
+                       _read_dicom, _read_rows, _read_sources,
                        _spine_variant, _write_dicom)
 
 
@@ -84,10 +84,32 @@ def _overlay(base: Image.Image, geometry: dict, region: str):
             draw.ellipse((x - 5, y - 5, x + 5, y + 5), fill="#13d7f5", outline="black")
             draw.text((x + 6, y - 14), str(digit), fill="#13d7f5",
                       font=_font(14), stroke_width=1, stroke_fill="black")
-        for layer, color in (("trochanter", "#ff9a30"), ("adjacent_bone", "#f8ee3b")):
-            for stroke in geometry["hip"]["lesser_trochanter_traces"][layer]:
-                draw.line([tuple(p) for p in stroke["points"]], fill=color, width=2)
+        pixels = geometry["hip"].get("lesser_trochanter_pixels") or []
+        if pixels:
+            draw.point([tuple(point) for point in pixels], fill="#ff3030")
+        else:
+            for stroke in geometry["hip"]["lesser_trochanter_traces"]["trochanter"]:
+                _dashed_polyline(draw, stroke["points"], "#ff3030")
     return out
+
+
+def _dashed_polyline(draw, points, color, on=4.0, off=3.0):
+    phase, period = 0.0, on + off
+    for first, second in zip(points, points[1:]):
+        a, b = np.asarray(first, dtype=float), np.asarray(second, dtype=float)
+        length = float(np.linalg.norm(b - a))
+        if length < 1e-6:
+            continue
+        cursor = 0.0
+        while cursor < length - 1e-9:
+            visible = phase < on
+            step = min(length - cursor, (on if visible else period) - phase)
+            if visible:
+                start_xy = a + (b - a) * (cursor / length)
+                end_xy = a + (b - a) * ((cursor + step) / length)
+                draw.line([tuple(start_xy), tuple(end_xy)], fill=color, width=2)
+            cursor += step
+            phase = (phase + step) % period
 
 
 def _target_text(row, region):
@@ -101,14 +123,19 @@ def _target_text(row, region):
         third = f"Угол {angle:.1f}°" if angle is not None else "Угол ?"
     else:
         first = f"Точки {value('hip_position')} · ROI {value('hip_roi')}"
-        second = f"Ротация {value('hip_rotation')}"
+        second = f"Ротация {value('hip_rotation')} · Часть {value('trochanter_partial')}"
         third = f"Вертел {row.get('trochanter_between_area_px2', '?')} px²"
+        top, bottom, lateral = (row.get(f"hip_roi_{key}_cm") for key in
+                                ("top", "bottom", "lateral"))
+        fourth = (f"Зазоры В/Н/Б: {top:.1f}/{bottom:.1f}/{lateral:.1f} см"
+                  if None not in (top, bottom, lateral) else "Зазоры ROI: ?")
+        return (first, second, third, fourth)
     return (first, second, third)
 
 
 def _sheet(entries, region, destination):
     cell_width, image_size = 332, 306
-    width, height = 6 * cell_width, 800
+    width, height = 6 * cell_width, 826
     sheet = Image.new("RGB", (width, height), "#121820")
     draw = ImageDraw.Draw(sheet)
     normal_font, small_font = _font(17), _font(15)
@@ -126,20 +153,10 @@ def _sheet(entries, region, destination):
             draw.text((col * cell_width + 8, 698 + line_number * 21), text,
                       fill="#f4f7fb" if line_number == 0 else "#bcd0e2", font=small_font)
         if col:
-            draw.text((col * cell_width + 8, 767), entry["variant"][:37],
+            draw.text((col * cell_width + 8, 792), entry["variant"][:37],
                       fill="#aebdcc", font=_font(13))
     destination.parent.mkdir(parents=True, exist_ok=True)
     sheet.save(destination, optimize=True)
-
-
-def _traces_fully_visible(geometry, transform):
-    width, height = transform.width, transform.height
-    traces = geometry["hip"]["lesser_trochanter_traces"]
-    if not traces["trochanter"] or not traces["adjacent_bone"]:
-        return False
-    return all(0 <= q[0] <= width - 1 and 0 <= q[1] <= height - 1
-               for layer in traces.values() for stroke in layer
-               for point in stroke["points"] for q in (transform.point(point),))
 
 
 def _source_candidate(item, region):
@@ -157,10 +174,7 @@ def _source_candidate(item, region):
             return None
     else:
         side = region.removeprefix("LEG_")
-        spacing, basis = _dicom_spacing(ds)
-        if spacing is None:
-            spacing = _roi_proxy_spacing(geometry, side)
-            basis = "roi_proxy" if spacing else "missing"
+        spacing, basis = _source_spacing(ds)
         key = f"{side.lower()}_hip_roi"
         if (not hip_position_ok(geometry) or
                 hip_roi_ok(geometry, True, side, spacing) is not True or
@@ -179,9 +193,6 @@ def _source_labels(item):
                      image, item["spacing"], row)
     if region == "SPINE":
         labels["spine_artifact"] = _reference_value(row.get("spine_artifact"))
-    else:
-        key = f"{region.removeprefix('LEG_').lower()}_hip_rotation"
-        labels["hip_rotation"] = _reference_value(row.get(key))
     return labels
 
 
@@ -200,7 +211,8 @@ def _make_variants(item, rng, attempts_per_slot=250):
                 transform, variant = _spine_variant(geometry, group, rng, item["base_angle"])
             else:
                 transform, variant = _hip_variant(geometry, group, rng,
-                                                  region.removeprefix("LEG_"))
+                                                  region.removeprefix("LEG_"),
+                                                  item["spacing"])
             if variant in used_variants or not transform.covers_output():
                 continue
             try:
@@ -212,9 +224,6 @@ def _make_variants(item, rng, attempts_per_slot=250):
             labels = _labels(region, moved_geometry, info, moved_image, spacing, row)
             if not _check_group(region, group, labels):
                 continue
-            if region != "SPINE" and _traces_fully_visible(geometry, transform):
-                key = f"{region.removeprefix('LEG_').lower()}_hip_rotation"
-                labels["hip_rotation"] = _reference_value(row.get(key))
             chosen = {"ds": ds, "image": moved_image, "geometry": moved_geometry,
                       "labels": labels, "variant": variant, "transform": transform,
                       "group": group, "spacing_basis": item["spacing_basis"]}
@@ -260,6 +269,13 @@ def run(workspace: Path, output: Path, seed=20260927, per_region=10):
         # Include real artifact/rotation violations without letting them
         # dominate the small ten-source visual pilot.
         queue = positives[:2] + others + positives[2:]
+        if region == "LEG_RIGHT":
+            # Keep the user-reported contour case 358 in this fixed visual pilot.
+            featured = [item for item in queue
+                        if ordinal[item["source"]["relative_path"].replace("\\", "/")] == 358]
+            featured_paths = {item["source"]["relative_path"] for item in featured}
+            queue = featured + [item for item in queue
+                                if item["source"]["relative_path"] not in featured_paths]
         for item in queue:
             if selected[region] >= per_region:
                 break
@@ -273,9 +289,12 @@ def run(workspace: Path, output: Path, seed=20260927, per_region=10):
             for number, entry in enumerate(entries):
                 image_rel = None if number == 0 else f"images/{region}/{sample_id}_{number}.dcm"
                 geo_rel = f"geometry/{sample_id}_{number}.json"
+                sample_spacing = (transformed_spacing(item["spacing"], entry["transform"])
+                                  if entry["transform"] else item["spacing"])
                 if image_rel:
                     _write_dicom(item["ds"], entry["image"], entry["transform"],
-                                 output / image_rel, f"pilot30-{seed}-{sample_id}-{number}")
+                                 output / image_rel, f"pilot30-{seed}-{sample_id}-{number}",
+                                 entry["geometry"], entry["labels"], region)
                 destination = output / geo_rel
                 destination.parent.mkdir(parents=True, exist_ok=True)
                 destination.write_text(json.dumps(entry["geometry"], ensure_ascii=False,
@@ -288,6 +307,8 @@ def run(workspace: Path, output: Path, seed=20260927, per_region=10):
                                  "source_relative_path": item["source"]["relative_path"],
                                  "source_study_uid": item["source"]["study_uid"],
                                  "spacing_basis": item["spacing_basis"],
+                                 "row_spacing_mm": sample_spacing[0] if sample_spacing else None,
+                                 "col_spacing_mm": sample_spacing[1] if sample_spacing else None,
                                  **entry["labels"]})
             board_rel = f"boards/{sample_id}.png"
             _sheet(entries, region, output / board_rel)
@@ -298,9 +319,11 @@ def run(workspace: Path, output: Path, seed=20260927, per_region=10):
     output.mkdir(parents=True, exist_ok=True)
     columns = ["sample_id", "source_row", "region", "column", "group", "variant",
                "image_path", "geometry_path", "source_relative_path", "source_study_uid",
-               "spacing_basis", *TARGETS, "spine_axis_angle_deg",
+               "spacing_basis", "row_spacing_mm", "col_spacing_mm",
+               *TARGETS, "spine_axis_angle_deg",
+               "hip_roi_top_cm", "hip_roi_bottom_cm", "hip_roi_lateral_cm",
                "trochanter_between_area_px2", "trochanter_curve_crossings",
-               "trochanter_area_fraction_roi"]
+               "trochanter_area_fraction_roi", "trochanter_partial"]
     with (output / "manifest.csv").open("w", encoding="utf-8-sig", newline="") as stream:
         writer = csv.DictWriter(stream, fieldnames=columns)
         writer.writeheader()
@@ -315,7 +338,7 @@ def run(workspace: Path, output: Path, seed=20260927, per_region=10):
               "target_coverage": coverage, "failures": dict(failures),
               "boards": boards,
               "target_convention": "1=нарушение, 0=норма, ?=неизвестно",
-              "roi_spacing_note": "roi_proxy is inferred from the original ROI, not measured DICOM spacing"}
+              "roi_spacing_note": "1.05 mm/Y and 0.6 mm/X are user-supplied scanner nominal values; no spacing tags in these DICOMs"}
     (output / "report.json").write_text(json.dumps(report, ensure_ascii=False,
                                                    indent=2), encoding="utf-8")
     sections = []
@@ -337,7 +360,9 @@ def run(workspace: Path, output: Path, seed=20260927, per_region=10):
             'снизу те же 6 изображений с разметкой. '
             '1 = нарушение, 0 = норма, ? = метка неизвестна. '
             'Метки стоят под соответствующим столбцом. '
-            'Для ROI миллиметры оценены по исходному ROI.</p>'
+            'Для ROI использовано 1,05 мм/Y и 0,6 мм/X: это номинальный масштаб сканера, '
+            'его нет в DICOM. Зазоры указаны в сантиметрах. '
+            '<a href="../roi_mismatch_review/index.html">Разбор 24 расхождений ROI</a>.</p>'
             + "\n".join(sections) + '</html>')
     (output / "index.html").write_text(page, encoding="utf-8")
     return report

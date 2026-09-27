@@ -1,10 +1,10 @@
 services:
   dxa-labeler:
     build: .
-    container_name: dxa_dicom_labeler
+    container_name: ${DXA_CONTAINER_NAME:-dxa_dicom_labeler}
 
     ports:
-      - "8501:8501"
+      - "${DXA_PORT:-8501}:8501"
 
     environment:
       DATA_ROOT: /data
@@ -13,6 +13,7 @@ services:
       EXPECTED_DICOM_COUNT: ${EXPECTED_DICOM_COUNT:-499}
       EXPECTED_DATASET_FINGERPRINT: ${EXPECTED_DATASET_FINGERPRINT:-}
       STRICT_DATASET_CHECK: ${STRICT_DATASET_CHECK:-1}
+      AUGMENTATION_MANIFEST: ${AUGMENTATION_MANIFEST:-}
 
     volumes:
       # ВАЖНО: source берётся из .env.

@@ -32,7 +32,8 @@ def test_roundtrip_and_all_annotation_types(tmp_path):
     assert geometry_counts(normalized) == {
         'disc_lines':1,'iliac_points':2,'foreign_objects':1,
         'hip_landmarks':3,'lesser_trochanter':1, 'trochanter_traces':1,
-        'bone_contour_traces':1, 'hip_roi':1, 'threshold_8bit':173,
+        'bone_contour_traces':1, 'trochanter_pixels':0,
+        'hip_roi':1, 'threshold_8bit':173,
     }
     lines = (tmp_path/'geometry'/'geometry_history.jsonl').read_text().splitlines()
     assert len(lines)==1 and json.loads(lines[0])['geometry']==normalized
