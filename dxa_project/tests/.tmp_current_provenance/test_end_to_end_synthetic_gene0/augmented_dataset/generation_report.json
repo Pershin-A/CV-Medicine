@@ -1,0 +1,89 @@
+{
+  "requested_per_region": {
+    "positive": 1,
+    "negative_position": 1,
+    "negative_axis_or_roi": 1
+  },
+  "eligible_sources": {
+    "SPINE": 1,
+    "LEG_LEFT": 1,
+    "LEG_RIGHT": 1
+  },
+  "generated": {
+    "SPINE": {
+      "positive": 1,
+      "negative_position": 1,
+      "negative_axis_or_roi": 1
+    },
+    "LEG_LEFT": {
+      "positive": 1,
+      "negative_position": 1,
+      "negative_axis_or_roi": 1
+    },
+    "LEG_RIGHT": {
+      "positive": 1,
+      "negative_position": 1,
+      "negative_axis_or_roi": 1
+    }
+  },
+  "skipped": {
+    "transform_exceeds_source": 30
+  },
+  "seed": 20260926,
+  "total_generated": 9,
+  "shortfall": {
+    "SPINE": {
+      "positive": 0,
+      "negative_position": 0,
+      "negative_axis_or_roi": 0
+    },
+    "LEG_LEFT": {
+      "positive": 0,
+      "negative_position": 0,
+      "negative_axis_or_roi": 0
+    },
+    "LEG_RIGHT": {
+      "positive": 0,
+      "negative_position": 0,
+      "negative_axis_or_roi": 0
+    }
+  },
+  "actual_labels": {
+    "SPINE": {
+      "spine_position": {
+        "negative": 2,
+        "positive": 1,
+        "unknown": 0
+      },
+      "spine_axis": {
+        "negative": 1,
+        "positive": 2,
+        "unknown": 0
+      }
+    },
+    "LEG_LEFT": {
+      "hip_position": {
+        "negative": 1,
+        "positive": 2,
+        "unknown": 0
+      },
+      "hip_roi": {
+        "negative": 2,
+        "positive": 1,
+        "unknown": 0
+      }
+    },
+    "LEG_RIGHT": {
+      "hip_position": {
+        "negative": 1,
+        "positive": 2,
+        "unknown": 0
+      },
+      "hip_roi": {
+        "negative": 2,
+        "positive": 1,
+        "unknown": 0
+      }
+    }
+  }
+}

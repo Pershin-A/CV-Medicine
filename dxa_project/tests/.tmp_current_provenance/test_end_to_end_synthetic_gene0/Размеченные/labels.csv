@@ -1,0 +1,4 @@
+relative_path,label,side,geometry_path
+study_0/image.dcm,SPINE,,geometry/image_0.json
+study_1/image.dcm,LEG,LEFT,geometry/image_1.json
+study_2/image.dcm,LEG,RIGHT,geometry/image_2.json

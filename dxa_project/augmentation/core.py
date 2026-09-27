@@ -8,8 +8,8 @@ from pathlib import Path
 import sys
 
 import numpy as np
+from PIL import Image, ImageDraw
 from scipy.ndimage import affine_transform, gaussian_filter1d, median_filter
-from scipy.signal import find_peaks
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from labeler.geometry import validate_geometry  # noqa: E402
@@ -157,7 +157,7 @@ def prepare_geometry(geometry: dict, region: str) -> dict:
         raise ValueError(f"Unknown region: {region}")
     if region in ("LEG_LEFT", "LEG_RIGHT"):
         mask = (_pixels_mask(out) if out["hip"].get("lesser_trochanter_mask_ready")
-                else build_lesser_trochanter_mask(out))
+                else build_lesser_trochanter_mask(out, region))
         out["hip"]["lesser_trochanter_pixels"] = _mask_pixels(mask)
         out["hip"]["lesser_trochanter_mask_ready"] = True
         out["hip"]["lesser_trochanter_partial"] = bool(
@@ -213,66 +213,98 @@ def _scanline_positions(strokes, height: int) -> list[list[float]]:
     return positions
 
 
-def build_lesser_trochanter_mask(geometry: dict) -> np.ndarray:
-    """Fill an interior widening bounded by narrow contour separations.
+def build_lesser_trochanter_mask(geometry: dict, region: str | None = None) -> np.ndarray:
+    """Fill positive contour separation along normals to the local bone axis.
 
-    The median x of each trace gives the horizontal gap on every common row.
-    A visible tubercle is a smoothed interior peak at least 5 px wide, with
-    a narrow (at most 2.5–5 px) shoulder on both sides, at least 10 rows long
-    and 50 px² in integrated width. Choose the largest qualifying bulge.
-    In particular, a U-shaped profile with wide ends has no interior peak.
+    The bone chord only defines a coordinate system. Both actual pencil curves
+    bound the filled pixels. A 0.5 px dead zone absorbs subpixel tracing noise;
+    an endpoint is a valid boundary when the drawn contour is incomplete.
     """
     h, w = geometry["image_height"], geometry["image_width"]
     mask = np.zeros((h, w), dtype=bool)
     layers = geometry["hip"]["lesser_trochanter_traces"]
     if not layers["trochanter"] or not layers["adjacent_bone"]:
         return mask
-    first = _scanline_positions(layers["trochanter"], h)
-    second = _scanline_positions(layers["adjacent_bone"], h)
-    max_gap = 0.25 * min(w, h)
-    samples = []
-    for y, (a, b) in enumerate(zip(first, second)):
-        if not a or not b:
-            continue
-        left_curve, right_curve = float(np.median(a)), float(np.median(b))
-        gap = abs(right_curve - left_curve)
-        if gap > max_gap:
-            continue
-        left = max(0, int(math.ceil(min(left_curve, right_curve))))
-        right = min(w - 1, int(math.floor(max(left_curve, right_curve))))
-        samples.append((y, left, right, gap))
-    if len(samples) < 10:
+    trochanter_points = np.asarray(
+        [point for stroke in layers["trochanter"] for point in stroke["points"]],
+        dtype=float)
+    if len(trochanter_points) < 2:
         return mask
-    widths = np.asarray([sample[3] for sample in samples], dtype=float)
-    smooth = gaussian_filter1d(median_filter(widths, size=5), sigma=1.5)
-    peaks, properties = find_peaks(smooth, prominence=2.0, distance=8)
-    best = None
-    for peak, prominence in zip(peaks, properties["prominences"]):
-        height = float(smooth[peak])
-        if height < 4 or prominence < 2:
-            continue
-        shoulder = min(5.0, max(2.5, 0.25 * height))
-        left = np.flatnonzero(smooth[:peak] <= shoulder)
-        right = np.flatnonzero(smooth[peak + 1:] <= shoulder)
-        if not len(left) or not len(right):
-            continue
-        start, end = int(left[-1]), int(peak + 1 + right[0])
-        length = samples[end][0] - samples[start][0] + 1
-        area = float(widths[start:end + 1].sum())
-        if length < 10 or area < 50:
-            continue
-        # A gap in either pencil trace cannot be filled by interpolation.
-        if any(samples[i + 1][0] - samples[i][0] > 2
-               for i in range(start, end)):
-            continue
-        if best is None or area > best[0]:
-            best = (area, start, end)
-    if best is None:
+    bone_rows = _scanline_positions(layers["adjacent_bone"], h)
+    top = max(0, math.ceil(float(trochanter_points[:, 1].min()) - 0.5))
+    bottom = min(h - 1, math.floor(float(trochanter_points[:, 1].max()) - 0.5))
+    common = [y for y in range(top, bottom + 1) if bone_rows[y]]
+    if len(common) < 2:
         return mask
-    for y, left, right, _ in samples[best[1]:best[2] + 1]:
-        if right >= left:
-            mask[y, left:right + 1] = True
-    return mask
+    origin = np.array([np.median(bone_rows[common[0]]), common[0] + 0.5])
+    end = np.array([np.median(bone_rows[common[-1]]), common[-1] + 0.5])
+    tangent = end - origin
+    length = np.linalg.norm(tangent)
+    if length < 1:
+        return mask
+    tangent /= length
+    normal = np.array([-tangent[1], tangent[0]])
+    if normal[1] > 0:
+        normal *= -1
+    if abs(normal[1]) < 1e-9:
+        if region in ("LEG_LEFT", "LEG_RIGHT"):
+            desired_x = -1 if region == "LEG_LEFT" else 1
+        else:
+            bone_points = np.asarray(
+                [point for stroke in layers["adjacent_bone"]
+                 for point in stroke["points"]], dtype=float)
+            desired_x = np.sign(bone_points[:, 0].mean() -
+                                trochanter_points[:, 0].mean())
+        if normal[0] * desired_x < 0:
+            normal *= -1
+
+    def projected_intersections(strokes):
+        positions = {}
+        for stroke in strokes:
+            points = np.asarray(stroke["points"], dtype=float)
+            for first, second in zip(points[:-1], points[1:]):
+                a, b = np.dot(first - origin, tangent), np.dot(second - origin, tangent)
+                na, nb = np.dot(first - origin, normal), np.dot(second - origin, normal)
+                if abs(b - a) < 1e-9:
+                    continue
+                low = math.ceil(min(a, b) - 0.5)
+                high = math.floor(max(a, b) - 0.5)
+                for index in range(low, high + 1):
+                    sample = index + 0.5
+                    value = na + (sample - a) * (nb - na) / (b - a)
+                    positions.setdefault(index, []).append(value)
+        return {key: float(np.median(values)) for key, values in positions.items()}
+
+    bone = projected_intersections(layers["adjacent_bone"])
+    troch = projected_intersections(layers["trochanter"])
+    indices = sorted(bone.keys() & troch.keys())
+    if not indices:
+        return mask
+    gaps = np.asarray([bone[i] - troch[i] for i in indices])
+    # Only the segment around the largest outward bulge is used. A missing
+    # shoulder is represented by the end of the annotated curve.
+    smooth = gaussian_filter1d(median_filter(gaps, size=5), sigma=1.5) if len(gaps) >= 5 else gaps
+    peak = int(np.argmax(smooth))
+    if smooth[peak] <= 0.5:
+        return mask
+    left = int(np.argmin(smooth[:peak + 1]))
+    right = peak + int(np.argmin(smooth[peak:]))
+    if left == peak:
+        left = 0
+    if right == peak:
+        right = len(indices) - 1
+    canvas = Image.new("1", (w, h))
+    draw = ImageDraw.Draw(canvas)
+    for j in range(left, right + 1):
+        if gaps[j] <= 0.5 or gaps[j] > 0.25 * min(w, h):
+            continue
+        index = indices[j]
+        s = index + 0.5
+        first = origin + tangent * s + normal * troch[index]
+        second = origin + tangent * s + normal * bone[index]
+        draw.line((float(first[0]), float(first[1]),
+                   float(second[0]), float(second[1])), fill=1, width=2)
+    return np.asarray(canvas, dtype=bool)
 
 
 def _mask_pixels(mask: np.ndarray) -> list[list[int]]:

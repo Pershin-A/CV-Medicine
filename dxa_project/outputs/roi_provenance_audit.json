@@ -1,0 +1,15 @@
+{
+  "label_rows": 499,
+  "manifest_rows": 499,
+  "unique_label_paths": 499,
+  "unique_manifest_paths": 499,
+  "pixel_equal": 499,
+  "byte_equal": 0,
+  "uid_equal": 499,
+  "dimension_equal": 499,
+  "manifest_path_correct": 499,
+  "manifest_uid_correct": 499,
+  "manifest_dimension_correct": 499,
+  "geometry_dimension_correct": 499,
+  "problems": []
+}

@@ -41,7 +41,7 @@ def render(workspace: Path, audit_path: Path, output: Path) -> dict:
         side = label["side"].upper()
         with warnings.catch_warnings():
             warnings.filterwarnings("ignore", category=UserWarning, module="pydicom")
-            ds, pixels = _read_dicom(workspace / "Размеченные" / rel)
+            ds, pixels = _read_dicom(workspace / "Исследования" / rel)
         raw = json.loads((workspace / "Размеченные" /
                           label["geometry_path"]).read_text(encoding="utf-8"))
         geometry = prepare_geometry(raw, "LEG_" + side)
@@ -94,7 +94,8 @@ def render(workspace: Path, audit_path: Path, output: Path) -> dict:
         "#8bedad}small{display:block;color:#a6b9ca;overflow-wrap:anywhere;"
         "margin-top:12px}</style>"
         "<h1>Почему расходятся метки ROI</h1>"
-        "<p>Фиолетовая рамка — размеченный ROI после продления произвольной "
+        "<p>Подложка взята непосредственно из папки «Исследования». "
+        "Фиолетовая рамка — размеченный ROI после продления произвольной "
         "стороны до края снимка. Голубой пунктир — пороги: отступ 3 см сверху "
         "и снизу, 2 см с боковой стороны. Бирюзовые точки — ориентиры бедра. "
         "В таблице каждой карточки показано «измеренный зазор / требуемый». "
@@ -104,7 +105,10 @@ def render(workspace: Path, audit_path: Path, output: Path) -> dict:
         f"а геометрия по номинальному масштабу — 1; в {len(cases)-count_good_to_bad} "
         "случаях наоборот. Масштаб 1,05 мм/Y и 0,6 мм/X указан для сканера, "
         "но физический размер пикселя в DICOM отсутствует. Поэтому это "
-        "разбор расхождений, а не доказательство ошибки в таблице.</p>"
+        "разбор расхождений, а не доказательство ошибки в таблице. "
+        "Дополнительная сверка показала совпадение пикселей, UID и размеров "
+        "исходной и размеченной копий на всех 499 снимках; каждой строке "
+        "таблицы соответствует правильный исходный путь.</p>"
         "<main>" + "".join(cards) + "</main></html>"
     )
     (output / "index.html").write_text(page, encoding="utf-8")

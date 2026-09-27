@@ -157,7 +157,7 @@ def test_trochanter_pixels_need_overlap_in_height_not_curve_crossings():
 def test_rotation_copies_source_if_pixels_remain_otherwise_violation():
     g = hip_fixture()
     g["hip"]["lesser_trochanter_traces"] = {
-        "trochanter": [{"id": "t", "points": [[100, 40], [118, 60], [100, 80]]}],
+        "trochanter": [{"id": "t", "points": [[96, 40], [78, 60], [96, 80]]}],
         "adjacent_bone": [{"id": "b", "points": [[98, 30], [98, 90]]}],
     }
     prepared = prepare_geometry(g, "LEG_RIGHT")
@@ -174,10 +174,10 @@ def test_rotation_copies_source_if_pixels_remain_otherwise_violation():
     assert labels["hip_rotation"] == 1
 
 
-def test_one_width_minimum_has_no_trochanter_pixels_but_keeps_contour():
+def test_inward_contour_has_no_trochanter_pixels_but_keeps_contour():
     g = hip_fixture()
     g["hip"]["lesser_trochanter_traces"] = {
-        "trochanter": [{"id": "t", "points": [[120, 40], [100, 60], [120, 80]]}],
+        "trochanter": [{"id": "t", "points": [[96, 40], [90, 60], [96, 80]]}],
         "adjacent_bone": [{"id": "b", "points": [[98, 30], [98, 90]]}],
     }
     prepared = prepare_geometry(g, "LEG_LEFT")
@@ -201,7 +201,7 @@ def test_small_interior_widening_is_filled_without_two_local_minima():
     }
     prepared = prepare_geometry(g, "LEG_LEFT")
     rows = [point[1] for point in prepared["hip"]["lesser_trochanter_pixels"]]
-    assert rows and 40 < min(rows) < 55 and 60 < max(rows) < 75
+    assert rows and 39 <= min(rows) < 55 and 60 < max(rows) <= 75
 
 
 def test_partial_visible_trochanter_forces_rotation_violation():

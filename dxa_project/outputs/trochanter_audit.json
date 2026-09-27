@@ -1,0 +1,1824 @@
+{
+  "with_both_traces": 332,
+  "filled": 282,
+  "zero": 50,
+  "review_rows": [
+    {
+      "number": 24,
+      "area_px": 256,
+      "relative_path": "2.25.102755089973625799055786462646268820450/series_002_2_CR/A2504257770 DXA/CR DXA/CR000002.dcm"
+    },
+    {
+      "number": 37,
+      "area_px": 251,
+      "relative_path": "2.25.105033841136787477881326326053319223817/series_001_2_CR/A250790559 DXA/CR DXA/CR000003.dcm"
+    },
+    {
+      "number": 54,
+      "area_px": 380,
+      "relative_path": "2.25.114887542067602662452692698814728642117/series_001_2_CR/A2504131887 DXA/CR DXA/CR000006.dcm"
+    },
+    {
+      "number": 77,
+      "area_px": 435,
+      "relative_path": "2.25.127126130998341190348103034690069487890/series_002_2_CR/A250428736 DXA/CR DXA/CR000001.dcm"
+    },
+    {
+      "number": 78,
+      "area_px": 427,
+      "relative_path": "2.25.127126130998341190348103034690069487890/series_002_2_CR/A250428736 DXA/CR DXA/CR000002.dcm"
+    },
+    {
+      "number": 79,
+      "area_px": 354,
+      "relative_path": "2.25.127126130998341190348103034690069487890/series_002_2_CR/A250428736 DXA/CR DXA/CR000003.dcm"
+    },
+    {
+      "number": 81,
+      "area_px": 282,
+      "relative_path": "2.25.127126130998341190348103034690069487890/series_002_2_CR/A250428736 DXA/CR DXA/CR000005.dcm"
+    },
+    {
+      "number": 96,
+      "area_px": 74,
+      "relative_path": "2.25.13069823278093578548407087310307113784/series_003_2_CR/A2507242667 DXA/CR DXA/CR000002.dcm"
+    },
+    {
+      "number": 104,
+      "area_px": 447,
+      "relative_path": "2.25.13325817932854000792938662637654885530/series_002_2_CR/A2507365486 DXA/CR DXA/CR000001.dcm"
+    },
+    {
+      "number": 112,
+      "area_px": 465,
+      "relative_path": "2.25.13325817932854000792938662637654885530/series_002_2_CR/A2507365486 DXA/CR DXA/CR000009.dcm"
+    },
+    {
+      "number": 119,
+      "area_px": 328,
+      "relative_path": "2.25.135241889065705954191821710363605596815/series_003_3_CR/A250715060 DXA/CR DXA/CR000000.dcm"
+    },
+    {
+      "number": 142,
+      "area_px": 278,
+      "relative_path": "2.25.144941557565802351596730914409170713112/series_001_2_CR/A250728979 DXA/CR DXA/CR000010.dcm"
+    },
+    {
+      "number": 188,
+      "area_px": 84,
+      "relative_path": "2.25.158646777318759504110695916200521633609/series_003_6_CR/A2507266260 DXA/CR DXA/CR000003.dcm"
+    },
+    {
+      "number": 192,
+      "area_px": 95,
+      "relative_path": "2.25.158646777318759504110695916200521633609/series_003_6_CR/A2507266260 DXA/CR DXA/CR000007.dcm"
+    },
+    {
+      "number": 197,
+      "area_px": 81,
+      "relative_path": "2.25.158646777318759504110695916200521633609/series_004_2_CR/A2507266260 DXA/CR DXA/CR000001.dcm"
+    },
+    {
+      "number": 202,
+      "area_px": 184,
+      "relative_path": "2.25.158646777318759504110695916200521633609/series_004_2_CR/A2507266260 DXA/CR DXA/CR000006.dcm"
+    },
+    {
+      "number": 206,
+      "area_px": 150,
+      "relative_path": "2.25.158646777318759504110695916200521633609/series_004_2_CR/A2507266260 DXA/CR DXA/CR000010.dcm"
+    },
+    {
+      "number": 213,
+      "area_px": 132,
+      "relative_path": "2.25.158646777318759504110695916200521633609/series_004_2_CR/A2507266260 DXA/CR DXA/CR000017.dcm"
+    },
+    {
+      "number": 226,
+      "area_px": 283,
+      "relative_path": "2.25.167344201679287285499405412654740659745/series_003_2_CR/A2504249537 DXA/CR DXA/CR000000.dcm"
+    },
+    {
+      "number": 227,
+      "area_px": 389,
+      "relative_path": "2.25.167344201679287285499405412654740659745/series_003_2_CR/A2504249537 DXA/CR DXA/CR000001.dcm"
+    },
+    {
+      "number": 229,
+      "area_px": 271,
+      "relative_path": "2.25.167344201679287285499405412654740659745/series_003_2_CR/A2504249537 DXA/CR DXA/CR000003.dcm"
+    },
+    {
+      "number": 258,
+      "area_px": 303,
+      "relative_path": "2.25.172445998420765569384934552191547932566/series_004_2_CR/A2507368766 DXA/CR DXA/CR000001.dcm"
+    },
+    {
+      "number": 259,
+      "area_px": 448,
+      "relative_path": "2.25.172445998420765569384934552191547932566/series_004_2_CR/A2507368766 DXA/CR DXA/CR000002.dcm"
+    },
+    {
+      "number": 262,
+      "area_px": 259,
+      "relative_path": "2.25.173753313169335820519632380691065649420/series_003_2_CR/A2504265499 DXA/CR DXA/CR000000.dcm"
+    },
+    {
+      "number": 263,
+      "area_px": 252,
+      "relative_path": "2.25.173753313169335820519632380691065649420/series_003_2_CR/A2504265499 DXA/CR DXA/CR000001.dcm"
+    },
+    {
+      "number": 266,
+      "area_px": 214,
+      "relative_path": "2.25.173753313169335820519632380691065649420/series_003_2_CR/A2504265499 DXA/CR DXA/CR000004.dcm"
+    },
+    {
+      "number": 276,
+      "area_px": 242,
+      "relative_path": "2.25.175881661753775295785039265792986971602/series_003_2_CR/A2507266462 DXA/CR DXA/CR000003.dcm"
+    },
+    {
+      "number": 286,
+      "area_px": 416,
+      "relative_path": "2.25.177745077805190810016231350557005569203/series_002_2_CR/A2504273759 DXA/CR DXA/CR000000.dcm"
+    },
+    {
+      "number": 293,
+      "area_px": 249,
+      "relative_path": "2.25.181196659018348153828200695057897449628/series_004_2_CR/A2507370620 DXA/CR DXA/CR000000.dcm"
+    },
+    {
+      "number": 410,
+      "area_px": 234,
+      "relative_path": "2.25.307021710202910067378603383388989711646/series_004_2_CR/A2504110565 DXA/CR DXA/CR000007.dcm"
+    },
+    {
+      "number": 455,
+      "area_px": 649,
+      "relative_path": "2.25.66397484472966116002950503539482860450/series_001_2_CR/A2504194637 DXA/CR DXA/CR000000.dcm"
+    }
+  ],
+  "all_rows": [
+    {
+      "number": 2,
+      "area_px": 0,
+      "relative_path": "1.2.840.113619.2.110.512719.20250403090444/series_004_3_CR/DXA/CR DXA/CR000001.dcm"
+    },
+    {
+      "number": 3,
+      "area_px": 0,
+      "relative_path": "1.2.840.113619.2.110.512719.20250403090444/series_004_3_CR/DXA/CR DXA/CR000002.dcm"
+    },
+    {
+      "number": 4,
+      "area_px": 0,
+      "relative_path": "1.2.840.113619.2.110.512719.20250403090444/series_004_3_CR/DXA/CR DXA/CR000003.dcm"
+    },
+    {
+      "number": 5,
+      "area_px": 40,
+      "relative_path": "1.2.840.113619.2.110.512719.20250403090444/series_004_3_CR/DXA/CR DXA/CR000004.dcm"
+    },
+    {
+      "number": 7,
+      "area_px": 99,
+      "relative_path": "1.2.840.113619.2.110.512719.20250403092052/series_003_3_CR/DXA/CR DXA/CR000000.dcm"
+    },
+    {
+      "number": 9,
+      "area_px": 0,
+      "relative_path": "1.2.840.113619.2.110.512719.20250403092052/series_003_3_CR/DXA/CR DXA/CR000002.dcm"
+    },
+    {
+      "number": 10,
+      "area_px": 81,
+      "relative_path": "1.2.840.113619.2.110.512719.20250403092052/series_003_3_CR/DXA/CR DXA/CR000003.dcm"
+    },
+    {
+      "number": 11,
+      "area_px": 46,
+      "relative_path": "1.2.840.113619.2.110.512719.20250403092052/series_003_3_CR/DXA/CR DXA/CR000004.dcm"
+    },
+    {
+      "number": 13,
+      "area_px": 0,
+      "relative_path": "1.2.840.113619.2.110.512719.20250407113211/series_001_2_CR/DXA/CR DXA/CR000000.dcm"
+    },
+    {
+      "number": 14,
+      "area_px": 0,
+      "relative_path": "1.2.840.113619.2.110.512719.20250407113211/series_001_2_CR/DXA/CR DXA/CR000001.dcm"
+    },
+    {
+      "number": 15,
+      "area_px": 0,
+      "relative_path": "1.2.840.113619.2.110.512719.20250407113211/series_001_2_CR/DXA/CR DXA/CR000002.dcm"
+    },
+    {
+      "number": 18,
+      "area_px": 52,
+      "relative_path": "1.2.840.113619.2.110.512719.20250407113211/series_001_2_CR/DXA/CR DXA/CR000005.dcm"
+    },
+    {
+      "number": 19,
+      "area_px": 509,
+      "relative_path": "2.25.10245777060263212829333021434108890537/series_003_2_CR/A2504412435 DXA/CR DXA/CR000000.dcm"
+    },
+    {
+      "number": 21,
+      "area_px": 579,
+      "relative_path": "2.25.10245777060263212829333021434108890537/series_003_2_CR/A2504412435 DXA/CR DXA/CR000002.dcm"
+    },
+    {
+      "number": 22,
+      "area_px": 169,
+      "relative_path": "2.25.102755089973625799055786462646268820450/series_002_2_CR/A2504257770 DXA/CR DXA/CR000000.dcm"
+    },
+    {
+      "number": 24,
+      "area_px": 256,
+      "relative_path": "2.25.102755089973625799055786462646268820450/series_002_2_CR/A2504257770 DXA/CR DXA/CR000002.dcm"
+    },
+    {
+      "number": 25,
+      "area_px": 311,
+      "relative_path": "2.25.102755089973625799055786462646268820450/series_002_2_CR/A2504257770 DXA/CR DXA/CR000003.dcm"
+    },
+    {
+      "number": 27,
+      "area_px": 192,
+      "relative_path": "2.25.102755089973625799055786462646268820450/series_002_2_CR/A2504257770 DXA/CR DXA/CR000005.dcm"
+    },
+    {
+      "number": 28,
+      "area_px": 77,
+      "relative_path": "2.25.102965897799404973225419898683246248872/series_001_2_CR/A250726353 DXA/CR DXA/CR000000.dcm"
+    },
+    {
+      "number": 30,
+      "area_px": 13,
+      "relative_path": "2.25.102965897799404973225419898683246248872/series_001_2_CR/A250726353 DXA/CR DXA/CR000002.dcm"
+    },
+    {
+      "number": 31,
+      "area_px": 285,
+      "relative_path": "2.25.103868781101960771917584077315578649178/series_001_3_CR/A2507485409 DXA/CR DXA/CR000000.dcm"
+    },
+    {
+      "number": 32,
+      "area_px": 112,
+      "relative_path": "2.25.103868781101960771917584077315578649178/series_001_3_CR/A2507485409 DXA/CR DXA/CR000001.dcm"
+    },
+    {
+      "number": 36,
+      "area_px": 391,
+      "relative_path": "2.25.105033841136787477881326326053319223817/series_001_2_CR/A250790559 DXA/CR DXA/CR000002.dcm"
+    },
+    {
+      "number": 37,
+      "area_px": 251,
+      "relative_path": "2.25.105033841136787477881326326053319223817/series_001_2_CR/A250790559 DXA/CR DXA/CR000003.dcm"
+    },
+    {
+      "number": 38,
+      "area_px": 251,
+      "relative_path": "2.25.105033841136787477881326326053319223817/series_001_2_CR/A250790559 DXA/CR DXA/CR000004.dcm"
+    },
+    {
+      "number": 39,
+      "area_px": 407,
+      "relative_path": "2.25.105033841136787477881326326053319223817/series_001_2_CR/A250790559 DXA/CR DXA/CR000005.dcm"
+    },
+    {
+      "number": 41,
+      "area_px": 374,
+      "relative_path": "2.25.11175860580562939441493697221497597640/series_003_2_CR/A2507431060 DXA/CR DXA/CR000000.dcm"
+    },
+    {
+      "number": 43,
+      "area_px": 107,
+      "relative_path": "2.25.11175860580562939441493697221497597640/series_003_2_CR/A2507431060 DXA/CR DXA/CR000002.dcm"
+    },
+    {
+      "number": 44,
+      "area_px": 158,
+      "relative_path": "2.25.11175860580562939441493697221497597640/series_003_2_CR/A2507431060 DXA/CR DXA/CR000003.dcm"
+    },
+    {
+      "number": 46,
+      "area_px": 275,
+      "relative_path": "2.25.11175860580562939441493697221497597640/series_003_2_CR/A2507431060 DXA/CR DXA/CR000005.dcm"
+    },
+    {
+      "number": 48,
+      "area_px": 435,
+      "relative_path": "2.25.114887542067602662452692698814728642117/series_001_2_CR/A2504131887 DXA/CR DXA/CR000000.dcm"
+    },
+    {
+      "number": 49,
+      "area_px": 342,
+      "relative_path": "2.25.114887542067602662452692698814728642117/series_001_2_CR/A2504131887 DXA/CR DXA/CR000001.dcm"
+    },
+    {
+      "number": 50,
+      "area_px": 453,
+      "relative_path": "2.25.114887542067602662452692698814728642117/series_001_2_CR/A2504131887 DXA/CR DXA/CR000002.dcm"
+    },
+    {
+      "number": 51,
+      "area_px": 403,
+      "relative_path": "2.25.114887542067602662452692698814728642117/series_001_2_CR/A2504131887 DXA/CR DXA/CR000003.dcm"
+    },
+    {
+      "number": 53,
+      "area_px": 434,
+      "relative_path": "2.25.114887542067602662452692698814728642117/series_001_2_CR/A2504131887 DXA/CR DXA/CR000005.dcm"
+    },
+    {
+      "number": 54,
+      "area_px": 380,
+      "relative_path": "2.25.114887542067602662452692698814728642117/series_001_2_CR/A2504131887 DXA/CR DXA/CR000006.dcm"
+    },
+    {
+      "number": 56,
+      "area_px": 436,
+      "relative_path": "2.25.114887542067602662452692698814728642117/series_001_2_CR/A2504131887 DXA/CR DXA/CR000008.dcm"
+    },
+    {
+      "number": 57,
+      "area_px": 319,
+      "relative_path": "2.25.114887542067602662452692698814728642117/series_001_2_CR/A2504131887 DXA/CR DXA/CR000009.dcm"
+    },
+    {
+      "number": 59,
+      "area_px": 131,
+      "relative_path": "2.25.116822802042655971810859435524105064465/series_003_2_CR/A2507273296 DXA/CR DXA/CR000000.dcm"
+    },
+    {
+      "number": 60,
+      "area_px": 122,
+      "relative_path": "2.25.116822802042655971810859435524105064465/series_003_2_CR/A2507273296 DXA/CR DXA/CR000001.dcm"
+    },
+    {
+      "number": 62,
+      "area_px": 0,
+      "relative_path": "2.25.122446767306607067205618235949445789306/series_001_2_CR/A2504255080 DXA/CR DXA/CR000000.dcm"
+    },
+    {
+      "number": 63,
+      "area_px": 0,
+      "relative_path": "2.25.122446767306607067205618235949445789306/series_001_2_CR/A2504255080 DXA/CR DXA/CR000001.dcm"
+    },
+    {
+      "number": 65,
+      "area_px": 0,
+      "relative_path": "2.25.122446767306607067205618235949445789306/series_001_2_CR/A2504255080 DXA/CR DXA/CR000003.dcm"
+    },
+    {
+      "number": 66,
+      "area_px": 0,
+      "relative_path": "2.25.122446767306607067205618235949445789306/series_001_2_CR/A2504255080 DXA/CR DXA/CR000004.dcm"
+    },
+    {
+      "number": 70,
+      "area_px": 171,
+      "relative_path": "2.25.124890633326693921702195356152595253940/series_002_2_CR/A2504263153 DXA/CR DXA/CR000001.dcm"
+    },
+    {
+      "number": 71,
+      "area_px": 164,
+      "relative_path": "2.25.124890633326693921702195356152595253940/series_002_2_CR/A2504263153 DXA/CR DXA/CR000002.dcm"
+    },
+    {
+      "number": 73,
+      "area_px": 0,
+      "relative_path": "2.25.126293418391331346694592071563510265596/series_002_3_CR/A2507250865 DXA/CR DXA/CR000000.dcm"
+    },
+    {
+      "number": 77,
+      "area_px": 435,
+      "relative_path": "2.25.127126130998341190348103034690069487890/series_002_2_CR/A250428736 DXA/CR DXA/CR000001.dcm"
+    },
+    {
+      "number": 78,
+      "area_px": 427,
+      "relative_path": "2.25.127126130998341190348103034690069487890/series_002_2_CR/A250428736 DXA/CR DXA/CR000002.dcm"
+    },
+    {
+      "number": 79,
+      "area_px": 354,
+      "relative_path": "2.25.127126130998341190348103034690069487890/series_002_2_CR/A250428736 DXA/CR DXA/CR000003.dcm"
+    },
+    {
+      "number": 81,
+      "area_px": 282,
+      "relative_path": "2.25.127126130998341190348103034690069487890/series_002_2_CR/A250428736 DXA/CR DXA/CR000005.dcm"
+    },
+    {
+      "number": 83,
+      "area_px": 594,
+      "relative_path": "2.25.12798473087614376830819854616447908612/series_002_2_CR/A2507538847 DXA/CR DXA/CR000001.dcm"
+    },
+    {
+      "number": 84,
+      "area_px": 420,
+      "relative_path": "2.25.12798473087614376830819854616447908612/series_002_2_CR/A2507538847 DXA/CR DXA/CR000002.dcm"
+    },
+    {
+      "number": 87,
+      "area_px": 0,
+      "relative_path": "2.25.128990540359421489042453547244535073735/series_002_2_CR/A2507388698 DXA/CR DXA/CR000000.dcm"
+    },
+    {
+      "number": 89,
+      "area_px": 0,
+      "relative_path": "2.25.128990540359421489042453547244535073735/series_002_2_CR/A2507388698 DXA/CR DXA/CR000002.dcm"
+    },
+    {
+      "number": 90,
+      "area_px": 0,
+      "relative_path": "2.25.128990540359421489042453547244535073735/series_002_2_CR/A2507388698 DXA/CR DXA/CR000003.dcm"
+    },
+    {
+      "number": 92,
+      "area_px": 0,
+      "relative_path": "2.25.128990540359421489042453547244535073735/series_002_2_CR/A2507388698 DXA/CR DXA/CR000005.dcm"
+    },
+    {
+      "number": 93,
+      "area_px": 319,
+      "relative_path": "2.25.129239680100193368599713239115902740628/series_003_3_CR/A250757345 DXA/CR DXA/CR000000.dcm"
+    },
+    {
+      "number": 94,
+      "area_px": 12,
+      "relative_path": "2.25.13069823278093578548407087310307113784/series_003_2_CR/A2507242667 DXA/CR DXA/CR000000.dcm"
+    },
+    {
+      "number": 96,
+      "area_px": 74,
+      "relative_path": "2.25.13069823278093578548407087310307113784/series_003_2_CR/A2507242667 DXA/CR DXA/CR000002.dcm"
+    },
+    {
+      "number": 97,
+      "area_px": 376,
+      "relative_path": "2.25.132083163398091874662674590622589534350/series_003_2_CR/A2507386583 DXA Exam/CR DXA Images/CR000000.dcm"
+    },
+    {
+      "number": 99,
+      "area_px": 308,
+      "relative_path": "2.25.132083163398091874662674590622589534350/series_003_2_CR/A2507386583 DXA Exam/CR DXA Images/CR000002.dcm"
+    },
+    {
+      "number": 100,
+      "area_px": 68,
+      "relative_path": "2.25.132272637351979990811754009849547633391/series_003_3_CR/A2504141080 DXA/CR DXA/CR000000.dcm"
+    },
+    {
+      "number": 101,
+      "area_px": 57,
+      "relative_path": "2.25.132272637351979990811754009849547633391/series_003_3_CR/A2504141080 DXA/CR DXA/CR000001.dcm"
+    },
+    {
+      "number": 104,
+      "area_px": 447,
+      "relative_path": "2.25.13325817932854000792938662637654885530/series_002_2_CR/A2507365486 DXA/CR DXA/CR000001.dcm"
+    },
+    {
+      "number": 105,
+      "area_px": 375,
+      "relative_path": "2.25.13325817932854000792938662637654885530/series_002_2_CR/A2507365486 DXA/CR DXA/CR000002.dcm"
+    },
+    {
+      "number": 106,
+      "area_px": 386,
+      "relative_path": "2.25.13325817932854000792938662637654885530/series_002_2_CR/A2507365486 DXA/CR DXA/CR000003.dcm"
+    },
+    {
+      "number": 107,
+      "area_px": 379,
+      "relative_path": "2.25.13325817932854000792938662637654885530/series_002_2_CR/A2507365486 DXA/CR DXA/CR000004.dcm"
+    },
+    {
+      "number": 108,
+      "area_px": 311,
+      "relative_path": "2.25.13325817932854000792938662637654885530/series_002_2_CR/A2507365486 DXA/CR DXA/CR000005.dcm"
+    },
+    {
+      "number": 109,
+      "area_px": 473,
+      "relative_path": "2.25.13325817932854000792938662637654885530/series_002_2_CR/A2507365486 DXA/CR DXA/CR000006.dcm"
+    },
+    {
+      "number": 110,
+      "area_px": 339,
+      "relative_path": "2.25.13325817932854000792938662637654885530/series_002_2_CR/A2507365486 DXA/CR DXA/CR000007.dcm"
+    },
+    {
+      "number": 111,
+      "area_px": 290,
+      "relative_path": "2.25.13325817932854000792938662637654885530/series_002_2_CR/A2507365486 DXA/CR DXA/CR000008.dcm"
+    },
+    {
+      "number": 112,
+      "area_px": 465,
+      "relative_path": "2.25.13325817932854000792938662637654885530/series_002_2_CR/A2507365486 DXA/CR DXA/CR000009.dcm"
+    },
+    {
+      "number": 114,
+      "area_px": 409,
+      "relative_path": "2.25.13325817932854000792938662637654885530/series_002_2_CR/A2507365486 DXA/CR DXA/CR000011.dcm"
+    },
+    {
+      "number": 116,
+      "area_px": 0,
+      "relative_path": "2.25.134456506307367483341018281460841912845/series_002_2_CR/A2507120612 DXA/CR DXA/CR000000.dcm"
+    },
+    {
+      "number": 118,
+      "area_px": 0,
+      "relative_path": "2.25.134456506307367483341018281460841912845/series_002_2_CR/A2507120612 DXA/CR DXA/CR000002.dcm"
+    },
+    {
+      "number": 119,
+      "area_px": 328,
+      "relative_path": "2.25.135241889065705954191821710363605596815/series_003_3_CR/A250715060 DXA/CR DXA/CR000000.dcm"
+    },
+    {
+      "number": 123,
+      "area_px": 0,
+      "relative_path": "2.25.137344827330550141320158285144101816664/series_003_3_CR/A2507146630 DXA/CR DXA/CR000001.dcm"
+    },
+    {
+      "number": 124,
+      "area_px": 235,
+      "relative_path": "2.25.137344827330550141320158285144101816664/series_003_3_CR/A2507146630 DXA/CR DXA/CR000002.dcm"
+    },
+    {
+      "number": 127,
+      "area_px": 262,
+      "relative_path": "2.25.13983650679559142983913935144968795415/series_003_2_CR/A2504335111 DXA/CR DXA/CR000001.dcm"
+    },
+    {
+      "number": 128,
+      "area_px": 161,
+      "relative_path": "2.25.13983650679559142983913935144968795415/series_003_2_CR/A2504335111 DXA/CR DXA/CR000002.dcm"
+    },
+    {
+      "number": 130,
+      "area_px": 166,
+      "relative_path": "2.25.13983650679559142983913935144968795415/series_003_2_CR/A2504335111 DXA/CR DXA/CR000004.dcm"
+    },
+    {
+      "number": 131,
+      "area_px": 302,
+      "relative_path": "2.25.13983650679559142983913935144968795415/series_003_2_CR/A2504335111 DXA/CR DXA/CR000005.dcm"
+    },
+    {
+      "number": 132,
+      "area_px": 158,
+      "relative_path": "2.25.144941557565802351596730914409170713112/series_001_2_CR/A250728979 DXA/CR DXA/CR000000.dcm"
+    },
+    {
+      "number": 133,
+      "area_px": 113,
+      "relative_path": "2.25.144941557565802351596730914409170713112/series_001_2_CR/A250728979 DXA/CR DXA/CR000001.dcm"
+    },
+    {
+      "number": 134,
+      "area_px": 0,
+      "relative_path": "2.25.144941557565802351596730914409170713112/series_001_2_CR/A250728979 DXA/CR DXA/CR000002.dcm"
+    },
+    {
+      "number": 135,
+      "area_px": 0,
+      "relative_path": "2.25.144941557565802351596730914409170713112/series_001_2_CR/A250728979 DXA/CR DXA/CR000003.dcm"
+    },
+    {
+      "number": 136,
+      "area_px": 0,
+      "relative_path": "2.25.144941557565802351596730914409170713112/series_001_2_CR/A250728979 DXA/CR DXA/CR000004.dcm"
+    },
+    {
+      "number": 137,
+      "area_px": 0,
+      "relative_path": "2.25.144941557565802351596730914409170713112/series_001_2_CR/A250728979 DXA/CR DXA/CR000005.dcm"
+    },
+    {
+      "number": 139,
+      "area_px": 214,
+      "relative_path": "2.25.144941557565802351596730914409170713112/series_001_2_CR/A250728979 DXA/CR DXA/CR000007.dcm"
+    },
+    {
+      "number": 142,
+      "area_px": 278,
+      "relative_path": "2.25.144941557565802351596730914409170713112/series_001_2_CR/A250728979 DXA/CR DXA/CR000010.dcm"
+    },
+    {
+      "number": 143,
+      "area_px": 238,
+      "relative_path": "2.25.145848300160680194368420189079847088556/series_002_2_CR/A2504248615 DXA Exam/CR DXA Images/CR000000.dcm"
+    },
+    {
+      "number": 144,
+      "area_px": 30,
+      "relative_path": "2.25.145848300160680194368420189079847088556/series_002_2_CR/A2504248615 DXA Exam/CR DXA Images/CR000001.dcm"
+    },
+    {
+      "number": 147,
+      "area_px": 408,
+      "relative_path": "2.25.151186844055172005615813066162721550889/series_002_2_CR/A250436130 DXA/CR DXA/CR000001.dcm"
+    },
+    {
+      "number": 148,
+      "area_px": 347,
+      "relative_path": "2.25.151186844055172005615813066162721550889/series_002_2_CR/A250436130 DXA/CR DXA/CR000002.dcm"
+    },
+    {
+      "number": 150,
+      "area_px": 0,
+      "relative_path": "2.25.156021661584944120526934974594604520993/series_003_2_CR/A2507142228 DXA/CR DXA/CR000001.dcm"
+    },
+    {
+      "number": 151,
+      "area_px": 0,
+      "relative_path": "2.25.156021661584944120526934974594604520993/series_003_2_CR/A2507142228 DXA/CR DXA/CR000002.dcm"
+    },
+    {
+      "number": 152,
+      "area_px": 0,
+      "relative_path": "2.25.156021661584944120526934974594604520993/series_003_2_CR/A2507142228 DXA/CR DXA/CR000003.dcm"
+    },
+    {
+      "number": 153,
+      "area_px": 0,
+      "relative_path": "2.25.156021661584944120526934974594604520993/series_003_2_CR/A2507142228 DXA/CR DXA/CR000004.dcm"
+    },
+    {
+      "number": 154,
+      "area_px": 0,
+      "relative_path": "2.25.156021661584944120526934974594604520993/series_003_2_CR/A2507142228 DXA/CR DXA/CR000005.dcm"
+    },
+    {
+      "number": 155,
+      "area_px": 0,
+      "relative_path": "2.25.156021661584944120526934974594604520993/series_003_2_CR/A2507142228 DXA/CR DXA/CR000006.dcm"
+    },
+    {
+      "number": 156,
+      "area_px": 0,
+      "relative_path": "2.25.156021661584944120526934974594604520993/series_003_2_CR/A2507142228 DXA/CR DXA/CR000007.dcm"
+    },
+    {
+      "number": 158,
+      "area_px": 0,
+      "relative_path": "2.25.156021661584944120526934974594604520993/series_003_2_CR/A2507142228 DXA/CR DXA/CR000009.dcm"
+    },
+    {
+      "number": 159,
+      "area_px": 0,
+      "relative_path": "2.25.156021661584944120526934974594604520993/series_003_2_CR/A2507142228 DXA/CR DXA/CR000010.dcm"
+    },
+    {
+      "number": 161,
+      "area_px": 34,
+      "relative_path": "2.25.156375884487675936513403083218009333856/series_003_2_CR/A250727121 DXA/CR DXA/CR000000.dcm"
+    },
+    {
+      "number": 163,
+      "area_px": 0,
+      "relative_path": "2.25.156375884487675936513403083218009333856/series_003_2_CR/A250727121 DXA/CR DXA/CR000002.dcm"
+    },
+    {
+      "number": 165,
+      "area_px": 24,
+      "relative_path": "2.25.156375884487675936513403083218009333856/series_003_2_CR/A250727121 DXA/CR DXA/CR000004.dcm"
+    },
+    {
+      "number": 166,
+      "area_px": 7,
+      "relative_path": "2.25.156375884487675936513403083218009333856/series_003_2_CR/A250727121 DXA/CR DXA/CR000005.dcm"
+    },
+    {
+      "number": 167,
+      "area_px": 0,
+      "relative_path": "2.25.156375884487675936513403083218009333856/series_003_2_CR/A250727121 DXA/CR DXA/CR000006.dcm"
+    },
+    {
+      "number": 168,
+      "area_px": 0,
+      "relative_path": "2.25.156375884487675936513403083218009333856/series_003_2_CR/A250727121 DXA/CR DXA/CR000007.dcm"
+    },
+    {
+      "number": 169,
+      "area_px": 0,
+      "relative_path": "2.25.156375884487675936513403083218009333856/series_003_2_CR/A250727121 DXA/CR DXA/CR000008.dcm"
+    },
+    {
+      "number": 171,
+      "area_px": 19,
+      "relative_path": "2.25.156375884487675936513403083218009333856/series_003_2_CR/A250727121 DXA/CR DXA/CR000010.dcm"
+    },
+    {
+      "number": 172,
+      "area_px": 0,
+      "relative_path": "2.25.156389075510671877606923458507011517218/series_001_2_CR/A2507389755 DXA/CR DXA/CR000000.dcm"
+    },
+    {
+      "number": 173,
+      "area_px": 90,
+      "relative_path": "2.25.156389075510671877606923458507011517218/series_001_2_CR/A2507389755 DXA/CR DXA/CR000001.dcm"
+    },
+    {
+      "number": 176,
+      "area_px": 83,
+      "relative_path": "2.25.156389075510671877606923458507011517218/series_001_2_CR/A2507389755 DXA/CR DXA/CR000004.dcm"
+    },
+    {
+      "number": 177,
+      "area_px": 0,
+      "relative_path": "2.25.156389075510671877606923458507011517218/series_001_2_CR/A2507389755 DXA/CR DXA/CR000005.dcm"
+    },
+    {
+      "number": 179,
+      "area_px": 362,
+      "relative_path": "2.25.157462338378550185821790046400986801350/series_001_2_CR/A2507498707 DXA/CR DXA/CR000001.dcm"
+    },
+    {
+      "number": 181,
+      "area_px": 338,
+      "relative_path": "2.25.157462338378550185821790046400986801350/series_001_2_CR/A2507498707 DXA/CR DXA/CR000003.dcm"
+    },
+    {
+      "number": 182,
+      "area_px": 472,
+      "relative_path": "2.25.157462338378550185821790046400986801350/series_001_2_CR/A2507498707 DXA/CR DXA/CR000004.dcm"
+    },
+    {
+      "number": 183,
+      "area_px": 338,
+      "relative_path": "2.25.157462338378550185821790046400986801350/series_001_2_CR/A2507498707 DXA/CR DXA/CR000005.dcm"
+    },
+    {
+      "number": 185,
+      "area_px": 135,
+      "relative_path": "2.25.158646777318759504110695916200521633609/series_003_6_CR/A2507266260 DXA/CR DXA/CR000000.dcm"
+    },
+    {
+      "number": 188,
+      "area_px": 84,
+      "relative_path": "2.25.158646777318759504110695916200521633609/series_003_6_CR/A2507266260 DXA/CR DXA/CR000003.dcm"
+    },
+    {
+      "number": 189,
+      "area_px": 133,
+      "relative_path": "2.25.158646777318759504110695916200521633609/series_003_6_CR/A2507266260 DXA/CR DXA/CR000004.dcm"
+    },
+    {
+      "number": 190,
+      "area_px": 156,
+      "relative_path": "2.25.158646777318759504110695916200521633609/series_003_6_CR/A2507266260 DXA/CR DXA/CR000005.dcm"
+    },
+    {
+      "number": 191,
+      "area_px": 99,
+      "relative_path": "2.25.158646777318759504110695916200521633609/series_003_6_CR/A2507266260 DXA/CR DXA/CR000006.dcm"
+    },
+    {
+      "number": 192,
+      "area_px": 95,
+      "relative_path": "2.25.158646777318759504110695916200521633609/series_003_6_CR/A2507266260 DXA/CR DXA/CR000007.dcm"
+    },
+    {
+      "number": 195,
+      "area_px": 112,
+      "relative_path": "2.25.158646777318759504110695916200521633609/series_003_6_CR/A2507266260 DXA/CR DXA/CR000010.dcm"
+    },
+    {
+      "number": 197,
+      "area_px": 81,
+      "relative_path": "2.25.158646777318759504110695916200521633609/series_004_2_CR/A2507266260 DXA/CR DXA/CR000001.dcm"
+    },
+    {
+      "number": 199,
+      "area_px": 192,
+      "relative_path": "2.25.158646777318759504110695916200521633609/series_004_2_CR/A2507266260 DXA/CR DXA/CR000003.dcm"
+    },
+    {
+      "number": 200,
+      "area_px": 126,
+      "relative_path": "2.25.158646777318759504110695916200521633609/series_004_2_CR/A2507266260 DXA/CR DXA/CR000004.dcm"
+    },
+    {
+      "number": 202,
+      "area_px": 184,
+      "relative_path": "2.25.158646777318759504110695916200521633609/series_004_2_CR/A2507266260 DXA/CR DXA/CR000006.dcm"
+    },
+    {
+      "number": 203,
+      "area_px": 138,
+      "relative_path": "2.25.158646777318759504110695916200521633609/series_004_2_CR/A2507266260 DXA/CR DXA/CR000007.dcm"
+    },
+    {
+      "number": 205,
+      "area_px": 195,
+      "relative_path": "2.25.158646777318759504110695916200521633609/series_004_2_CR/A2507266260 DXA/CR DXA/CR000009.dcm"
+    },
+    {
+      "number": 206,
+      "area_px": 150,
+      "relative_path": "2.25.158646777318759504110695916200521633609/series_004_2_CR/A2507266260 DXA/CR DXA/CR000010.dcm"
+    },
+    {
+      "number": 207,
+      "area_px": 80,
+      "relative_path": "2.25.158646777318759504110695916200521633609/series_004_2_CR/A2507266260 DXA/CR DXA/CR000011.dcm"
+    },
+    {
+      "number": 210,
+      "area_px": 113,
+      "relative_path": "2.25.158646777318759504110695916200521633609/series_004_2_CR/A2507266260 DXA/CR DXA/CR000014.dcm"
+    },
+    {
+      "number": 211,
+      "area_px": 106,
+      "relative_path": "2.25.158646777318759504110695916200521633609/series_004_2_CR/A2507266260 DXA/CR DXA/CR000015.dcm"
+    },
+    {
+      "number": 212,
+      "area_px": 172,
+      "relative_path": "2.25.158646777318759504110695916200521633609/series_004_2_CR/A2507266260 DXA/CR DXA/CR000016.dcm"
+    },
+    {
+      "number": 213,
+      "area_px": 132,
+      "relative_path": "2.25.158646777318759504110695916200521633609/series_004_2_CR/A2507266260 DXA/CR DXA/CR000017.dcm"
+    },
+    {
+      "number": 215,
+      "area_px": 337,
+      "relative_path": "2.25.164566280810634620154538016595892212884/series_001_2_CR/A2504291878 DXA Exam/CR DXA Images/CR000000.dcm"
+    },
+    {
+      "number": 217,
+      "area_px": 173,
+      "relative_path": "2.25.164566280810634620154538016595892212884/series_001_2_CR/A2504291878 DXA Exam/CR DXA Images/CR000002.dcm"
+    },
+    {
+      "number": 218,
+      "area_px": 0,
+      "relative_path": "2.25.165091430504580219034019815337441064349/series_001_2_CR/A2504415443 DXA/CR DXA/CR000000.dcm"
+    },
+    {
+      "number": 219,
+      "area_px": 67,
+      "relative_path": "2.25.165091430504580219034019815337441064349/series_001_2_CR/A2504415443 DXA/CR DXA/CR000001.dcm"
+    },
+    {
+      "number": 222,
+      "area_px": 0,
+      "relative_path": "2.25.165091430504580219034019815337441064349/series_001_2_CR/A2504415443 DXA/CR DXA/CR000004.dcm"
+    },
+    {
+      "number": 223,
+      "area_px": 64,
+      "relative_path": "2.25.165091430504580219034019815337441064349/series_001_2_CR/A2504415443 DXA/CR DXA/CR000005.dcm"
+    },
+    {
+      "number": 224,
+      "area_px": 213,
+      "relative_path": "2.25.165355673991587715046346525964554729786/series_003_3_CR/A2506448267 DXA/CR DXA/CR000000.dcm"
+    },
+    {
+      "number": 226,
+      "area_px": 283,
+      "relative_path": "2.25.167344201679287285499405412654740659745/series_003_2_CR/A2504249537 DXA/CR DXA/CR000000.dcm"
+    },
+    {
+      "number": 227,
+      "area_px": 389,
+      "relative_path": "2.25.167344201679287285499405412654740659745/series_003_2_CR/A2504249537 DXA/CR DXA/CR000001.dcm"
+    },
+    {
+      "number": 229,
+      "area_px": 271,
+      "relative_path": "2.25.167344201679287285499405412654740659745/series_003_2_CR/A2504249537 DXA/CR DXA/CR000003.dcm"
+    },
+    {
+      "number": 231,
+      "area_px": 277,
+      "relative_path": "2.25.167344201679287285499405412654740659745/series_003_2_CR/A2504249537 DXA/CR DXA/CR000005.dcm"
+    },
+    {
+      "number": 233,
+      "area_px": 78,
+      "relative_path": "2.25.16773626720107440979805052259711419763/series_004_2_CR/A2507537392 DXA/CR DXA/CR000001.dcm"
+    },
+    {
+      "number": 234,
+      "area_px": 0,
+      "relative_path": "2.25.16773626720107440979805052259711419763/series_004_2_CR/A2507537392 DXA/CR DXA/CR000002.dcm"
+    },
+    {
+      "number": 236,
+      "area_px": 23,
+      "relative_path": "2.25.16773626720107440979805052259711419763/series_004_2_CR/A2507537392 DXA/CR DXA/CR000004.dcm"
+    },
+    {
+      "number": 237,
+      "area_px": 96,
+      "relative_path": "2.25.16773626720107440979805052259711419763/series_004_2_CR/A2507537392 DXA/CR DXA/CR000005.dcm"
+    },
+    {
+      "number": 238,
+      "area_px": 39,
+      "relative_path": "2.25.16773626720107440979805052259711419763/series_004_2_CR/A2507537392 DXA/CR DXA/CR000006.dcm"
+    },
+    {
+      "number": 239,
+      "area_px": 130,
+      "relative_path": "2.25.16773626720107440979805052259711419763/series_004_2_CR/A2507537392 DXA/CR DXA/CR000007.dcm"
+    },
+    {
+      "number": 240,
+      "area_px": 114,
+      "relative_path": "2.25.16773626720107440979805052259711419763/series_004_2_CR/A2507537392 DXA/CR DXA/CR000008.dcm"
+    },
+    {
+      "number": 241,
+      "area_px": 193,
+      "relative_path": "2.25.16773626720107440979805052259711419763/series_004_2_CR/A2507537392 DXA/CR DXA/CR000009.dcm"
+    },
+    {
+      "number": 242,
+      "area_px": 14,
+      "relative_path": "2.25.16773626720107440979805052259711419763/series_004_2_CR/A2507537392 DXA/CR DXA/CR000010.dcm"
+    },
+    {
+      "number": 244,
+      "area_px": 62,
+      "relative_path": "2.25.168317503020329569414190677927680518621/series_004_2_CR/A2507557128 DXA/CR DXA/CR000000.dcm"
+    },
+    {
+      "number": 245,
+      "area_px": 65,
+      "relative_path": "2.25.168317503020329569414190677927680518621/series_004_2_CR/A2507557128 DXA/CR DXA/CR000001.dcm"
+    },
+    {
+      "number": 246,
+      "area_px": 0,
+      "relative_path": "2.25.168317503020329569414190677927680518621/series_004_2_CR/A2507557128 DXA/CR DXA/CR000002.dcm"
+    },
+    {
+      "number": 248,
+      "area_px": 28,
+      "relative_path": "2.25.168317503020329569414190677927680518621/series_004_2_CR/A2507557128 DXA/CR DXA/CR000004.dcm"
+    },
+    {
+      "number": 249,
+      "area_px": 141,
+      "relative_path": "2.25.168317503020329569414190677927680518621/series_004_2_CR/A2507557128 DXA/CR DXA/CR000005.dcm"
+    },
+    {
+      "number": 251,
+      "area_px": 114,
+      "relative_path": "2.25.168317503020329569414190677927680518621/series_004_2_CR/A2507557128 DXA/CR DXA/CR000007.dcm"
+    },
+    {
+      "number": 252,
+      "area_px": 32,
+      "relative_path": "2.25.168317503020329569414190677927680518621/series_004_2_CR/A2507557128 DXA/CR DXA/CR000008.dcm"
+    },
+    {
+      "number": 254,
+      "area_px": 52,
+      "relative_path": "2.25.168317503020329569414190677927680518621/series_004_2_CR/A2507557128 DXA/CR DXA/CR000010.dcm"
+    },
+    {
+      "number": 255,
+      "area_px": 61,
+      "relative_path": "2.25.168317503020329569414190677927680518621/series_004_2_CR/A2507557128 DXA/CR DXA/CR000011.dcm"
+    },
+    {
+      "number": 258,
+      "area_px": 303,
+      "relative_path": "2.25.172445998420765569384934552191547932566/series_004_2_CR/A2507368766 DXA/CR DXA/CR000001.dcm"
+    },
+    {
+      "number": 259,
+      "area_px": 448,
+      "relative_path": "2.25.172445998420765569384934552191547932566/series_004_2_CR/A2507368766 DXA/CR DXA/CR000002.dcm"
+    },
+    {
+      "number": 261,
+      "area_px": 103,
+      "relative_path": "2.25.173731186748227489808861376513577450951/series_002_2_CR/A2507188958 DXA/CR DXA/CR000001.dcm"
+    },
+    {
+      "number": 262,
+      "area_px": 259,
+      "relative_path": "2.25.173753313169335820519632380691065649420/series_003_2_CR/A2504265499 DXA/CR DXA/CR000000.dcm"
+    },
+    {
+      "number": 263,
+      "area_px": 252,
+      "relative_path": "2.25.173753313169335820519632380691065649420/series_003_2_CR/A2504265499 DXA/CR DXA/CR000001.dcm"
+    },
+    {
+      "number": 265,
+      "area_px": 170,
+      "relative_path": "2.25.173753313169335820519632380691065649420/series_003_2_CR/A2504265499 DXA/CR DXA/CR000003.dcm"
+    },
+    {
+      "number": 266,
+      "area_px": 214,
+      "relative_path": "2.25.173753313169335820519632380691065649420/series_003_2_CR/A2504265499 DXA/CR DXA/CR000004.dcm"
+    },
+    {
+      "number": 268,
+      "area_px": 183,
+      "relative_path": "2.25.173753313169335820519632380691065649420/series_003_2_CR/A2504265499 DXA/CR DXA/CR000006.dcm"
+    },
+    {
+      "number": 269,
+      "area_px": 106,
+      "relative_path": "2.25.173753313169335820519632380691065649420/series_003_2_CR/A2504265499 DXA/CR DXA/CR000007.dcm"
+    },
+    {
+      "number": 271,
+      "area_px": 225,
+      "relative_path": "2.25.173753313169335820519632380691065649420/series_003_2_CR/A2504265499 DXA/CR DXA/CR000009.dcm"
+    },
+    {
+      "number": 272,
+      "area_px": 275,
+      "relative_path": "2.25.173753313169335820519632380691065649420/series_003_2_CR/A2504265499 DXA/CR DXA/CR000010.dcm"
+    },
+    {
+      "number": 273,
+      "area_px": 230,
+      "relative_path": "2.25.175881661753775295785039265792986971602/series_003_2_CR/A2507266462 DXA/CR DXA/CR000000.dcm"
+    },
+    {
+      "number": 275,
+      "area_px": 173,
+      "relative_path": "2.25.175881661753775295785039265792986971602/series_003_2_CR/A2507266462 DXA/CR DXA/CR000002.dcm"
+    },
+    {
+      "number": 276,
+      "area_px": 242,
+      "relative_path": "2.25.175881661753775295785039265792986971602/series_003_2_CR/A2507266462 DXA/CR DXA/CR000003.dcm"
+    },
+    {
+      "number": 278,
+      "area_px": 289,
+      "relative_path": "2.25.175903805423871105435148927871625232853/series_001_2_CR/A2507159447 DXA/CR DXA/CR000001.dcm"
+    },
+    {
+      "number": 279,
+      "area_px": 326,
+      "relative_path": "2.25.175903805423871105435148927871625232853/series_001_2_CR/A2507159447 DXA/CR DXA/CR000002.dcm"
+    },
+    {
+      "number": 280,
+      "area_px": 160,
+      "relative_path": "2.25.17706555930735581384953296958427669848/series_004_3_CR/A2504146513 DXA/CR DXA/CR000000.dcm"
+    },
+    {
+      "number": 283,
+      "area_px": 145,
+      "relative_path": "2.25.17706555930735581384953296958427669848/series_004_3_CR/A2504146513 DXA/CR DXA/CR000003.dcm"
+    },
+    {
+      "number": 284,
+      "area_px": 211,
+      "relative_path": "2.25.17706555930735581384953296958427669848/series_004_3_CR/A2504146513 DXA/CR DXA/CR000004.dcm"
+    },
+    {
+      "number": 285,
+      "area_px": 129,
+      "relative_path": "2.25.17706555930735581384953296958427669848/series_004_3_CR/A2504146513 DXA/CR DXA/CR000005.dcm"
+    },
+    {
+      "number": 286,
+      "area_px": 416,
+      "relative_path": "2.25.177745077805190810016231350557005569203/series_002_2_CR/A2504273759 DXA/CR DXA/CR000000.dcm"
+    },
+    {
+      "number": 289,
+      "area_px": 469,
+      "relative_path": "2.25.177745077805190810016231350557005569203/series_002_2_CR/A2504273759 DXA/CR DXA/CR000003.dcm"
+    },
+    {
+      "number": 290,
+      "area_px": 391,
+      "relative_path": "2.25.177745077805190810016231350557005569203/series_002_2_CR/A2504273759 DXA/CR DXA/CR000004.dcm"
+    },
+    {
+      "number": 291,
+      "area_px": 433,
+      "relative_path": "2.25.177745077805190810016231350557005569203/series_002_2_CR/A2504273759 DXA/CR DXA/CR000005.dcm"
+    },
+    {
+      "number": 293,
+      "area_px": 249,
+      "relative_path": "2.25.181196659018348153828200695057897449628/series_004_2_CR/A2507370620 DXA/CR DXA/CR000000.dcm"
+    },
+    {
+      "number": 294,
+      "area_px": 60,
+      "relative_path": "2.25.181196659018348153828200695057897449628/series_004_2_CR/A2507370620 DXA/CR DXA/CR000001.dcm"
+    },
+    {
+      "number": 297,
+      "area_px": 7,
+      "relative_path": "2.25.181196659018348153828200695057897449628/series_004_2_CR/A2507370620 DXA/CR DXA/CR000004.dcm"
+    },
+    {
+      "number": 298,
+      "area_px": 51,
+      "relative_path": "2.25.181196659018348153828200695057897449628/series_004_2_CR/A2507370620 DXA/CR DXA/CR000005.dcm"
+    },
+    {
+      "number": 299,
+      "area_px": 261,
+      "relative_path": "2.25.181196659018348153828200695057897449628/series_004_2_CR/A2507370620 DXA/CR DXA/CR000006.dcm"
+    },
+    {
+      "number": 300,
+      "area_px": 191,
+      "relative_path": "2.25.181196659018348153828200695057897449628/series_004_2_CR/A2507370620 DXA/CR DXA/CR000007.dcm"
+    },
+    {
+      "number": 301,
+      "area_px": 276,
+      "relative_path": "2.25.181196659018348153828200695057897449628/series_004_2_CR/A2507370620 DXA/CR DXA/CR000008.dcm"
+    },
+    {
+      "number": 302,
+      "area_px": 69,
+      "relative_path": "2.25.181196659018348153828200695057897449628/series_004_2_CR/A2507370620 DXA/CR DXA/CR000009.dcm"
+    },
+    {
+      "number": 303,
+      "area_px": 269,
+      "relative_path": "2.25.181196659018348153828200695057897449628/series_004_2_CR/A2507370620 DXA/CR DXA/CR000010.dcm"
+    },
+    {
+      "number": 305,
+      "area_px": 52,
+      "relative_path": "2.25.181196659018348153828200695057897449628/series_004_2_CR/A2507370620 DXA/CR DXA/CR000012.dcm"
+    },
+    {
+      "number": 307,
+      "area_px": 267,
+      "relative_path": "2.25.184198356665635336833172191504278054074/series_004_2_CR/A250788286 DXA/CR DXA/CR000001.dcm"
+    },
+    {
+      "number": 308,
+      "area_px": 315,
+      "relative_path": "2.25.184198356665635336833172191504278054074/series_004_2_CR/A250788286 DXA/CR DXA/CR000002.dcm"
+    },
+    {
+      "number": 309,
+      "area_px": 331,
+      "relative_path": "2.25.186201010600484120326273381077449377115/series_004_2_CR/A250777475 DXA/CR DXA/CR000000.dcm"
+    },
+    {
+      "number": 310,
+      "area_px": 326,
+      "relative_path": "2.25.186201010600484120326273381077449377115/series_004_2_CR/A250777475 DXA/CR DXA/CR000001.dcm"
+    },
+    {
+      "number": 311,
+      "area_px": 177,
+      "relative_path": "2.25.186201010600484120326273381077449377115/series_004_2_CR/A250777475 DXA/CR DXA/CR000002.dcm"
+    },
+    {
+      "number": 312,
+      "area_px": 92,
+      "relative_path": "2.25.186201010600484120326273381077449377115/series_004_2_CR/A250777475 DXA/CR DXA/CR000003.dcm"
+    },
+    {
+      "number": 313,
+      "area_px": 293,
+      "relative_path": "2.25.186201010600484120326273381077449377115/series_004_2_CR/A250777475 DXA/CR DXA/CR000004.dcm"
+    },
+    {
+      "number": 314,
+      "area_px": 152,
+      "relative_path": "2.25.186201010600484120326273381077449377115/series_004_2_CR/A250777475 DXA/CR DXA/CR000005.dcm"
+    },
+    {
+      "number": 315,
+      "area_px": 141,
+      "relative_path": "2.25.186201010600484120326273381077449377115/series_004_2_CR/A250777475 DXA/CR DXA/CR000006.dcm"
+    },
+    {
+      "number": 317,
+      "area_px": 281,
+      "relative_path": "2.25.186201010600484120326273381077449377115/series_004_2_CR/A250777475 DXA/CR DXA/CR000008.dcm"
+    },
+    {
+      "number": 318,
+      "area_px": 247,
+      "relative_path": "2.25.186201010600484120326273381077449377115/series_004_2_CR/A250777475 DXA/CR DXA/CR000009.dcm"
+    },
+    {
+      "number": 321,
+      "area_px": 103,
+      "relative_path": "2.25.190331309633057244929837507901317950031/series_001_2_CR/A250791815 DXA/CR DXA/CR000000.dcm"
+    },
+    {
+      "number": 322,
+      "area_px": 127,
+      "relative_path": "2.25.190331309633057244929837507901317950031/series_001_2_CR/A250791815 DXA/CR DXA/CR000001.dcm"
+    },
+    {
+      "number": 323,
+      "area_px": 99,
+      "relative_path": "2.25.190331309633057244929837507901317950031/series_001_2_CR/A250791815 DXA/CR DXA/CR000002.dcm"
+    },
+    {
+      "number": 325,
+      "area_px": 49,
+      "relative_path": "2.25.190331309633057244929837507901317950031/series_001_2_CR/A250791815 DXA/CR DXA/CR000004.dcm"
+    },
+    {
+      "number": 327,
+      "area_px": 42,
+      "relative_path": "2.25.190331309633057244929837507901317950031/series_001_2_CR/A250791815 DXA/CR DXA/CR000006.dcm"
+    },
+    {
+      "number": 328,
+      "area_px": 40,
+      "relative_path": "2.25.190331309633057244929837507901317950031/series_001_2_CR/A250791815 DXA/CR DXA/CR000007.dcm"
+    },
+    {
+      "number": 330,
+      "area_px": 139,
+      "relative_path": "2.25.190331309633057244929837507901317950031/series_001_2_CR/A250791815 DXA/CR DXA/CR000009.dcm"
+    },
+    {
+      "number": 331,
+      "area_px": 58,
+      "relative_path": "2.25.190331309633057244929837507901317950031/series_001_2_CR/A250791815 DXA/CR DXA/CR000010.dcm"
+    },
+    {
+      "number": 333,
+      "area_px": 264,
+      "relative_path": "2.25.190807933410234695931591553323782771995/series_002_3_CR/A250762254 DXA/CR DXA/CR000001.dcm"
+    },
+    {
+      "number": 334,
+      "area_px": 0,
+      "relative_path": "2.25.215177279960644564778148238928738915103/series_002_2_CR/A2504147013 DXA/CR DXA/CR000000.dcm"
+    },
+    {
+      "number": 336,
+      "area_px": 0,
+      "relative_path": "2.25.215177279960644564778148238928738915103/series_002_2_CR/A2504147013 DXA/CR DXA/CR000002.dcm"
+    },
+    {
+      "number": 337,
+      "area_px": 13,
+      "relative_path": "2.25.215177279960644564778148238928738915103/series_002_2_CR/A2504147013 DXA/CR DXA/CR000003.dcm"
+    },
+    {
+      "number": 339,
+      "area_px": 250,
+      "relative_path": "2.25.217397325224876728316360420804118329081/series_002_2_CR/A250474631 DXA/CR DXA/CR000000.dcm"
+    },
+    {
+      "number": 340,
+      "area_px": 65,
+      "relative_path": "2.25.217397325224876728316360420804118329081/series_002_2_CR/A250474631 DXA/CR DXA/CR000001.dcm"
+    },
+    {
+      "number": 342,
+      "area_px": 100,
+      "relative_path": "2.25.217397325224876728316360420804118329081/series_002_2_CR/A250474631 DXA/CR DXA/CR000003.dcm"
+    },
+    {
+      "number": 345,
+      "area_px": 337,
+      "relative_path": "2.25.217397325224876728316360420804118329081/series_002_2_CR/A250474631 DXA/CR DXA/CR000006.dcm"
+    },
+    {
+      "number": 346,
+      "area_px": 282,
+      "relative_path": "2.25.217397325224876728316360420804118329081/series_002_2_CR/A250474631 DXA/CR DXA/CR000007.dcm"
+    },
+    {
+      "number": 347,
+      "area_px": 118,
+      "relative_path": "2.25.217397325224876728316360420804118329081/series_002_2_CR/A250474631 DXA/CR DXA/CR000008.dcm"
+    },
+    {
+      "number": 348,
+      "area_px": 248,
+      "relative_path": "2.25.217397325224876728316360420804118329081/series_002_2_CR/A250474631 DXA/CR DXA/CR000009.dcm"
+    },
+    {
+      "number": 349,
+      "area_px": 123,
+      "relative_path": "2.25.217397325224876728316360420804118329081/series_002_2_CR/A250474631 DXA/CR DXA/CR000010.dcm"
+    },
+    {
+      "number": 351,
+      "area_px": 383,
+      "relative_path": "2.25.234651502352368356456298825489565282446/series_002_2_CR/A2504307193 DXA/CR DXA/CR000000.dcm"
+    },
+    {
+      "number": 352,
+      "area_px": 306,
+      "relative_path": "2.25.234651502352368356456298825489565282446/series_002_2_CR/A2504307193 DXA/CR DXA/CR000001.dcm"
+    },
+    {
+      "number": 354,
+      "area_px": 354,
+      "relative_path": "2.25.234651502352368356456298825489565282446/series_002_2_CR/A2504307193 DXA/CR DXA/CR000003.dcm"
+    },
+    {
+      "number": 355,
+      "area_px": 331,
+      "relative_path": "2.25.234651502352368356456298825489565282446/series_002_2_CR/A2504307193 DXA/CR DXA/CR000004.dcm"
+    },
+    {
+      "number": 356,
+      "area_px": 415,
+      "relative_path": "2.25.234651502352368356456298825489565282446/series_002_2_CR/A2504307193 DXA/CR DXA/CR000005.dcm"
+    },
+    {
+      "number": 358,
+      "area_px": 396,
+      "relative_path": "2.25.234651502352368356456298825489565282446/series_002_2_CR/A2504307193 DXA/CR DXA/CR000007.dcm"
+    },
+    {
+      "number": 360,
+      "area_px": 278,
+      "relative_path": "2.25.234651502352368356456298825489565282446/series_002_2_CR/A2504307193 DXA/CR DXA/CR000009.dcm"
+    },
+    {
+      "number": 361,
+      "area_px": 380,
+      "relative_path": "2.25.234651502352368356456298825489565282446/series_002_2_CR/A2504307193 DXA/CR DXA/CR000010.dcm"
+    },
+    {
+      "number": 362,
+      "area_px": 181,
+      "relative_path": "2.25.247714038039430659432048101646401574824/series_002_2_CR/A2504238024 DXA Exam/CR DXA Images/CR000000.dcm"
+    },
+    {
+      "number": 363,
+      "area_px": 156,
+      "relative_path": "2.25.247714038039430659432048101646401574824/series_002_2_CR/A2504238024 DXA Exam/CR DXA Images/CR000001.dcm"
+    },
+    {
+      "number": 365,
+      "area_px": 138,
+      "relative_path": "2.25.269648774413746842548908998641183395622/series_001_2_CR/A2504393664 DXA/CR DXA/CR000000.dcm"
+    },
+    {
+      "number": 367,
+      "area_px": 210,
+      "relative_path": "2.25.269648774413746842548908998641183395622/series_001_2_CR/A2504393664 DXA/CR DXA/CR000002.dcm"
+    },
+    {
+      "number": 369,
+      "area_px": 310,
+      "relative_path": "2.25.272690031744216183651627058502316132741/series_002_2_CR/A2504373414 DXA/CR DXA/CR000000.dcm"
+    },
+    {
+      "number": 371,
+      "area_px": 429,
+      "relative_path": "2.25.272690031744216183651627058502316132741/series_002_2_CR/A2504373414 DXA/CR DXA/CR000002.dcm"
+    },
+    {
+      "number": 372,
+      "area_px": 467,
+      "relative_path": "2.25.272690031744216183651627058502316132741/series_002_2_CR/A2504373414 DXA/CR DXA/CR000003.dcm"
+    },
+    {
+      "number": 373,
+      "area_px": 245,
+      "relative_path": "2.25.272690031744216183651627058502316132741/series_002_2_CR/A2504373414 DXA/CR DXA/CR000004.dcm"
+    },
+    {
+      "number": 374,
+      "area_px": 220,
+      "relative_path": "2.25.272690031744216183651627058502316132741/series_002_2_CR/A2504373414 DXA/CR DXA/CR000005.dcm"
+    },
+    {
+      "number": 376,
+      "area_px": 332,
+      "relative_path": "2.25.272690031744216183651627058502316132741/series_002_2_CR/A2504373414 DXA/CR DXA/CR000007.dcm"
+    },
+    {
+      "number": 377,
+      "area_px": 314,
+      "relative_path": "2.25.272690031744216183651627058502316132741/series_002_2_CR/A2504373414 DXA/CR DXA/CR000008.dcm"
+    },
+    {
+      "number": 379,
+      "area_px": 382,
+      "relative_path": "2.25.272690031744216183651627058502316132741/series_002_2_CR/A2504373414 DXA/CR DXA/CR000010.dcm"
+    },
+    {
+      "number": 382,
+      "area_px": 120,
+      "relative_path": "2.25.276415754443998872860614500027519740375/series_002_2_CR/A2504387089 DXA/CR DXA/CR000002.dcm"
+    },
+    {
+      "number": 383,
+      "area_px": 198,
+      "relative_path": "2.25.276415754443998872860614500027519740375/series_002_2_CR/A2504387089 DXA/CR DXA/CR000003.dcm"
+    },
+    {
+      "number": 384,
+      "area_px": 97,
+      "relative_path": "2.25.276415754443998872860614500027519740375/series_002_2_CR/A2504387089 DXA/CR DXA/CR000004.dcm"
+    },
+    {
+      "number": 385,
+      "area_px": 150,
+      "relative_path": "2.25.276415754443998872860614500027519740375/series_002_2_CR/A2504387089 DXA/CR DXA/CR000005.dcm"
+    },
+    {
+      "number": 386,
+      "area_px": 62,
+      "relative_path": "2.25.277752758923974029595977676354128739670/series_002_2_CR/A2504223752 DXA/CR DXA/CR000000.dcm"
+    },
+    {
+      "number": 387,
+      "area_px": 0,
+      "relative_path": "2.25.277752758923974029595977676354128739670/series_002_2_CR/A2504223752 DXA/CR DXA/CR000001.dcm"
+    },
+    {
+      "number": 388,
+      "area_px": 0,
+      "relative_path": "2.25.277752758923974029595977676354128739670/series_002_2_CR/A2504223752 DXA/CR DXA/CR000002.dcm"
+    },
+    {
+      "number": 389,
+      "area_px": 53,
+      "relative_path": "2.25.277752758923974029595977676354128739670/series_002_2_CR/A2504223752 DXA/CR DXA/CR000003.dcm"
+    },
+    {
+      "number": 392,
+      "area_px": 48,
+      "relative_path": "2.25.286999464611662854355201599068538813496/series_003_2_CR/A2504223477 DXA/CR DXA/CR000000.dcm"
+    },
+    {
+      "number": 394,
+      "area_px": 276,
+      "relative_path": "2.25.286999464611662854355201599068538813496/series_003_2_CR/A2504223477 DXA/CR DXA/CR000002.dcm"
+    },
+    {
+      "number": 395,
+      "area_px": 113,
+      "relative_path": "2.25.286999464611662854355201599068538813496/series_003_2_CR/A2504223477 DXA/CR DXA/CR000003.dcm"
+    },
+    {
+      "number": 397,
+      "area_px": 187,
+      "relative_path": "2.25.286999464611662854355201599068538813496/series_003_2_CR/A2504223477 DXA/CR DXA/CR000005.dcm"
+    },
+    {
+      "number": 398,
+      "area_px": 174,
+      "relative_path": "2.25.29638026465755240167985424461715024381/series_004_3_CR/A2504115579 DXA/CR DXA/CR000000.dcm"
+    },
+    {
+      "number": 400,
+      "area_px": 116,
+      "relative_path": "2.25.29638026465755240167985424461715024381/series_004_3_CR/A2504115579 DXA/CR DXA/CR000002.dcm"
+    },
+    {
+      "number": 401,
+      "area_px": 242,
+      "relative_path": "2.25.29638026465755240167985424461715024381/series_004_3_CR/A2504115579 DXA/CR DXA/CR000003.dcm"
+    },
+    {
+      "number": 404,
+      "area_px": 264,
+      "relative_path": "2.25.307021710202910067378603383388989711646/series_004_2_CR/A2504110565 DXA/CR DXA/CR000001.dcm"
+    },
+    {
+      "number": 405,
+      "area_px": 327,
+      "relative_path": "2.25.307021710202910067378603383388989711646/series_004_2_CR/A2504110565 DXA/CR DXA/CR000002.dcm"
+    },
+    {
+      "number": 406,
+      "area_px": 168,
+      "relative_path": "2.25.307021710202910067378603383388989711646/series_004_2_CR/A2504110565 DXA/CR DXA/CR000003.dcm"
+    },
+    {
+      "number": 407,
+      "area_px": 152,
+      "relative_path": "2.25.307021710202910067378603383388989711646/series_004_2_CR/A2504110565 DXA/CR DXA/CR000004.dcm"
+    },
+    {
+      "number": 408,
+      "area_px": 171,
+      "relative_path": "2.25.307021710202910067378603383388989711646/series_004_2_CR/A2504110565 DXA/CR DXA/CR000005.dcm"
+    },
+    {
+      "number": 409,
+      "area_px": 155,
+      "relative_path": "2.25.307021710202910067378603383388989711646/series_004_2_CR/A2504110565 DXA/CR DXA/CR000006.dcm"
+    },
+    {
+      "number": 410,
+      "area_px": 234,
+      "relative_path": "2.25.307021710202910067378603383388989711646/series_004_2_CR/A2504110565 DXA/CR DXA/CR000007.dcm"
+    },
+    {
+      "number": 411,
+      "area_px": 247,
+      "relative_path": "2.25.307021710202910067378603383388989711646/series_004_2_CR/A2504110565 DXA/CR DXA/CR000008.dcm"
+    },
+    {
+      "number": 412,
+      "area_px": 207,
+      "relative_path": "2.25.307021710202910067378603383388989711646/series_004_2_CR/A2504110565 DXA/CR DXA/CR000009.dcm"
+    },
+    {
+      "number": 416,
+      "area_px": 68,
+      "relative_path": "2.25.309085571913348252136520206003694446566/series_002_2_CR/A2504116267 DXA/CR DXA/CR000001.dcm"
+    },
+    {
+      "number": 417,
+      "area_px": 233,
+      "relative_path": "2.25.309085571913348252136520206003694446566/series_002_2_CR/A2504116267 DXA/CR DXA/CR000002.dcm"
+    },
+    {
+      "number": 418,
+      "area_px": 121,
+      "relative_path": "2.25.314147167453134440746270747484612743945/series_002_2_CR/A2504224780 DXA/CR DXA/CR000000.dcm"
+    },
+    {
+      "number": 419,
+      "area_px": 134,
+      "relative_path": "2.25.314147167453134440746270747484612743945/series_002_2_CR/A2504224780 DXA/CR DXA/CR000001.dcm"
+    },
+    {
+      "number": 423,
+      "area_px": 34,
+      "relative_path": "2.25.339027809107632348165171236474821772940/series_001_2_CR/A2504349642 DXA/CR DXA/CR000000.dcm"
+    },
+    {
+      "number": 425,
+      "area_px": 197,
+      "relative_path": "2.25.339027809107632348165171236474821772940/series_001_2_CR/A2504349642 DXA/CR DXA/CR000002.dcm"
+    },
+    {
+      "number": 426,
+      "area_px": 328,
+      "relative_path": "2.25.339027809107632348165171236474821772940/series_001_2_CR/A2504349642 DXA/CR DXA/CR000003.dcm"
+    },
+    {
+      "number": 428,
+      "area_px": 125,
+      "relative_path": "2.25.339027809107632348165171236474821772940/series_001_2_CR/A2504349642 DXA/CR DXA/CR000005.dcm"
+    },
+    {
+      "number": 429,
+      "area_px": 78,
+      "relative_path": "2.25.340839477910528898406207279980417945/series_001_2_CR/A2504224555 DXA Exam/CR DXA Images/CR000000.dcm"
+    },
+    {
+      "number": 430,
+      "area_px": 153,
+      "relative_path": "2.25.340839477910528898406207279980417945/series_001_2_CR/A2504224555 DXA Exam/CR DXA Images/CR000001.dcm"
+    },
+    {
+      "number": 433,
+      "area_px": 79,
+      "relative_path": "2.25.37515662379281069436632838996073181551/series_001_2_CR/A2504329840 DXA/CR DXA/CR000001.dcm"
+    },
+    {
+      "number": 434,
+      "area_px": 263,
+      "relative_path": "2.25.37515662379281069436632838996073181551/series_001_2_CR/A2504329840 DXA/CR DXA/CR000002.dcm"
+    },
+    {
+      "number": 435,
+      "area_px": 457,
+      "relative_path": "2.25.39068163399801173920284179500049527111/series_002_2_CR/A2504195842 DXA/CR DXA/CR000000.dcm"
+    },
+    {
+      "number": 436,
+      "area_px": 411,
+      "relative_path": "2.25.39068163399801173920284179500049527111/series_002_2_CR/A2504195842 DXA/CR DXA/CR000001.dcm"
+    },
+    {
+      "number": 438,
+      "area_px": 718,
+      "relative_path": "2.25.48906424954135283790354958243772558962/series_001_2_CR/A2504185596 DXA Exam/CR DXA Images/CR000000.dcm"
+    },
+    {
+      "number": 439,
+      "area_px": 813,
+      "relative_path": "2.25.48906424954135283790354958243772558962/series_001_2_CR/A2504185596 DXA Exam/CR DXA Images/CR000001.dcm"
+    },
+    {
+      "number": 442,
+      "area_px": 89,
+      "relative_path": "2.25.52982400970721161435951723390541696819/series_001_2_CR/A2504331065 DXA/CR DXA/CR000000.dcm"
+    },
+    {
+      "number": 443,
+      "area_px": 350,
+      "relative_path": "2.25.52982400970721161435951723390541696819/series_001_2_CR/A2504331065 DXA/CR DXA/CR000001.dcm"
+    },
+    {
+      "number": 445,
+      "area_px": 94,
+      "relative_path": "2.25.52982400970721161435951723390541696819/series_001_2_CR/A2504331065 DXA/CR DXA/CR000003.dcm"
+    },
+    {
+      "number": 447,
+      "area_px": 288,
+      "relative_path": "2.25.52982400970721161435951723390541696819/series_001_2_CR/A2504331065 DXA/CR DXA/CR000005.dcm"
+    },
+    {
+      "number": 448,
+      "area_px": 147,
+      "relative_path": "2.25.52982400970721161435951723390541696819/series_001_2_CR/A2504331065 DXA/CR DXA/CR000006.dcm"
+    },
+    {
+      "number": 449,
+      "area_px": 310,
+      "relative_path": "2.25.52982400970721161435951723390541696819/series_001_2_CR/A2504331065 DXA/CR DXA/CR000007.dcm"
+    },
+    {
+      "number": 452,
+      "area_px": 246,
+      "relative_path": "2.25.65954778282254353457041255543338557112/series_004_3_CR/A2504246289 DXA/CR DXA/CR000000.dcm"
+    },
+    {
+      "number": 453,
+      "area_px": 315,
+      "relative_path": "2.25.65954778282254353457041255543338557112/series_004_3_CR/A2504246289 DXA/CR DXA/CR000001.dcm"
+    },
+    {
+      "number": 455,
+      "area_px": 649,
+      "relative_path": "2.25.66397484472966116002950503539482860450/series_001_2_CR/A2504194637 DXA/CR DXA/CR000000.dcm"
+    },
+    {
+      "number": 456,
+      "area_px": 717,
+      "relative_path": "2.25.66397484472966116002950503539482860450/series_001_2_CR/A2504194637 DXA/CR DXA/CR000001.dcm"
+    },
+    {
+      "number": 457,
+      "area_px": 1059,
+      "relative_path": "2.25.66397484472966116002950503539482860450/series_001_2_CR/A2504194637 DXA/CR DXA/CR000002.dcm"
+    },
+    {
+      "number": 458,
+      "area_px": 1166,
+      "relative_path": "2.25.66397484472966116002950503539482860450/series_001_2_CR/A2504194637 DXA/CR DXA/CR000003.dcm"
+    },
+    {
+      "number": 460,
+      "area_px": 733,
+      "relative_path": "2.25.66397484472966116002950503539482860450/series_001_2_CR/A2504194637 DXA/CR DXA/CR000005.dcm"
+    },
+    {
+      "number": 461,
+      "area_px": 1009,
+      "relative_path": "2.25.66397484472966116002950503539482860450/series_001_2_CR/A2504194637 DXA/CR DXA/CR000006.dcm"
+    },
+    {
+      "number": 462,
+      "area_px": 821,
+      "relative_path": "2.25.66397484472966116002950503539482860450/series_001_2_CR/A2504194637 DXA/CR DXA/CR000007.dcm"
+    },
+    {
+      "number": 465,
+      "area_px": 964,
+      "relative_path": "2.25.66397484472966116002950503539482860450/series_001_2_CR/A2504194637 DXA/CR DXA/CR000010.dcm"
+    },
+    {
+      "number": 466,
+      "area_px": 0,
+      "relative_path": "2.25.73070100851377917031356937075051545239/series_002_2_CR/A2504239110 DXA/CR DXA/CR000000.dcm"
+    },
+    {
+      "number": 467,
+      "area_px": 0,
+      "relative_path": "2.25.73070100851377917031356937075051545239/series_002_2_CR/A2504239110 DXA/CR DXA/CR000001.dcm"
+    },
+    {
+      "number": 470,
+      "area_px": 0,
+      "relative_path": "2.25.73070100851377917031356937075051545239/series_002_2_CR/A2504239110 DXA/CR DXA/CR000004.dcm"
+    },
+    {
+      "number": 471,
+      "area_px": 0,
+      "relative_path": "2.25.73070100851377917031356937075051545239/series_002_2_CR/A2504239110 DXA/CR DXA/CR000005.dcm"
+    },
+    {
+      "number": 472,
+      "area_px": 401,
+      "relative_path": "2.25.76710355977373089612172037086913478687/series_002_3_CR/A2504104830 DXA/CR DXA/CR000000.dcm"
+    },
+    {
+      "number": 474,
+      "area_px": 204,
+      "relative_path": "2.25.76710355977373089612172037086913478687/series_002_3_CR/A2504104830 DXA/CR DXA/CR000002.dcm"
+    },
+    {
+      "number": 475,
+      "area_px": 334,
+      "relative_path": "2.25.78999454687125053757525542837745968726/series_004_3_CR/A2504222617 DXA/CR DXA/CR000000.dcm"
+    },
+    {
+      "number": 476,
+      "area_px": 347,
+      "relative_path": "2.25.78999454687125053757525542837745968726/series_004_3_CR/A2504222617 DXA/CR DXA/CR000001.dcm"
+    },
+    {
+      "number": 478,
+      "area_px": 225,
+      "relative_path": "2.25.82912555346523716720160717883917565880/series_002_2_CR/A2504149480 DXA/CR DXA/CR000000.dcm"
+    },
+    {
+      "number": 480,
+      "area_px": 310,
+      "relative_path": "2.25.82912555346523716720160717883917565880/series_002_2_CR/A2504149480 DXA/CR DXA/CR000002.dcm"
+    },
+    {
+      "number": 481,
+      "area_px": 242,
+      "relative_path": "2.25.82912555346523716720160717883917565880/series_002_2_CR/A2504149480 DXA/CR DXA/CR000003.dcm"
+    },
+    {
+      "number": 482,
+      "area_px": 271,
+      "relative_path": "2.25.82912555346523716720160717883917565880/series_002_2_CR/A2504149480 DXA/CR DXA/CR000004.dcm"
+    },
+    {
+      "number": 485,
+      "area_px": 163,
+      "relative_path": "2.25.87869906212286587478854831452123526595/series_002_2_CR/A250419699 DXA/CR DXA/CR000000.dcm"
+    },
+    {
+      "number": 487,
+      "area_px": 250,
+      "relative_path": "2.25.87869906212286587478854831452123526595/series_002_2_CR/A250419699 DXA/CR DXA/CR000002.dcm"
+    },
+    {
+      "number": 488,
+      "area_px": 126,
+      "relative_path": "2.25.91981043841368764114007975581101713077/series_003_2_CR/A250496619 DXA/CR DXA/CR000000.dcm"
+    },
+    {
+      "number": 489,
+      "area_px": 130,
+      "relative_path": "2.25.91981043841368764114007975581101713077/series_003_2_CR/A250496619 DXA/CR DXA/CR000001.dcm"
+    },
+    {
+      "number": 490,
+      "area_px": 159,
+      "relative_path": "2.25.91981043841368764114007975581101713077/series_003_2_CR/A250496619 DXA/CR DXA/CR000002.dcm"
+    },
+    {
+      "number": 491,
+      "area_px": 109,
+      "relative_path": "2.25.91981043841368764114007975581101713077/series_003_2_CR/A250496619 DXA/CR DXA/CR000003.dcm"
+    },
+    {
+      "number": 493,
+      "area_px": 124,
+      "relative_path": "2.25.91981043841368764114007975581101713077/series_003_2_CR/A250496619 DXA/CR DXA/CR000005.dcm"
+    },
+    {
+      "number": 494,
+      "area_px": 174,
+      "relative_path": "2.25.91981043841368764114007975581101713077/series_003_2_CR/A250496619 DXA/CR DXA/CR000006.dcm"
+    },
+    {
+      "number": 495,
+      "area_px": 247,
+      "relative_path": "2.25.91981043841368764114007975581101713077/series_003_2_CR/A250496619 DXA/CR DXA/CR000007.dcm"
+    },
+    {
+      "number": 496,
+      "area_px": 130,
+      "relative_path": "2.25.91981043841368764114007975581101713077/series_003_2_CR/A250496619 DXA/CR DXA/CR000008.dcm"
+    },
+    {
+      "number": 499,
+      "area_px": 122,
+      "relative_path": "2.25.91981043841368764114007975581101713077/series_003_2_CR/A250496619 DXA/CR DXA/CR000011.dcm"
+    }
+  ]
+}

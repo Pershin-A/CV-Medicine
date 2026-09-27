@@ -1,0 +1,230 @@
+{
+  "seed": 20260927,
+  "source_count": 30,
+  "augmented_count": 150,
+  "total_columns": 180,
+  "by_region": {
+    "SPINE": 10,
+    "LEG_LEFT": 10,
+    "LEG_RIGHT": 10
+  },
+  "target_coverage": {
+    "spine_position": {
+      "negative": 38,
+      "positive": 22,
+      "unknown": 120
+    },
+    "spine_axis": {
+      "negative": 20,
+      "positive": 40,
+      "unknown": 120
+    },
+    "spine_artifact": {
+      "negative": 10,
+      "positive": 48,
+      "unknown": 122
+    },
+    "hip_position": {
+      "negative": 40,
+      "positive": 80,
+      "unknown": 60
+    },
+    "hip_roi": {
+      "negative": 79,
+      "positive": 41,
+      "unknown": 60
+    },
+    "hip_rotation": {
+      "negative": 40,
+      "positive": 80,
+      "unknown": 60
+    }
+  },
+  "failures": {
+    "candidate_five_variants_failed_SPINE": 7
+  },
+  "boards": [
+    {
+      "source_row": 282,
+      "region": "SPINE",
+      "sample_id": "spine_01_row282",
+      "board_path": "boards/spine_01_row282.png"
+    },
+    {
+      "source_row": 257,
+      "region": "SPINE",
+      "sample_id": "spine_02_row257",
+      "board_path": "boards/spine_02_row257.png"
+    },
+    {
+      "source_row": 174,
+      "region": "SPINE",
+      "sample_id": "spine_03_row174",
+      "board_path": "boards/spine_03_row174.png"
+    },
+    {
+      "source_row": 353,
+      "region": "SPINE",
+      "sample_id": "spine_04_row353",
+      "board_path": "boards/spine_04_row353.png"
+    },
+    {
+      "source_row": 117,
+      "region": "SPINE",
+      "sample_id": "spine_05_row117",
+      "board_path": "boards/spine_05_row117.png"
+    },
+    {
+      "source_row": 292,
+      "region": "SPINE",
+      "sample_id": "spine_06_row292",
+      "board_path": "boards/spine_06_row292.png"
+    },
+    {
+      "source_row": 175,
+      "region": "SPINE",
+      "sample_id": "spine_07_row175",
+      "board_path": "boards/spine_07_row175.png"
+    },
+    {
+      "source_row": 103,
+      "region": "SPINE",
+      "sample_id": "spine_08_row103",
+      "board_path": "boards/spine_08_row103.png"
+    },
+    {
+      "source_row": 357,
+      "region": "SPINE",
+      "sample_id": "spine_09_row357",
+      "board_path": "boards/spine_09_row357.png"
+    },
+    {
+      "source_row": 8,
+      "region": "SPINE",
+      "sample_id": "spine_10_row008",
+      "board_path": "boards/spine_10_row008.png"
+    },
+    {
+      "source_row": 455,
+      "region": "LEG_LEFT",
+      "sample_id": "leg_left_01_row455",
+      "board_path": "boards/leg_left_01_row455.png"
+    },
+    {
+      "source_row": 54,
+      "region": "LEG_LEFT",
+      "sample_id": "leg_left_02_row054",
+      "board_path": "boards/leg_left_02_row054.png"
+    },
+    {
+      "source_row": 236,
+      "region": "LEG_LEFT",
+      "sample_id": "leg_left_03_row236",
+      "board_path": "boards/leg_left_03_row236.png"
+    },
+    {
+      "source_row": 362,
+      "region": "LEG_LEFT",
+      "sample_id": "leg_left_04_row362",
+      "board_path": "boards/leg_left_04_row362.png"
+    },
+    {
+      "source_row": 44,
+      "region": "LEG_LEFT",
+      "sample_id": "leg_left_05_row044",
+      "board_path": "boards/leg_left_05_row044.png"
+    },
+    {
+      "source_row": 410,
+      "region": "LEG_LEFT",
+      "sample_id": "leg_left_06_row410",
+      "board_path": "boards/leg_left_06_row410.png"
+    },
+    {
+      "source_row": 407,
+      "region": "LEG_LEFT",
+      "sample_id": "leg_left_07_row407",
+      "board_path": "boards/leg_left_07_row407.png"
+    },
+    {
+      "source_row": 167,
+      "region": "LEG_LEFT",
+      "sample_id": "leg_left_08_row167",
+      "board_path": "boards/leg_left_08_row167.png"
+    },
+    {
+      "source_row": 227,
+      "region": "LEG_LEFT",
+      "sample_id": "leg_left_09_row227",
+      "board_path": "boards/leg_left_09_row227.png"
+    },
+    {
+      "source_row": 496,
+      "region": "LEG_LEFT",
+      "sample_id": "leg_left_10_row496",
+      "board_path": "boards/leg_left_10_row496.png"
+    },
+    {
+      "source_row": 358,
+      "region": "LEG_RIGHT",
+      "sample_id": "leg_right_01_row358",
+      "board_path": "boards/leg_right_01_row358.png"
+    },
+    {
+      "source_row": 56,
+      "region": "LEG_RIGHT",
+      "sample_id": "leg_right_02_row056",
+      "board_path": "boards/leg_right_02_row056.png"
+    },
+    {
+      "source_row": 65,
+      "region": "LEG_RIGHT",
+      "sample_id": "leg_right_03_row065",
+      "board_path": "boards/leg_right_03_row065.png"
+    },
+    {
+      "source_row": 252,
+      "region": "LEG_RIGHT",
+      "sample_id": "leg_right_04_row252",
+      "board_path": "boards/leg_right_04_row252.png"
+    },
+    {
+      "source_row": 248,
+      "region": "LEG_RIGHT",
+      "sample_id": "leg_right_05_row248",
+      "board_path": "boards/leg_right_05_row248.png"
+    },
+    {
+      "source_row": 442,
+      "region": "LEG_RIGHT",
+      "sample_id": "leg_right_06_row442",
+      "board_path": "boards/leg_right_06_row442.png"
+    },
+    {
+      "source_row": 445,
+      "region": "LEG_RIGHT",
+      "sample_id": "leg_right_07_row445",
+      "board_path": "boards/leg_right_07_row445.png"
+    },
+    {
+      "source_row": 206,
+      "region": "LEG_RIGHT",
+      "sample_id": "leg_right_08_row206",
+      "board_path": "boards/leg_right_08_row206.png"
+    },
+    {
+      "source_row": 30,
+      "region": "LEG_RIGHT",
+      "sample_id": "leg_right_09_row030",
+      "board_path": "boards/leg_right_09_row030.png"
+    },
+    {
+      "source_row": 37,
+      "region": "LEG_RIGHT",
+      "sample_id": "leg_right_10_row037",
+      "board_path": "boards/leg_right_10_row037.png"
+    }
+  ],
+  "target_convention": "1=нарушение, 0=норма, ?=неизвестно",
+  "roi_spacing_note": "1.05 mm/Y and 0.6 mm/X are user-supplied scanner nominal values; no spacing tags in these DICOMs"
+}
