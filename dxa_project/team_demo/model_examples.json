@@ -1,0 +1,590 @@
+{
+  "modules": {
+    "router": [
+      {
+        "image_number": 42,
+        "unfiltered_labeler_number": 42,
+        "category": "Успехи",
+        "success": true,
+        "measurement": "Эталон: Позвоночник; модель: Позвоночник."
+      },
+      {
+        "image_number": 366,
+        "unfiltered_labeler_number": 366,
+        "category": "Успехи",
+        "success": true,
+        "measurement": "Эталон: Позвоночник; модель: Позвоночник."
+      },
+      {
+        "image_number": 399,
+        "unfiltered_labeler_number": 399,
+        "category": "Успехи",
+        "success": true,
+        "measurement": "Эталон: Позвоночник; модель: Позвоночник."
+      },
+      {
+        "image_number": 402,
+        "unfiltered_labeler_number": 402,
+        "category": "Успехи",
+        "success": true,
+        "measurement": "Эталон: Позвоночник; модель: Позвоночник."
+      },
+      {
+        "image_number": 216,
+        "unfiltered_labeler_number": 216,
+        "category": "Успехи",
+        "success": true,
+        "measurement": "Эталон: Позвоночник; модель: Позвоночник."
+      },
+      {
+        "image_number": 217,
+        "unfiltered_labeler_number": 217,
+        "category": "Ошибки",
+        "success": false,
+        "measurement": "Эталон: Левое бедро; модель: Правое бедро."
+      },
+      {
+        "image_number": 41,
+        "unfiltered_labeler_number": 41,
+        "category": "Ошибки",
+        "success": false,
+        "measurement": "Эталон: Правое бедро; модель: Левое бедро."
+      }
+    ],
+    "lines": [
+      {
+        "image_number": 256,
+        "unfiltered_labeler_number": 256,
+        "category": "Успехи",
+        "success": true,
+        "measurement": "Линий эталон / модель: 5 / 5; среднее вертикальное отклонение сопоставленных линий: 2.0 мм."
+      },
+      {
+        "image_number": 366,
+        "unfiltered_labeler_number": 366,
+        "category": "Успехи",
+        "success": true,
+        "measurement": "Линий эталон / модель: 5 / 5; среднее вертикальное отклонение сопоставленных линий: 2.2 мм."
+      },
+      {
+        "image_number": 359,
+        "unfiltered_labeler_number": 359,
+        "category": "Успехи",
+        "success": true,
+        "measurement": "Линий эталон / модель: 5 / 5; среднее вертикальное отклонение сопоставленных линий: 2.4 мм."
+      },
+      {
+        "image_number": 441,
+        "unfiltered_labeler_number": 441,
+        "category": "Ошибки",
+        "success": false,
+        "measurement": "Линий эталон / модель: 6 / 1; среднее вертикальное отклонение сопоставленных линий: 11.0 мм."
+      },
+      {
+        "image_number": 282,
+        "unfiltered_labeler_number": 282,
+        "category": "Ошибки",
+        "success": false,
+        "measurement": "Линий эталон / модель: 5 / 2; среднее вертикальное отклонение сопоставленных линий: 2.3 мм."
+      },
+      {
+        "image_number": 186,
+        "unfiltered_labeler_number": 186,
+        "category": "Ошибки",
+        "success": false,
+        "measurement": "Линий эталон / модель: 5 / 3; среднее вертикальное отклонение сопоставленных линий: 8.6 мм."
+      },
+      {
+        "image_number": 221,
+        "unfiltered_labeler_number": 221,
+        "category": "Ошибки",
+        "success": false,
+        "measurement": "Линий эталон / модель: 6 / 4; среднее вертикальное отклонение сопоставленных линий: 5.6 мм."
+      },
+      {
+        "image_number": 42,
+        "unfiltered_labeler_number": 42,
+        "category": "Ошибки",
+        "success": false,
+        "measurement": "Линий эталон / модель: 7 / 5; среднее вертикальное отклонение сопоставленных линий: 4.8 мм."
+      }
+    ],
+    "crests": [
+      {
+        "image_number": 473,
+        "unfiltered_labeler_number": 473,
+        "category": "Лучшие из имеющихся — критерий успеха не достигнут",
+        "success": false,
+        "measurement": "Средняя ошибка: 11.7 мм; максимум: 12.3 мм. Пропущено видимых: 0; лишних: 0."
+      },
+      {
+        "image_number": 198,
+        "unfiltered_labeler_number": 198,
+        "category": "Лучшие из имеющихся — критерий успеха не достигнут",
+        "success": false,
+        "measurement": "Средняя ошибка: 14.2 мм; максимум: 16.5 мм. Пропущено видимых: 0; лишних: 0."
+      },
+      {
+        "image_number": 220,
+        "unfiltered_labeler_number": 220,
+        "category": "Лучшие из имеющихся — критерий успеха не достигнут",
+        "success": false,
+        "measurement": "Средняя ошибка: 14.5 мм; максимум: 18.4 мм. Пропущено видимых: 0; лишних: 0."
+      },
+      {
+        "image_number": 357,
+        "unfiltered_labeler_number": 357,
+        "category": "Лучшие из имеющихся — критерий успеха не достигнут",
+        "success": false,
+        "measurement": "Средняя ошибка: 19.9 мм; максимум: 20.4 мм. Пропущено видимых: 0; лишних: 0."
+      },
+      {
+        "image_number": 441,
+        "unfiltered_labeler_number": 441,
+        "category": "Лучшие из имеющихся — критерий успеха не достигнут",
+        "success": false,
+        "measurement": "Средняя ошибка: 20.6 мм; максимум: 25.3 мм. Пропущено видимых: 0; лишних: 0."
+      },
+      {
+        "image_number": 399,
+        "unfiltered_labeler_number": 399,
+        "category": "Ошибки",
+        "success": false,
+        "measurement": "Нет пар точек для измерения расстояния. Пропущено видимых: 0; лишних: 2."
+      },
+      {
+        "image_number": 444,
+        "unfiltered_labeler_number": 444,
+        "category": "Ошибки",
+        "success": false,
+        "measurement": "Нет пар точек для измерения расстояния. Пропущено видимых: 0; лишних: 2."
+      },
+      {
+        "image_number": 216,
+        "unfiltered_labeler_number": 216,
+        "category": "Ошибки",
+        "success": false,
+        "measurement": "Нет пар точек для измерения расстояния. Пропущено видимых: 0; лишних: 1."
+      },
+      {
+        "image_number": 121,
+        "unfiltered_labeler_number": 121,
+        "category": "Ошибки",
+        "success": false,
+        "measurement": "Средняя ошибка: 34.5 мм; максимум: 67.4 мм. Пропущено видимых: 0; лишних: 0."
+      },
+      {
+        "image_number": 306,
+        "unfiltered_labeler_number": 306,
+        "category": "Ошибки",
+        "success": false,
+        "measurement": "Средняя ошибка: 45.1 мм; максимум: 60.6 мм. Пропущено видимых: 0; лишних: 0."
+      }
+    ],
+    "artifact": [
+      {
+        "image_number": 225,
+        "unfiltered_labeler_number": 225,
+        "category": "Успехи",
+        "success": true,
+        "measurement": "Рамок эталон / модель: 2 / 2; совпало при IoU ≥ 0,5: 2; пропуски: 0; лишние: 0."
+      },
+      {
+        "image_number": 33,
+        "unfiltered_labeler_number": 33,
+        "category": "Успехи",
+        "success": true,
+        "measurement": "Рамок эталон / модель: 0 / 0; совпало при IoU ≥ 0,5: 0; пропуски: 0; лишние: 0."
+      },
+      {
+        "image_number": 216,
+        "unfiltered_labeler_number": 216,
+        "category": "Успехи",
+        "success": true,
+        "measurement": "Рамок эталон / модель: 0 / 0; совпало при IoU ≥ 0,5: 0; пропуски: 0; лишние: 0."
+      },
+      {
+        "image_number": 220,
+        "unfiltered_labeler_number": 220,
+        "category": "Успехи",
+        "success": true,
+        "measurement": "Рамок эталон / модель: 0 / 0; совпало при IoU ≥ 0,5: 0; пропуски: 0; лишние: 0."
+      },
+      {
+        "image_number": 256,
+        "unfiltered_labeler_number": 256,
+        "category": "Успехи",
+        "success": true,
+        "measurement": "Рамок эталон / модель: 0 / 0; совпало при IoU ≥ 0,5: 0; пропуски: 0; лишние: 0."
+      },
+      {
+        "image_number": 121,
+        "unfiltered_labeler_number": 121,
+        "category": "Ошибки",
+        "success": false,
+        "measurement": "Рамок эталон / модель: 3 / 0; совпало при IoU ≥ 0,5: 0; пропуски: 3; лишние: 0."
+      },
+      {
+        "image_number": 186,
+        "unfiltered_labeler_number": 186,
+        "category": "Ошибки",
+        "success": false,
+        "measurement": "Рамок эталон / модель: 5 / 2; совпало при IoU ≥ 0,5: 2; пропуски: 3; лишние: 0."
+      },
+      {
+        "image_number": 390,
+        "unfiltered_labeler_number": 390,
+        "category": "Ошибки",
+        "success": false,
+        "measurement": "Рамок эталон / модель: 3 / 1; совпало при IoU ≥ 0,5: 1; пропуски: 2; лишние: 0."
+      },
+      {
+        "image_number": 42,
+        "unfiltered_labeler_number": 42,
+        "category": "Ошибки",
+        "success": false,
+        "measurement": "Рамок эталон / модель: 1 / 0; совпало при IoU ≥ 0,5: 0; пропуски: 1; лишние: 0."
+      },
+      {
+        "image_number": 281,
+        "unfiltered_labeler_number": 281,
+        "category": "Ошибки",
+        "success": false,
+        "measurement": "Рамок эталон / модель: 1 / 0; совпало при IoU ≥ 0,5: 0; пропуски: 1; лишние: 0."
+      }
+    ],
+    "points": [
+      {
+        "image_number": 356,
+        "unfiltered_labeler_number": 356,
+        "category": "Успехи",
+        "success": true,
+        "measurement": "Средняя ошибка: 4.0 мм; максимум: 5.5 мм. Пропущено видимых: 0; лишних: 0."
+      },
+      {
+        "image_number": 360,
+        "unfiltered_labeler_number": 360,
+        "category": "Успехи",
+        "success": true,
+        "measurement": "Средняя ошибка: 4.6 мм; максимум: 6.3 мм. Пропущено видимых: 0; лишних: 0."
+      },
+      {
+        "image_number": 449,
+        "unfiltered_labeler_number": 449,
+        "category": "Успехи",
+        "success": true,
+        "measurement": "Средняя ошибка: 4.1 мм; максимум: 7.0 мм. Пропущено видимых: 0; лишних: 0."
+      },
+      {
+        "image_number": 351,
+        "unfiltered_labeler_number": 351,
+        "category": "Успехи",
+        "success": true,
+        "measurement": "Средняя ошибка: 5.0 мм; максимум: 7.2 мм. Пропущено видимых: 0; лишних: 0."
+      },
+      {
+        "image_number": 190,
+        "unfiltered_labeler_number": 190,
+        "category": "Успехи",
+        "success": true,
+        "measurement": "Средняя ошибка: 6.2 мм; максимум: 8.0 мм. Пропущено видимых: 0; лишних: 0."
+      },
+      {
+        "image_number": 217,
+        "unfiltered_labeler_number": 217,
+        "category": "Ошибки",
+        "success": false,
+        "measurement": "Средняя ошибка: 17.6 мм; максимум: 27.0 мм. Пропущено видимых: 1; лишних: 0."
+      },
+      {
+        "image_number": 218,
+        "unfiltered_labeler_number": 218,
+        "category": "Ошибки",
+        "success": false,
+        "measurement": "Средняя ошибка: 15.5 мм; максимум: 21.7 мм. Пропущено видимых: 1; лишних: 0."
+      },
+      {
+        "image_number": 367,
+        "unfiltered_labeler_number": 367,
+        "category": "Ошибки",
+        "success": false,
+        "measurement": "Средняя ошибка: 12.6 мм; максимум: 19.0 мм. Пропущено видимых: 1; лишних: 0."
+      },
+      {
+        "image_number": 284,
+        "unfiltered_labeler_number": 284,
+        "category": "Ошибки",
+        "success": false,
+        "measurement": "Средняя ошибка: 39.3 мм; максимум: 110.6 мм. Пропущено видимых: 0; лишних: 0."
+      },
+      {
+        "image_number": 283,
+        "unfiltered_labeler_number": 283,
+        "category": "Ошибки",
+        "success": false,
+        "measurement": "Средняя ошибка: 3.1 мм; максимум: 4.7 мм. Пропущено видимых: 1; лишних: 0."
+      }
+    ],
+    "coordinate": [
+      {
+        "image_number": 43,
+        "unfiltered_labeler_number": 43,
+        "category": "Успехи",
+        "success": true,
+        "measurement": "Средняя ошибка: 5.1 мм; максимум: 8.2 мм. Пропущено видимых: 0; лишних: 0."
+      },
+      {
+        "image_number": 448,
+        "unfiltered_labeler_number": 448,
+        "category": "Успехи",
+        "success": true,
+        "measurement": "Средняя ошибка: 5.8 мм; максимум: 8.5 мм. Пропущено видимых: 0; лишних: 0."
+      },
+      {
+        "image_number": 472,
+        "unfiltered_labeler_number": 472,
+        "category": "Успехи",
+        "success": true,
+        "measurement": "Средняя ошибка: 8.0 мм; максимум: 9.8 мм. Пропущено видимых: 0; лишних: 0."
+      },
+      {
+        "image_number": 217,
+        "unfiltered_labeler_number": 217,
+        "category": "Ошибки",
+        "success": false,
+        "measurement": "Средняя ошибка: 19.8 мм; максимум: 33.6 мм. Пропущено видимых: 0; лишних: 0."
+      },
+      {
+        "image_number": 206,
+        "unfiltered_labeler_number": 206,
+        "category": "Ошибки",
+        "success": false,
+        "measurement": "Средняя ошибка: 21.2 мм; максимум: 33.2 мм. Пропущено видимых: 0; лишних: 0."
+      },
+      {
+        "image_number": 307,
+        "unfiltered_labeler_number": 307,
+        "category": "Ошибки",
+        "success": false,
+        "measurement": "Средняя ошибка: 17.6 мм; максимум: 28.6 мм. Пропущено видимых: 0; лишних: 0."
+      },
+      {
+        "image_number": 46,
+        "unfiltered_labeler_number": 46,
+        "category": "Ошибки",
+        "success": false,
+        "measurement": "Средняя ошибка: 20.5 мм; максимум: 27.8 мм. Пропущено видимых: 0; лишних: 0."
+      },
+      {
+        "image_number": 215,
+        "unfiltered_labeler_number": 215,
+        "category": "Ошибки",
+        "success": false,
+        "measurement": "Средняя ошибка: 19.1 мм; максимум: 27.3 мм. Пропущено видимых: 0; лишних: 0."
+      }
+    ],
+    "roi": [
+      {
+        "image_number": 354,
+        "unfiltered_labeler_number": 354,
+        "category": "Успехи",
+        "success": true,
+        "measurement": "IoU ROI = 0.950."
+      },
+      {
+        "image_number": 365,
+        "unfiltered_labeler_number": 365,
+        "category": "Успехи",
+        "success": true,
+        "measurement": "IoU ROI = 0.940."
+      },
+      {
+        "image_number": 360,
+        "unfiltered_labeler_number": 360,
+        "category": "Успехи",
+        "success": true,
+        "measurement": "IoU ROI = 0.928."
+      },
+      {
+        "image_number": 43,
+        "unfiltered_labeler_number": 43,
+        "category": "Успехи",
+        "success": true,
+        "measurement": "IoU ROI = 0.901."
+      },
+      {
+        "image_number": 388,
+        "unfiltered_labeler_number": 388,
+        "category": "Успехи",
+        "success": true,
+        "measurement": "IoU ROI = 0.896."
+      },
+      {
+        "image_number": 46,
+        "unfiltered_labeler_number": 46,
+        "category": "Ошибки",
+        "success": false,
+        "measurement": "IoU ROI = 0.551."
+      },
+      {
+        "image_number": 32,
+        "unfiltered_labeler_number": 32,
+        "category": "Ошибки",
+        "success": false,
+        "measurement": "IoU ROI = 0.709."
+      },
+      {
+        "image_number": 207,
+        "unfiltered_labeler_number": 207,
+        "category": "Ошибки",
+        "success": false,
+        "measurement": "IoU ROI = 0.718."
+      },
+      {
+        "image_number": 224,
+        "unfiltered_labeler_number": 224,
+        "category": "Ошибки",
+        "success": false,
+        "measurement": "IoU ROI = 0.719."
+      },
+      {
+        "image_number": 217,
+        "unfiltered_labeler_number": 217,
+        "category": "Ошибки",
+        "success": false,
+        "measurement": "IoU ROI = 0.727."
+      }
+    ],
+    "mask": [
+      {
+        "image_number": 283,
+        "unfiltered_labeler_number": 283,
+        "category": "Успехи",
+        "success": true,
+        "measurement": "Dice = 0.899; площадь эталона / модели: 145 / 151 пикселей."
+      },
+      {
+        "image_number": 351,
+        "unfiltered_labeler_number": 351,
+        "category": "Успехи",
+        "success": true,
+        "measurement": "Dice = 0.892; площадь эталона / модели: 383 / 444 пикселей."
+      },
+      {
+        "image_number": 308,
+        "unfiltered_labeler_number": 308,
+        "category": "Успехи",
+        "success": true,
+        "measurement": "Dice = 0.887; площадь эталона / модели: 315 / 278 пикселей."
+      },
+      {
+        "image_number": 279,
+        "unfiltered_labeler_number": 279,
+        "category": "Успехи",
+        "success": true,
+        "measurement": "Dice = 0.885; площадь эталона / модели: 326 / 311 пикселей."
+      },
+      {
+        "image_number": 355,
+        "unfiltered_labeler_number": 355,
+        "category": "Успехи",
+        "success": true,
+        "measurement": "Dice = 0.880; площадь эталона / модели: 331 / 403 пикселей."
+      },
+      {
+        "image_number": 386,
+        "unfiltered_labeler_number": 386,
+        "category": "Ошибки",
+        "success": false,
+        "measurement": "Dice = 0.000; площадь эталона / модели: 62 / 0 пикселей."
+      },
+      {
+        "image_number": 398,
+        "unfiltered_labeler_number": 398,
+        "category": "Ошибки",
+        "success": false,
+        "measurement": "Dice = 0.257; площадь эталона / модели: 174 / 28 пикселей."
+      },
+      {
+        "image_number": 442,
+        "unfiltered_labeler_number": 442,
+        "category": "Ошибки",
+        "success": false,
+        "measurement": "Dice = 0.438; площадь эталона / модели: 89 / 135 пикселей."
+      },
+      {
+        "image_number": 205,
+        "unfiltered_labeler_number": 205,
+        "category": "Ошибки",
+        "success": false,
+        "measurement": "Dice = 0.508; площадь эталона / модели: 195 / 69 пикселей."
+      },
+      {
+        "image_number": 32,
+        "unfiltered_labeler_number": 32,
+        "category": "Ошибки",
+        "success": false,
+        "measurement": "Dice = 0.509; площадь эталона / модели: 112 / 104 пикселей."
+      }
+    ]
+  },
+  "manual_review": [
+    {
+      "image_number": 52,
+      "unfiltered_labeler_number": 52,
+      "reason": "artifact_label_vs_visual_boxes",
+      "table_label": 1,
+      "visual_box_count": 0
+    },
+    {
+      "image_number": 55,
+      "unfiltered_labeler_number": 55,
+      "reason": "artifact_label_vs_visual_boxes",
+      "table_label": 1,
+      "visual_box_count": 0
+    },
+    {
+      "image_number": 58,
+      "unfiltered_labeler_number": 58,
+      "reason": "artifact_label_vs_visual_boxes",
+      "table_label": 1,
+      "visual_box_count": 0
+    },
+    {
+      "image_number": 102,
+      "unfiltered_labeler_number": 102,
+      "reason": "artifact_label_vs_visual_boxes",
+      "table_label": 0,
+      "visual_box_count": 3
+    },
+    {
+      "image_number": 121,
+      "unfiltered_labeler_number": 121,
+      "reason": "artifact_label_vs_visual_boxes",
+      "table_label": 0,
+      "visual_box_count": 3
+    },
+    {
+      "image_number": 122,
+      "unfiltered_labeler_number": 122,
+      "reason": "artifact_label_vs_visual_boxes",
+      "table_label": 0,
+      "visual_box_count": 4
+    },
+    {
+      "image_number": 287,
+      "unfiltered_labeler_number": 287,
+      "reason": "artifact_label_vs_visual_boxes",
+      "table_label": 0,
+      "visual_box_count": 1
+    },
+    {
+      "image_number": 288,
+      "unfiltered_labeler_number": 288,
+      "reason": "artifact_label_vs_visual_boxes",
+      "table_label": 0,
+      "visual_box_count": 1
+    }
+  ],
+  "roi_nominal_review": []
+}
