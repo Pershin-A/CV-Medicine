@@ -18,12 +18,13 @@ import warnings
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont, ImageOps
 
-from .core import (hip_position_ok, hip_roi_ok,
+from .core import (hip_position_ok, hip_roi_ok, physical_axis_angle,
                    spine_axis_angle, spine_position_ok, transform_geometry,
                    transformed_spacing, warp_image)
 from .generate import (_check_group, _source_spacing, _hip_variant, _labels,
                        _read_dicom, _read_rows, _read_sources,
                        _spine_variant, _write_dicom)
+from .vertebral_axes import analyze_spine, placement_from_axes
 
 
 REGIONS = ("SPINE", "LEG_LEFT", "LEG_RIGHT")
@@ -163,12 +164,14 @@ def _source_candidate(item, region):
     row, geometry = item["source"], item["geometry"]
     ds, image = _read_dicom(Path(row["path"]))
     if region == "SPINE":
-        angle = spine_axis_angle(image, geometry)
-        if (not spine_position_ok(geometry) or angle is None or abs(angle) > 5 or
+        spacing, basis = _source_spacing(ds)
+        row["axis_polarity"] = "dark" if str(getattr(ds,"PhotometricInterpretation",""))=="MONOCHROME1" else "bright"
+        analysis = analyze_spine(image,geometry,spacing,polarity=row["axis_polarity"])
+        angle = analysis["global_angle_deg"]
+        if (analysis["review_required"] or placement_from_axes(geometry,analysis) is not True or angle is None or abs(angle) > 5 or
                 any(_reference_value(row.get(key)) != 0
                     for key in ("spine_position", "spine_axis"))):
             return None
-        spacing, basis = None, "not_applicable"
         ancillary = _reference_value(row.get("spine_artifact"))
         if ancillary == 1 and not geometry["spine"]["foreign_objects"]:
             return None
@@ -208,7 +211,8 @@ def _make_variants(item, rng, attempts_per_slot=250):
         chosen = None
         for _ in range(attempts_per_slot):
             if region == "SPINE":
-                transform, variant = _spine_variant(geometry, group, rng, item["base_angle"])
+                transform, variant = _spine_variant(geometry, group, rng,
+                                                    item["base_angle"], item["spacing"])
             else:
                 transform, variant = _hip_variant(geometry, group, rng,
                                                   region.removeprefix("LEG_"),
@@ -302,6 +306,8 @@ def run(workspace: Path, output: Path, seed=20260927, per_region=10):
                 all_rows.append({"sample_id": sample_id, "source_row": source_num,
                                  "region": region, "column": number,
                                  "group": entry["group"], "variant": entry["variant"],
+                                 "reflect_x": int(bool(entry["transform"] and
+                                                       entry["transform"].reflect_x)),
                                  "image_path": image_rel or item["source"]["path"],
                                  "geometry_path": geo_rel,
                                  "source_relative_path": item["source"]["relative_path"],
@@ -318,6 +324,7 @@ def run(workspace: Path, output: Path, seed=20260927, per_region=10):
             raise RuntimeError(f"Only {selected[region]}/{per_region} complete examples for {region}")
     output.mkdir(parents=True, exist_ok=True)
     columns = ["sample_id", "source_row", "region", "column", "group", "variant",
+               "reflect_x",
                "image_path", "geometry_path", "source_relative_path", "source_study_uid",
                "spacing_basis", "row_spacing_mm", "col_spacing_mm",
                *TARGETS, "spine_axis_angle_deg",

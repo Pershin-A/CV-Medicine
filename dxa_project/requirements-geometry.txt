@@ -1,0 +1,14 @@
+# Install compatible torch and torchvision for your CPU/CUDA separately.
+# Tested here: torch 2.12.1+cu130, torchvision 0.27.1+cu130.
+pydicom==3.0.2
+numpy==2.3.5
+scipy==1.18.0
+scikit-learn==1.7.2
+Pillow==12.0.0
+pandas==2.3.3
+openpyxl==3.1.5
+matplotlib==3.11.0
+mistune==3.1.2
+nbformat==5.10.4
+nbclient==0.10.2
+pytest==7.4.3

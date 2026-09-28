@@ -1,0 +1,77 @@
+[
+  {
+    "example": 1,
+    "truth_region": "LEG_RIGHT",
+    "predicted_region": "LEG_LEFT",
+    "truth": {
+      "hip_position": 0,
+      "hip_roi": null,
+      "hip_rotation": null
+    },
+    "prediction": {
+      "hip_position": 1,
+      "hip_roi": 1,
+      "hip_rotation": 1
+    }
+  },
+  {
+    "example": 2,
+    "truth_region": "SPINE",
+    "predicted_region": "SPINE",
+    "truth": {
+      "spine_position": 0,
+      "spine_axis": 0,
+      "spine_artifact": 0
+    },
+    "prediction": {
+      "spine_position": 1,
+      "spine_axis": 0,
+      "spine_artifact": 0
+    }
+  },
+  {
+    "example": 3,
+    "truth_region": "SPINE",
+    "predicted_region": "SPINE",
+    "truth": {
+      "spine_position": 1,
+      "spine_axis": 0,
+      "spine_artifact": 0
+    },
+    "prediction": {
+      "spine_position": 1,
+      "spine_axis": 0,
+      "spine_artifact": 0
+    }
+  },
+  {
+    "example": 4,
+    "truth_region": "LEG_LEFT",
+    "predicted_region": "LEG_LEFT",
+    "truth": {
+      "hip_position": 0,
+      "hip_roi": 0,
+      "hip_rotation": 0
+    },
+    "prediction": {
+      "hip_position": 1,
+      "hip_roi": 0,
+      "hip_rotation": 0
+    }
+  },
+  {
+    "example": 5,
+    "truth_region": "LEG_LEFT",
+    "predicted_region": "LEG_RIGHT",
+    "truth": {
+      "hip_position": 0,
+      "hip_roi": 0,
+      "hip_rotation": 0
+    },
+    "prediction": {
+      "hip_position": 1,
+      "hip_roi": 1,
+      "hip_rotation": 1
+    }
+  }
+]

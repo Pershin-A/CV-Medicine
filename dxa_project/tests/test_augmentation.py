@@ -8,6 +8,7 @@ import pytest
 
 from dxa_project.augmentation.core import (Transform, hip_position_ok, hip_roi_ok,
                                lesser_trochanter_between_area, prepare_geometry,
+                               physical_axis_angle, pixel_axis_angle,
                                spine_axis_angle, spine_position_ok,
                                transform_geometry, transformed_spacing, warp_image)
 from dxa_project.augmentation.generate import (_check_group, _hip_variant,
@@ -77,6 +78,56 @@ def test_axis_uses_brightness_and_rotation_label_boundary():
         actual = spine_axis_angle(moved_image, moved_geometry)
         assert actual is not None
         assert int(abs(actual) > 5) == expected
+
+
+def test_spine_reflection_changes_axis_sign_and_swaps_crest_names():
+    g = spine_fixture()
+    g["spine"]["iliac_crests"] = {"image_left": [35, 260],
+                                      "image_right": [240, 265]}
+    y, x = np.mgrid[:300, :300]
+    image = (1000 + 500 * np.exp(-((x - (145 + .12 * (y - 150))) / 25) ** 2)).astype(np.uint16)
+    original = spine_axis_angle(image, g)
+    t = Transform(300, 300, reflect_x=True)
+    assert t.covers_output()
+    moved_image = warp_image(image, t)
+    moved, _ = transform_geometry(g, t, region="SPINE")
+    assert moved["spine"]["iliac_crests"]["image_left"][0] == pytest.approx(59)
+    assert moved["spine"]["iliac_crests"]["image_right"][0] == pytest.approx(264)
+    reflected = spine_axis_angle(moved_image, moved)
+    assert original is not None and reflected is not None
+    assert reflected == pytest.approx(-original, abs=1.5)
+
+
+def test_spine_target_angle_ranges_and_normalization():
+    rng = random.Random(91)
+    g = spine_fixture()
+    for group in ("positive", "negative_axis_or_roi"):
+        for _ in range(100):
+            t, variant = _spine_variant(g, group, rng, 9.0)
+            target = float(variant.rsplit("_", 1)[-1])
+            intended = (-9.0 if t.reflect_x else 9.0) - t.angle_deg
+            assert target == pytest.approx(intended, abs=.01)
+            assert t.physical_spacing_mm == (1.05, .6)
+            if group == "positive":
+                assert -4 <= target <= 4
+            else:
+                assert -10 <= target <= -6 or 6 <= target <= 10
+
+
+def test_physical_angle_roundtrip_uses_anisotropic_spacing():
+    for angle in (-15, -6, -4, 0, 4, 6, 15):
+        pixel = pixel_axis_angle(angle, (1.05, .6))
+        assert physical_axis_angle(pixel, (1.05, .6)) == pytest.approx(angle)
+    assert pixel_axis_angle(15, (1.05, .6)) > 15
+
+
+def test_physical_rotation_preserves_physical_lengths():
+    transform = Transform(300, 300, angle_deg=15,
+                          physical_spacing_mm=(1.05, .6))
+    for vector in ((20, 0), (0, 20), (13, 27)):
+        before = np.linalg.norm(np.asarray(vector) * (.6, 1.05))
+        after = np.linalg.norm((transform.matrix @ vector) * (.6, 1.05))
+        assert after == pytest.approx(before)
 
 
 def test_hip_roi_and_position_checked_together():
@@ -230,13 +281,17 @@ def test_nominal_spacing_and_strict_axis_intervals():
     assert spacing == (1.05, 0.6)
     assert basis == "scanner_nominal_user_supplied"
     assert _source_spacing(Dataset(), allow_nominal=False) == (None, "missing")
-    for angle in (-20, -6, 6, 20):
+    for angle in (-10, -6, 6, 10):
         assert _check_group("SPINE", "negative_axis_or_roi",
                             {"spine_position": 0, "spine_axis": 1,
                              "spine_axis_angle_deg": angle})
     for angle in (-5, 4.6, 4.1, 5):
         assert not _check_group("SPINE", "negative_axis_or_roi",
                                 {"spine_position": 0, "spine_axis": 0,
+                                 "spine_axis_angle_deg": angle})
+    for angle in (-20, -15, -5, 5, 15, 20):
+        assert not _check_group("SPINE", "negative_axis_or_roi",
+                                {"spine_position": 0, "spine_axis": 1,
                                  "spine_axis_angle_deg": angle})
 
 
@@ -361,7 +416,7 @@ def test_end_to_end_synthetic_generation(tmp_path):
     report = generate(tmp_path, manifest_file, output,
                       target_per_group={"positive": 1, "negative_position": 1,
                                         "negative_axis_or_roi": 1},
-                      max_attempts_per_image=150)
+                      max_attempts_per_image=150,workers=2)
     assert report["total_generated"] == 9, report
     with (output / "manifest.csv").open(encoding="utf-8-sig", newline="") as stream:
         rows = list(csv.DictReader(stream))

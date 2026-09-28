@@ -10,22 +10,27 @@ import csv
 import hashlib
 import json
 import math
+import time
 from pathlib import Path
 import random
 from collections import Counter, defaultdict
+from collections import deque
+from concurrent.futures import ProcessPoolExecutor
 
 import numpy as np
 
 from .core import (Transform, hip_position_ok, hip_roi_ok, hip_roi_margins_mm,
                    lesser_trochanter_between_area, prepare_geometry,
-                   spine_axis_angle, spine_position_ok, transform_geometry,
+                   physical_axis_angle, spine_axis_angle,
+                   spine_position_ok, transform_geometry,
                    transformed_spacing, warp_image)
+from .vertebral_axes import AxisConfig, analyze_spine, placement_from_axes
 
 
 REGIONS = ("SPINE", "LEG_LEFT", "LEG_RIGHT")
 GROUPS = ("positive", "negative_position", "negative_axis_or_roi")
-TARGET_PER_GROUP = {"positive": 500, "negative_position": 250,
-                    "negative_axis_or_roi": 250}
+TARGET_PER_GROUP = {"positive": 2500, "negative_position": 1250,
+                    "negative_axis_or_roi": 1250}
 SCANNER_NOMINAL_SPACING_MM = (1.05, 0.6)  # (row/Y, column/X), supplied by user
 
 
@@ -87,6 +92,8 @@ def _read_sources(workspace: Path, manifest_path: Path,
                     quarantined.add(rel)
                 continue
             entries[rel] = {"source": item, "geometry": geometry, "region": region}
+            item["artifact_annotation_complete"] = bool(
+                geometry["spine"]["foreign_objects"])
     return list(entries.values()), problems
 
 
@@ -124,35 +131,43 @@ def _roi_proxy_spacing(geometry: dict, side: str):
             1.1 * 20 / lateral_px)
 
 
-def _spine_variant(geometry, group, rng, base_angle):
+def _spine_variant(geometry, group, rng, base_angle, spacing_mm=SCANNER_NOMINAL_SPACING_MM):
     w, h = geometry["image_width"], geometry["image_height"]
     lines = sorted(geometry["spine"]["disc_lines"],
                    key=lambda l: sum(p[1] for p in l["points"]) / 2)
     mids = [np.mean(l["points"], axis=0) for l in lines]
     gap = float(np.median(np.diff([m[1] for m in mids])))
     cx, cy = (w - 1) / 2, (h - 1) / 2
+    reflect = rng.random() < 0.5
+    normalized_angle = -base_angle if reflect else base_angle
+    row_mm, col_mm = spacing_mm
+
+    def coverage_scale(angle_deg):
+        a = math.radians(angle_deg)
+        return max(abs(math.cos(a)) + abs(math.sin(a)) * row_mm / col_mm,
+                   abs(math.cos(a)) + abs(math.sin(a)) * col_mm / row_mm) + .025
     if group == "negative_axis_or_roi":
-        target = rng.choice((rng.uniform(-20, -6), rng.uniform(6, 20)))
-        angle = base_angle - target
-        scale = max(1.02, abs(math.cos(math.radians(angle)))
-                    + abs(math.sin(math.radians(angle))) + 0.025)
+        target = rng.choice((rng.uniform(-10, -6), rng.uniform(6, 10)))
+        angle = normalized_angle - target
+        scale = max(1.02, coverage_scale(angle))
         scale += rng.uniform(0, 0.06)
-        return Transform(w, h, scale, angle), f"axis_target_{target:.2f}"
+        return Transform(w, h, scale, angle, reflect_x=reflect,
+                         physical_spacing_mm=spacing_mm), f"axis_target_{target:.2f}"
     if group == "positive":
         target = rng.uniform(-4, 4)
-        angle = base_angle - target
-        scale = max(1.01, abs(math.cos(math.radians(angle)))
-                    + abs(math.sin(math.radians(angle))) + 0.025)
+        angle = normalized_angle - target
+        scale = max(1.01, coverage_scale(angle))
         scale += rng.uniform(0, 0.05)
         desired_y = rng.uniform(0.35, 0.65) * gap * scale
         src_y = float(mids[0][1] + (cy - desired_y) /
                       (scale * math.cos(math.radians(angle))))
-        return Transform(w, h, scale, angle, cx, src_y), f"half_Th12_axis_{target:.2f}"
+        return Transform(w, h, scale, angle, cx, src_y,
+                         reflect_x=reflect, physical_spacing_mm=spacing_mm), f"half_Th12_axis_{target:.2f}"
     variant = rng.choice(("crop_Th12", "crop_Th12_and_next",
                           "crop_left_crest", "crop_right_crest", "crop_both_crests_bottom"))
     scale = rng.uniform(1.18, 1.65)
     axis_target = rng.uniform(-4, 4)
-    angle = base_angle - axis_target
+    angle = normalized_angle - axis_target
     src_x, src_y = cx, cy
     if variant == "crop_Th12":
         src_y = float(mids[0][1] + (cy - rng.uniform(-0.3, 0.15) * gap * scale) / scale)
@@ -169,7 +184,8 @@ def _spine_variant(geometry, group, rng, base_angle):
         if all(p is not None for p in crests):
             y_top = min(p[1] for p in crests)
             src_y = y_top + (cy - (h + rng.uniform(2, 20))) / scale
-    return Transform(w, h, scale, angle, src_x, src_y), variant
+    return Transform(w, h, scale, angle, src_x, src_y,
+                     reflect_x=reflect, physical_spacing_mm=spacing_mm), variant
 
 
 def _positive_roi_center_intervals(geometry, side, scale, spacing_mm, slack_mm=0.0):
@@ -264,18 +280,24 @@ def _check_group(region, group, labels):
     if region == "SPINE":
         angle = labels["spine_axis_angle_deg"]
         return angle is not None and (
-            -20 <= angle <= -6 or 6 <= angle <= 20)
+            -10 <= angle <= -6 or 6 <= angle <= 10)
     return position == 0 and other == 1
 
 
 def _labels(region, geometry, info, image, spacing, source_row):
     if region == "SPINE":
-        angle = spine_axis_angle(image, geometry)
-        position = int(not spine_position_ok(geometry))
+        analysis = analyze_spine(image,geometry,spacing or SCANNER_NOMINAL_SPACING_MM,
+                                 polarity=source_row.get("axis_polarity","bright"))
+        angle = analysis["global_angle_deg"]
+        if any(not a["valid"] or a["review_reasons"] for a in analysis["axes"]):
+            angle = None
+        placement = placement_from_axes(geometry,analysis)
+        position = None if placement is None else int(not placement)
         axis = None if angle is None else int(abs(angle) > 5)
         source_artifact = source_row.get("spine_artifact", "")
         objects = geometry["spine"]["foreign_objects"]
-        artifact = 1 if objects else (0 if source_artifact in ("0", "0.0") else None)
+        artifact = 1 if objects else (0 if source_artifact in ("0", "0.0") or
+                                     source_row.get("artifact_annotation_complete", False) else None)
         return {"spine_position": position, "spine_axis": axis,
                 "spine_axis_angle_deg": angle, "spine_artifact": artifact}
     side = region.removeprefix("LEG_")
@@ -343,11 +365,32 @@ def _write_dicom(ds, image, transform, destination: Path, uid_seed: str,
     pydicom.dcmwrite(str(destination), out, enforce_file_format=True)
 
 
+def _spine_candidate(item, image, group, seed):
+    rng=random.Random(seed)
+    transform,variant=_spine_variant(item['geometry'],group,rng,item['base_angle'],item['spacing'])
+    if not transform.covers_output():
+        return 'transform_exceeds_source',None
+    try:
+        geometry,info=transform_geometry(item['geometry'],transform,region='SPINE')
+        if group=='positive' and (len(geometry['spine']['disc_lines']) not in range(4,8) or
+                any(p is None for p in geometry['spine']['iliac_crests'].values())):
+            return 'candidate_positive_lost_required_geometry',None
+        moved=warp_image(image,transform)
+        spacing=transformed_spacing(item['spacing'],transform)
+        labels=_labels('SPINE',geometry,info,moved,spacing,item['source'])
+    except (ValueError,IndexError):
+        return 'invalid_transform_or_geometry',None
+    if not _check_group('SPINE',group,labels):
+        return 'candidate_does_not_match_target',None
+    return None,(transform,variant,geometry,info,moved,spacing,labels)
+
+
 def generate(workspace: Path, manifest_path: Path, output: Path,
              seed: int = 20260926, target_per_group=None, max_attempts_per_image=300,
-             allow_nominal_spacing=True, annotations_root: Path | None = None):
+             allow_nominal_spacing=True, annotations_root: Path | None = None,
+             workers: int = 1,resume: bool = False):
     """Generate only from completed geometry; report every unmet quota."""
-    if output.exists() and any(output.iterdir()):
+    if output.exists() and any(output.iterdir()) and not resume:
         raise FileExistsError(f"Output directory is not empty: {output}")
     rng = random.Random(seed)
     sources, problems = _read_sources(workspace, manifest_path, annotations_root)
@@ -355,11 +398,26 @@ def generate(workspace: Path, manifest_path: Path, output: Path,
     for item in sources:
         by_region[item["region"]].append(item)
     targets = target_per_group or TARGET_PER_GROUP
-    report = {"requested_per_region": dict(targets), "eligible_sources": {},
+    report = {"axis_method": "joint_continuous_contour_l1",
+              "axis_max_deviation_deg": AxisConfig().max_deviation_deg,
+              "requested_per_region": dict(targets), "eligible_sources": {},
               "generated": {}, "skipped": dict(problems), "seed": seed}
-    output_rows = []
+    output_rows = _read_rows(output/'partial_manifest.csv') if resume else []
+    if resume:
+        for row in output_rows:
+            for task in ('spine_position','spine_axis','spine_artifact','hip_position','hip_roi','hip_rotation'):
+                if task in row:
+                    row[task]=int(float(row[task])) if row[task] not in ('',None) else None
+        report['resumed_images']=len(output_rows)
+    started=time.perf_counter()
     cache = {}
+    pool=ProcessPoolExecutor(max_workers=workers) if workers>1 else None
     for region in REGIONS:
+        counts=Counter(row['generation_group'] for row in output_rows if row['region']==region)
+        if all(counts[group]>=int(targets[group]) for group in GROUPS):
+            report['generated'][region]={group:counts[group] for group in GROUPS}
+            report['eligible_sources'][region]='completed_before_resume'
+            continue
         eligible = []
         for item in by_region[region]:
             source = item["source"]
@@ -369,11 +427,16 @@ def generate(workspace: Path, manifest_path: Path, output: Path,
                 problems["dicom_read_error"] += 1
                 continue
             if region == "SPINE":
-                angle = spine_axis_angle(image, item["geometry"])
-                if not spine_position_ok(item["geometry"]) or angle is None or abs(angle) > 5:
+                spacing, basis = _source_spacing(ds, allow_nominal_spacing)
+                if spacing is None:
+                    problems["source_spine_spacing_missing"] += 1
+                    continue
+                source["axis_polarity"] = "dark" if str(getattr(ds,"PhotometricInterpretation",""))=="MONOCHROME1" else "bright"
+                analysis = analyze_spine(image,item["geometry"],spacing,polarity=source["axis_polarity"])
+                angle = analysis["global_angle_deg"]
+                if analysis["review_required"] or placement_from_axes(item["geometry"],analysis) is not True or angle is None or abs(angle)>5:
                     problems["source_not_valid_spine_positive"] += 1
                     continue
-                spacing, basis = None, "not_applicable"
             else:
                 if not hip_position_ok(item["geometry"]) or item["geometry"]["hip"]["roi_box"] is None:
                     problems["source_not_valid_hip_positive"] += 1
@@ -388,35 +451,52 @@ def generate(workspace: Path, manifest_path: Path, output: Path,
             eligible.append(item)
             cache[source["relative_path"]] = (ds, image)
         report["eligible_sources"][region] = len(eligible)
-        counts = Counter()
+        print(json.dumps({'stage':'eligible_sources','region':region,'count':len(eligible)},ensure_ascii=False),flush=True)
         if not eligible:
             report["generated"][region] = dict(counts)
             continue
         for group in GROUPS:
+            pending=deque()
             requested = int(targets[group])
             attempts = 0
             limit = max_attempts_per_image * max(requested, 1)
             while counts[group] < requested and attempts < limit:
                 attempts += 1
-                item = rng.choice(eligible)
+                if region=='SPINE' and pool is not None:
+                    if not pending:
+                        for _ in range(workers*3):
+                            candidate_item=rng.choice(eligible)
+                            candidate_image=cache[candidate_item['source']['relative_path']][1]
+                            pending.append((candidate_item,pool.submit(_spine_candidate,candidate_item,candidate_image,group,rng.getrandbits(64))))
+                    item,future=pending.popleft()
+                    error,candidate=future.result()
+                    if error:
+                        problems[error]+=1
+                        continue
+                else:
+                    item = rng.choice(eligible)
                 row, geometry = item["source"], item["geometry"]
                 ds, image = cache[row["relative_path"]]
-                if region == "SPINE":
-                    transform, variant = _spine_variant(geometry, group, rng, item["base_angle"])
+                if region=='SPINE' and pool is not None:
+                    transform,variant,moved_geometry,info,moved_image,spacing,labels=candidate
+                elif region == "SPINE":
+                    transform, variant = _spine_variant(geometry, group, rng,
+                                                        item["base_angle"], item["spacing"])
                 else:
                     transform, variant = _hip_variant(geometry, group, rng,
                                                       region.removeprefix("LEG_"), item["spacing"])
-                if not transform.covers_output():
+                if not (region=='SPINE' and pool is not None) and not transform.covers_output():
                     problems["transform_exceeds_source"] += 1
                     continue
-                try:
-                    moved_geometry, info = transform_geometry(geometry, transform, region=region)
-                    moved_image = warp_image(image, transform)
-                except (ValueError, IndexError):
-                    problems["invalid_transform_or_geometry"] += 1
-                    continue
-                spacing = transformed_spacing(item["spacing"], transform)
-                labels = _labels(region, moved_geometry, info, moved_image, spacing, row)
+                if not (region=='SPINE' and pool is not None):
+                    try:
+                        moved_geometry, info = transform_geometry(geometry, transform, region=region)
+                        moved_image = warp_image(image, transform)
+                    except (ValueError, IndexError):
+                        problems["invalid_transform_or_geometry"] += 1
+                        continue
+                    spacing = transformed_spacing(item["spacing"], transform)
+                    labels = _labels(region, moved_geometry, info, moved_image, spacing, row)
                 if not _check_group(region, group, labels):
                     problems["candidate_does_not_match_target"] += 1
                     continue
@@ -436,6 +516,7 @@ def generate(workspace: Path, manifest_path: Path, output: Path,
                                     "generation_group": group, "variant": variant,
                                     "scale": round(transform.scale, 6),
                                     "rotation_deg": round(transform.angle_deg, 6),
+                                    "reflect_x": int(transform.reflect_x),
                                     "source_center_x": round(transform.source_center[0], 4),
                                     "source_center_y": round(transform.source_center[1], 4),
                                     "spacing_basis": item["spacing_basis"],
@@ -444,9 +525,22 @@ def generate(workspace: Path, manifest_path: Path, output: Path,
                                     "dropped_annotations": json.dumps(info["dropped"]),
                                     **labels})
                 counts[group] += 1
+                if counts[group] % 50 == 0:
+                    with (output/'partial_manifest.csv').open('w',encoding='utf-8-sig',newline='') as checkpoint:
+                        checkpoint_fields=list(dict.fromkeys(key for checkpoint_row in output_rows for key in checkpoint_row))
+                        checkpoint_writer=csv.DictWriter(checkpoint,fieldnames=checkpoint_fields)
+                        checkpoint_writer.writeheader();checkpoint_writer.writerows(output_rows)
+                    progress={'region':region,'group':group,'generated':counts[group],
+                              'requested':requested,'attempts':attempts,
+                              'total_generated':len(output_rows),'seconds':time.perf_counter()-started}
+                    (output/'progress.json').write_text(json.dumps(progress,indent=2),encoding='utf-8')
+                    print(json.dumps(progress),flush=True)
         report["generated"][region] = {group: counts[group] for group in GROUPS}
+    if pool is not None:
+        pool.shutdown(wait=True)
     report["skipped"] = dict(problems)
     report["total_generated"] = len(output_rows)
+    report['seconds']=time.perf_counter()-started
     report["shortfall"] = {region: {group: int(targets[group]) - report["generated"][region].get(group, 0)
                                    for group in GROUPS} for region in REGIONS}
     report["actual_labels"] = {}
@@ -461,6 +555,7 @@ def generate(workspace: Path, manifest_path: Path, output: Path,
     output.mkdir(parents=True, exist_ok=True)
     fields = ["image_path", "geometry_path", "source_relative_path", "source_study_uid",
               "region", "generation_group", "variant", "scale", "rotation_deg",
+              "reflect_x",
               "source_center_x", "source_center_y", "spacing_basis",
               "row_spacing_mm", "col_spacing_mm", "dropped_annotations",
               "spine_position", "spine_axis", "spine_axis_angle_deg", "spine_artifact",
@@ -484,14 +579,16 @@ def main():
     parser.add_argument("--manifest", type=Path, default=project / "outputs" / "manifest.csv")
     parser.add_argument("--annotations-root", type=Path,
                         default=project.parent / "Размеченные")
-    parser.add_argument("--output", type=Path, default=project / "outputs" / "augmented_dataset")
+    parser.add_argument("--output", type=Path, default=project / "outputs" / "augmented_15000")
     parser.add_argument("--seed", type=int, default=20260926)
+    parser.add_argument('--workers',type=int,default=1,help='Parallel CPU candidates for spine')
+    parser.add_argument('--resume',action='store_true',help='Continue from partial_manifest.csv')
     parser.add_argument("--require-dicom-spacing", action="store_true",
                         help="Skip hips without measured DICOM pixel spacing")
     args = parser.parse_args()
     report = generate(args.workspace, args.manifest, args.output, args.seed,
                       allow_nominal_spacing=not args.require_dicom_spacing,
-                      annotations_root=args.annotations_root)
+                      annotations_root=args.annotations_root,workers=args.workers,resume=args.resume)
     print(json.dumps(report, ensure_ascii=False, indent=2))
 
 

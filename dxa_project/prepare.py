@@ -76,7 +76,26 @@ def split_studies(frame: pd.DataFrame, seed: int = 42) -> pd.DataFrame:
     return frame.merge(unique[['study_uid', 'split']], on='study_uid', validate='many_to_one')
 
 
-def build_manifest(reference: Path, dicoms: Path, output: Path) -> None:
+def apply_image_overrides(frame: pd.DataFrame, path: Path) -> pd.DataFrame:
+    """Preserve reviewed scan-level corrections when rebuilding study labels."""
+    if not path.is_file():
+        return frame
+    overrides = pd.read_csv(path, dtype=str, keep_default_na=False)
+    if overrides.duplicated(['relative_path', 'target']).any():
+        raise ValueError('Duplicate per-image target override')
+    frame = frame.copy()
+    for row in overrides.to_dict('records'):
+        if row['target'] not in TARGETS or row['value'] not in ('0', '1'):
+            raise ValueError(f'Invalid target override: {row}')
+        mask = frame.relative_path.eq(row['relative_path'].replace('\\', '/'))
+        if int(mask.sum()) != 1:
+            raise ValueError(f'Override source absent/duplicated: {row["relative_path"]}')
+        frame.loc[mask, row['target']] = int(row['value'])
+    return frame
+
+
+def build_manifest(reference: Path, dicoms: Path, output: Path,
+                   overrides: Path | None = None) -> None:
     labels = read_reference(reference)
     files = scan_dicoms(dicoms)
     if files.empty:
@@ -95,6 +114,8 @@ def build_manifest(reference: Path, dicoms: Path, output: Path) -> None:
     joined['has_reference'] = joined['_merge'].eq('both')
     joined.drop(columns='_merge', inplace=True)
     joined = split_studies(joined)
+    overrides = overrides or reference.parent / 'dxa_project' / 'reference_overrides.csv'
+    joined = apply_image_overrides(joined, overrides)
     # The workbook is study-level; multiple images of the same anatomical area
     # must be reviewed before applying its target to any individual image.
     output.parent.mkdir(parents=True, exist_ok=True)
@@ -114,8 +135,10 @@ def main() -> None:
     parser.add_argument('--reference', type=Path, required=True)
     parser.add_argument('--dicoms', type=Path, required=True)
     parser.add_argument('--output', type=Path, default=Path('outputs/manifest.csv'))
+    parser.add_argument('--overrides', type=Path,
+                        help='Per-image reviewed target overrides (auto-detected by default)')
     args = parser.parse_args()
-    build_manifest(args.reference, args.dicoms, args.output)
+    build_manifest(args.reference, args.dicoms, args.output, args.overrides)
 
 
 if __name__ == '__main__':

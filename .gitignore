@@ -20,6 +20,7 @@
 .env.*
 !.env.example
 !.env.pilot.example
+!.env.augmented.example
 
 # Python
 __pycache__/

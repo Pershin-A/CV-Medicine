@@ -17,7 +17,7 @@ from labeler.geometry import validate_geometry  # noqa: E402
 
 @dataclass(frozen=True)
 class Transform:
-    """Source pixels -> output pixels; scale is isotropic and output size is fixed."""
+    """Source pixels -> output pixels; optional rotation in physical coordinates."""
 
     width: int
     height: int
@@ -25,6 +25,8 @@ class Transform:
     angle_deg: float = 0.0  # clockwise in image coordinates
     source_center_x: float | None = None
     source_center_y: float | None = None
+    reflect_x: bool = False  # reflect about the source vertical centerline first
+    physical_spacing_mm: tuple[float, float] | None = None
 
     @property
     def source_center(self) -> np.ndarray:
@@ -40,8 +42,14 @@ class Transform:
     @property
     def matrix(self) -> np.ndarray:
         a = math.radians(self.angle_deg)
-        return self.scale * np.array([[math.cos(a), -math.sin(a)],
-                                      [math.sin(a), math.cos(a)]])
+        rotation = np.array([[math.cos(a), -math.sin(a)],
+                             [math.sin(a), math.cos(a)]])
+        if self.physical_spacing_mm is not None:
+            row_mm, col_mm = self.physical_spacing_mm
+            physical = np.diag([col_mm, row_mm])
+            rotation = np.linalg.inv(physical) @ rotation @ physical
+        reflection = np.diag([-1.0, 1.0]) if self.reflect_x else np.eye(2)
+        return self.scale * rotation @ reflection
 
     def point(self, p) -> list[float]:
         return (self.matrix @ (np.asarray(p, dtype=float) - self.source_center)
@@ -355,6 +363,10 @@ def transform_geometry(geometry: dict, transform: Transform,
     for key, p in out["spine"]["iliac_crests"].items():
         q = None if p is None else transform.point(p)
         out["spine"]["iliac_crests"][key] = q if q is not None and _inside(q, w, h) else None
+    if transform.reflect_x:
+        crests = out["spine"]["iliac_crests"]
+        crests["image_left"], crests["image_right"] = (
+            crests["image_right"], crests["image_left"])
     objects = []
     for obj in out["spine"]["foreign_objects"]:
         x1, y1, x2, y2 = obj["bbox"]
@@ -461,49 +473,38 @@ def transform_geometry(geometry: dict, transform: Transform,
     return out, meta
 
 
-def spine_axis_angle(image: np.ndarray, geometry: dict) -> float | None:
-    """Fit a brightness-symmetry axis inside each vertebra; angle from vertical."""
-    lines = sorted(geometry["spine"]["disc_lines"],
-                   key=lambda l: sum(p[1] for p in l["points"]) / 2)
-    if len(lines) < 2:
+def spine_axis_angle(image: np.ndarray, geometry: dict,
+                     spacing_mm=(1.05, .6)) -> float | None:
+    """Compatibility wrapper; return pixel angle from the physical L1 fit."""
+    from .vertebral_axes import analyze_spine
+    return analyze_spine(image, geometry, spacing_mm)["global_angle_pixel_deg"]
+
+
+def physical_axis_angle(pixel_angle: float | None,
+                        spacing_mm: tuple[float, float]) -> float | None:
+    """Convert an angle from vertical in image pixels to millimeter space."""
+    if pixel_angle is None:
         return None
-    h, w = image.shape
-    fitted_axes = []
-    for upper, lower in zip(lines, lines[1:]):
-        top = np.mean(upper["points"], axis=0)
-        bottom = np.mean(lower["points"], axis=0)
-        half_width = max(4, int(min(np.linalg.norm(np.subtract(*upper["points"])),
-                                    np.linalg.norm(np.subtract(*lower["points"]))) * 0.20))
-        samples = []
-        for fraction in (0.2, 0.5, 0.8):
-            y_mid = float(top[1] + fraction * (bottom[1] - top[1]))
-            y = int(round(y_mid))
-            if y < 2 or y >= h - 2:
-                continue
-            x_guess = top[0] + fraction * (bottom[0] - top[0])
-            candidates = range(max(half_width + 1, int(x_guess - half_width)),
-                               min(w - half_width - 1, int(x_guess + half_width)) + 1)
-            if not candidates:
-                continue
-            row = image[max(0, y - 2):min(h, y + 3)].astype(float).mean(axis=0)
-            offsets = np.arange(1, half_width + 1)
-            scores = [np.mean(np.abs(row[x - offsets] - row[x + offsets]))
-                      + 0.05 * abs(x - x_guess) for x in candidates]
-            samples.append((y_mid, float(candidates[int(np.argmin(scores))])))
-        if len(samples) < 2:
-            return None
-        slope, intercept = np.polyfit([p[0] for p in samples], [p[1] for p in samples], 1)
-        fitted_axes.append((slope, intercept))
-    top_y = float(np.mean(lines[0]["points"], axis=0)[1])
-    bottom_y = float(np.mean(lines[-1]["points"], axis=0)[1])
-    first = np.array([fitted_axes[0][0] * top_y + fitted_axes[0][1], top_y])
-    second = np.array([fitted_axes[-1][0] * bottom_y + fitted_axes[-1][1], bottom_y])
-    dy = second[1] - first[1]
-    return math.degrees(math.atan2(second[0] - first[0], dy)) if dy > 0 else None
+    row_mm, col_mm = spacing_mm
+    return math.degrees(math.atan(math.tan(math.radians(pixel_angle)) * col_mm / row_mm))
+
+
+def pixel_axis_angle(physical_angle: float | None,
+                     spacing_mm: tuple[float, float]) -> float | None:
+    """Inverse of physical_axis_angle for rotations performed in pixel space."""
+    if physical_angle is None:
+        return None
+    row_mm, col_mm = spacing_mm
+    return math.degrees(math.atan(math.tan(math.radians(physical_angle)) * row_mm / col_mm))
 
 
 def spine_position_ok(geometry: dict, top_ratio_range=(0.25, 0.75),
-                      crest_margin_fraction=0.025) -> bool:
+                      crest_margin_fraction=0.0, *, image=None,
+                      spacing_mm=(1.05,.6), analysis=None) -> bool:
+    if image is not None or analysis is not None:
+        from .vertebral_axes import analyze_spine, placement_from_axes
+        report=analysis if analysis is not None else analyze_spine(image,geometry,spacing_mm)
+        return placement_from_axes(geometry,report,top_ratio_range) is True
     lines = sorted(geometry["spine"]["disc_lines"],
                    key=lambda l: sum(p[1] for p in l["points"]) / 2)
     if len(lines) not in (4, 5, 6, 7):
