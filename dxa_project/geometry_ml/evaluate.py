@@ -30,7 +30,7 @@ def binary_metrics(rows):
 
 def with_ci(rows,iterations=300):
     if not rows: return {'n':0,'metrics':None}
-    point=binary_metrics(rows); groups={s:[r for r in rows if r['study']==s] for s in {r['study'] for r in rows}}
+    point=binary_metrics(rows); groups={s:[r for r in rows if r['study']==s] for s in sorted({r['study'] for r in rows})}
     ids=list(groups); rng=np.random.default_rng(42)
     samples={k:[] for k in ('sensitivity','specificity','balanced_accuracy','f1','roc_auc','pr_auc_average_precision')}
     for _ in range(iterations):
@@ -41,9 +41,10 @@ def with_ci(rows,iterations=300):
     ci={k:np.percentile(v,[2.5,97.5]).tolist() if v and point[k] is not None else None for k,v in samples.items()}
     return {'n':len(rows),'studies':len(ids),'metrics':point,'ci95':ci,'bootstrap_valid_replicates':{k:len(v) for k,v in samples.items()}}
 
-def truth_flags(reference,region,geometry=None):
+def truth_flags(reference,region,geometry=None,include_scoliosis=False):
     result={}
-    for task in TASKS[region]:
+    tasks=TASKS[region]+(('spine_scoliosis',) if region=='SPINE' and include_scoliosis else ())
+    for task in tasks:
         field=task if region=='SPINE' else region.removeprefix('LEG_').lower()+'_'+task
         value=reference.get(field,'')
         result[task]=int(float(value)) if value not in ('',None) else None
@@ -52,11 +53,22 @@ def truth_flags(reference,region,geometry=None):
         result['hip_position']=int(not hip_position_ok(prepare_geometry(geometry,region)))
     return result
 
-def run(root,checkpoints,output,fold=0,bootstrap=300):
+def run(root,checkpoints,output,fold=0,bootstrap=300,selection_protocol=None):
     output.mkdir(parents=True,exist_ok=True)
     originals=load_records(root); train,valid=split_records(originals,fold)
+    if selection_protocol:
+        protocol=json.loads(selection_protocol.read_text(encoding='utf-8'))
+        train=[r for r in originals if protocol['partition_by_path'][r.relative_path]=='validation']
+        valid=[r for r in originals if protocol['partition_by_path'][r.relative_path]=='test']
     with (root/'dxa_project/outputs/manifest.csv').open(encoding='utf-8-sig',newline='') as f:
         reference={r['relative_path']:r for r in csv.DictReader(f)}
+    include_scoliosis=(checkpoints/'scoliosis.pt').is_file()
+    task_map={k:v+(('spine_scoliosis',) if k=='SPINE' and include_scoliosis else ()) for k,v in TASKS.items()}
+    if include_scoliosis:
+        with (root/'Размеченные/labels.csv').open(encoding='utf-8-sig',newline='') as f:
+            for row in csv.DictReader(f):
+                issue=row.get('spine_issue','')
+                if issue in ('SCOLIOSIS','NONE','LUMBARIZATION'):reference[row['relative_path']]['spine_scoliosis']=int(issue=='SCOLIOSIS')
     calibration=[r for r in train if r.region.startswith('LEG_') and truth_flags(reference[r.relative_path],r.region)['hip_rotation'] is not None]
     rng=np.random.default_rng(42); rng.shuffle(calibration); calibration=calibration[:80]
     areas=[]
@@ -65,12 +77,18 @@ def run(root,checkpoints,output,fold=0,bootstrap=300):
         areas.append((predicted['lesser_trochanter_area_px2'],truth_flags(reference[record.relative_path],record.region)['hip_rotation']))
     candidates=np.unique([0.,1.]+[float(a)+.5 for a,y in areas])
     threshold=max(candidates,key=lambda t:f1_score([y for a,y in areas],[int(a<t) for a,y in areas],zero_division=0)) if len({y for a,y in areas})==2 else 1.
-    (output/'calibration.json').write_text(json.dumps({'rotation_threshold_px2':float(threshold),'source':'training originals only','n':len(areas),'examples':areas},indent=2),encoding='utf-8')
+    calibration_scope='inner validation only' if selection_protocol else 'training originals only'
+    (output/'calibration.json').write_text(json.dumps({'rotation_threshold_px2':float(threshold),'source':calibration_scope,'n':len(areas),'examples':areas},indent=2),encoding='utf-8')
+    # Warm all branches before measuring steady-state per-study latency.
+    for region in TASKS:
+        sample=next((r for r in valid if r.region==region),None)
+        if sample:predict_file(sample.source_path,checkpoints,float(threshold),force_region=region)
+    if torch.cuda.is_available():torch.cuda.synchronize()
     results=[]; task_rows=[]; failures=[]; timings=[]
     for index,record in enumerate(valid,1):
         start=time.perf_counter()
         ground_geometry=json.loads(record.geometry_path.read_text(encoding='utf-8'))
-        truth=truth_flags(reference[record.relative_path],record.region,ground_geometry)
+        truth=truth_flags(reference[record.relative_path],record.region,ground_geometry,include_scoliosis)
         try:
             predicted=predict_file(record.source_path,checkpoints,rotation_area_threshold_px2=float(threshold))
             if torch.cuda.is_available():torch.cuda.synchronize()
@@ -90,7 +108,7 @@ def run(root,checkpoints,output,fold=0,bootstrap=300):
                                   'truth':value,'prediction':None,'score':None})
         if index%20==0: print(json.dumps({'evaluation_completed':index,'total':len(valid)}),flush=True)
     metrics=[]
-    for region,tasks in TASKS.items():
+    for region,tasks in task_map.items():
         for task in tasks:
             all_rows=[r for r in task_rows if r['region']==region and r['task']==task and r['truth'] is not None]
             usable=[r for r in all_rows if r['prediction'] is not None]
@@ -111,8 +129,9 @@ def run(root,checkpoints,output,fold=0,bootstrap=300):
             'quality_macro_f1':float(np.mean([m['metrics']['f1'] for m in metrics if m.get('metrics') and m['metrics']['f1'] is not None])) if any(m.get('metrics') and m['metrics']['f1'] is not None for m in metrics) else None,
             'ci_method':'percentile bootstrap by original study, not by augmented image',
             'score_note':'continuous rule-derived ranking scores, not calibrated clinical probabilities',
+            'timing_scope':'warm branches; includes DICOM read and geometric postprocessing, excludes initial checkpoint loading',
             'undefined_outputs':'abstentions excluded from task metrics and reported through coverage; they are not counted as correct',
-            'threshold_calibration':'training originals only; validation never used to choose rotation threshold'}
+            'threshold_calibration':calibration_scope+'; outer benchmark never used to choose rotation threshold'}
     report['label_sources']='corrected organizer manifest for existing flags; hip positioning computed from authoritative visual landmarks because the organizer table has no separate positioning field'
     report['overall_any_violation_coverage']=len(overall)/len(valid)
     (output/'report.json').write_text(json.dumps(report,ensure_ascii=False,indent=2),encoding='utf-8')
@@ -134,6 +153,7 @@ if __name__=='__main__':
     parser=argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--root',type=Path,default=Path(__file__).resolve().parents[2]); parser.add_argument('--checkpoints',type=Path,required=True)
     parser.add_argument('--output',type=Path,required=True); parser.add_argument('--fold',type=int,default=0); parser.add_argument('--bootstrap',type=int,default=300)
+    parser.add_argument('--selection-protocol',type=Path)
     args=parser.parse_args()
     with warnings.catch_warnings():
-        warnings.simplefilter('ignore');run(args.root.resolve(),args.checkpoints.resolve(),args.output.resolve(),args.fold,args.bootstrap)
+        warnings.simplefilter('ignore');run(args.root.resolve(),args.checkpoints.resolve(),args.output.resolve(),args.fold,args.bootstrap,args.selection_protocol)

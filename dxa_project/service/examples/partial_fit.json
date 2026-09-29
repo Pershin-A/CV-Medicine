@@ -1,0 +1,34 @@
+{
+  "human": {
+    "images": [
+      {
+        "path": "C:/dxa/human/scan.dcm",
+        "region": "LEG_LEFT",
+        "geometry_path": "C:/dxa/human/geometry.json",
+        "reviewed": [
+          "hip",
+          "hip_mask",
+          "hip_points"
+        ],
+        "targets": {
+          "hip_position": 0,
+          "hip_roi": 0,
+          "hip_rotation": 0
+        }
+      }
+    ]
+  },
+  "model": {
+    "images": [
+      {
+        "path": "C:/dxa/model/predicted.dcm"
+      }
+    ]
+  },
+  "augmentation": {
+    "n_pp": 5,
+    "n_pn": 5,
+    "n_nn": 5
+  },
+  "request_id": "fit-001"
+}

@@ -1,0 +1,79 @@
+{
+  "source_archive": "backend_handoff.zip",
+  "unchanged_model_sha256": {
+    "router": {
+      "file": "router.pt",
+      "sha256": "6e710a21e4f5312f7ddfa27a7083fc4856932a12508eaf8710fcc8caf4b70d5e"
+    },
+    "spine": {
+      "file": "spine.pt",
+      "sha256": "53d3ffe951d58056aceec8b7f78506c43461caa67aef49717fdcbb284431bdd8"
+    },
+    "hip": {
+      "file": "hip.pt",
+      "sha256": "69ce4310daa14d4d43675187722a13de71e08079f267cb6e7a1bae9500b556e9"
+    },
+    "hip_mask": {
+      "file": "hip_mask.pt",
+      "sha256": "69ce4310daa14d4d43675187722a13de71e08079f267cb6e7a1bae9500b556e9"
+    },
+    "hip_points": {
+      "file": "hip_points.pt",
+      "sha256": "e3e0ab86c7ef82f0871dfbfcb4f0584a60aa945eeb0a4346883787d6f5639fc2"
+    },
+    "artifact": {
+      "file": "artifact.pt",
+      "sha256": "32bc3592b5397ff00bbcf102ae49263172067cb358b12f48fb404ae6ae403dd7"
+    },
+    "scoliosis": {
+      "file": "scoliosis.pt",
+      "sha256": "f276e8554c794bf8ec73775d166d0dfdd597fcd58c93b66a111a1e731e17985a"
+    },
+    "spine_crests": {
+      "file": "spine_crests.pt",
+      "sha256": "d60ddfb1a9214892b5baf4f9fa0ea185802dbcfa8e1163abc73835f968949edf"
+    }
+  },
+  "predict_resources": [
+    "dxa_project/outputs/final_20260929/bundle",
+    "dxa_project/outputs/final_20260929/protocol.json"
+  ],
+  "partial_fit_additional_resources": [
+    "Исследования",
+    "Размеченные/labels.csv",
+    "Размеченные (geometry JSON files)",
+    "dxa_project/outputs/manifest.csv"
+  ],
+  "startup": "python -m dxa_project.service --device auto --data-dir dxa_project/outputs/final_api_20260929",
+  "model_architectures_unchanged": true,
+  "training_config": {
+    "epochs": {
+      "router": 8,
+      "hip": 11,
+      "hip_mask": 11,
+      "spine": 10,
+      "artifact": 7,
+      "hip_points": 10,
+      "spine_crests": 16,
+      "scoliosis": 7
+    },
+    "epoch_semantics": "Actual completed epochs in original selected-family training, not best checkpoint epoch or maximum budget. Each partial_fit stage uses this exact count without early stopping.",
+    "sources": {
+      "router": "router_light/router_report.json",
+      "hip": "hip_light/hip_report.json",
+      "hip_mask": "hip_light/hip_report.json",
+      "spine": "bundle/spine_report.json",
+      "artifact": "bundle/artifact_report.json",
+      "hip_points": "points_light/report.json",
+      "spine_crests": "bundle/spine_crests_report.json",
+      "scoliosis": "bundle/scoliosis_report.json"
+    },
+    "stage_order": [
+      "human_original",
+      "model_original",
+      "human_augmented",
+      "model_augmented"
+    ]
+  },
+  "dataset_note": "No previous 15000 augmented images are needed for service deployment; staged augmentation is generated into per-job temporary folders."
+}

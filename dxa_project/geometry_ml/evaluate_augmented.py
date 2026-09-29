@@ -7,9 +7,15 @@ from .train import split_records
 from .predict import predict_file
 from .evaluate import TASKS,with_ci
 
-def run(root,augmented,checkpoints,output,per_group=15):
+def run(root,augmented,checkpoints,output,per_group=15,selection_protocol=None):
     output.mkdir(parents=True,exist_ok=True)
     originals=load_records(root); train,valid=split_records(originals,0)
+    if selection_protocol is not None:
+        from .protocol import make_protocol
+        protocol=make_protocol(root,originals,train,valid,selection_protocol)
+        mapping=protocol['partition_by_path']
+        train=[r for r in originals if mapping[r.relative_path]!='test']
+        valid=[r for r in originals if mapping[r.relative_path]=='test']
     valid_sources={r.relative_path:r.study for r in valid}
     with (augmented/'manifest.csv').open(encoding='utf-8-sig',newline='') as f:all_rows=list(csv.DictReader(f))
     eligible=[r for r in all_rows if r['source_relative_path'] in valid_sources]
@@ -54,5 +60,6 @@ def run(root,augmented,checkpoints,output,per_group=15):
 if __name__=='__main__':
     p=argparse.ArgumentParser(description=__doc__);p.add_argument('--root',type=Path,default=Path(__file__).resolve().parents[2]);p.add_argument('--augmented-root',type=Path,required=True)
     p.add_argument('--checkpoints',type=Path,required=True);p.add_argument('--output',type=Path,required=True)
+    p.add_argument('--selection-protocol',type=Path)
     args=p.parse_args()
-    with warnings.catch_warnings():warnings.simplefilter('ignore');run(args.root,args.augmented_root,args.checkpoints,args.output)
+    with warnings.catch_warnings():warnings.simplefilter('ignore');run(args.root,args.augmented_root,args.checkpoints,args.output,selection_protocol=args.selection_protocol)

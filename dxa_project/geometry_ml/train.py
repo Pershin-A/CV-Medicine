@@ -23,6 +23,7 @@ from dxa_project.geometry_ml.data import (DxaDataset, collate,
 from dxa_project.geometry_ml.models import (
     Router, SpatialNet, artifact_detector, detector_images, spatial_loss,
 )
+from .protocol import make_protocol,source_sampler
 
 
 TASKS = ("router", "spine", "hip", "artifact")
@@ -74,7 +75,7 @@ def _loss(task, model, images, targets, device):
         outputs = model(images)
         return nn.functional.cross_entropy(outputs, truth), outputs
     if task in ("spine", "hip"):
-        outputs = model(images)
+        outputs = {k:v.float() for k,v in model(images).items()}
         return spatial_loss(outputs, targets, "SPINE" if task == "spine" else "HIP"), outputs
     boxes = [{"boxes": t["artifact_boxes"].to(device),
               "labels": torch.ones(len(t["artifact_boxes"]), dtype=torch.int64,
@@ -130,6 +131,7 @@ def _validation_stats(task, outputs, targets, size: int) -> dict:
         return {"correct": int((guesses == truth).sum()), "images": len(targets)}
     if task in ("spine", "hip"):
         probs = torch.sigmoid(outputs["spatial"]).cpu().numpy()
+        raw_logits=outputs['spatial'].cpu().numpy()
         key, channel = ("line", 0) if task == "spine" else ("trochanter", 3)
         stats = {"intersection": 0, "predicted_pixels": 0, "target_pixels": 0,
                  "point_error_sum_px": 0.0,"point_error_sum_mm":0., "visible_points": 0}
@@ -145,7 +147,12 @@ def _validation_stats(task, outputs, targets, size: int) -> dict:
             for k, visible in enumerate(target[present_key]):
                 if visible < .5:
                     continue
-                py, px = np.unravel_index(probs[n, first_channel + k].argmax(),
+                ranked=raw_logits[n,first_channel+k].copy()
+                left,top=target['pad_left'],target['pad_top']
+                dw=round(target['width']*target['scale']);dh=round(target['height']*target['scale'])
+                valid=np.zeros((size,size),dtype=bool);valid[top:top+dh,left:left+dw]=True
+                ranked[~valid]=-np.inf
+                py, px = np.unravel_index(ranked.argmax(),
                                           (size, size))
                 ty, tx = np.unravel_index(target[point_key][k].numpy().argmax(),
                                           (size, size))
@@ -206,13 +213,19 @@ def _aggregate_stats(rows: list[dict], task: str) -> dict:
 
 def train_task(task: str, train_records, valid_records, output: Path, device,
                epochs: int, size: int, batch_size: int, max_batches: int | None,
-               pretrained: bool, architecture='light', loader_workers=0) -> dict:
+               pretrained: bool, architecture='light', loader_workers=0,
+               encoder_lr=None,head_lr=None,scheduler_name='none',patience=0,balance_sources=False,
+               initial_checkpoint=None,loss_callback=None,selection_callback=None,mixed_precision=False) -> dict:
     train_records = _subset(train_records, task, max_batches is not None)
+    loss_fn=loss_callback or _loss
+    use_amp=bool(mixed_precision and device.type=='cuda' and torch.cuda.is_bf16_supported())
     valid_records = _subset(valid_records, task, max_batches is not None)
     if not train_records or not valid_records:
         raise ValueError(f"No training or validation records for {task}")
     sampler=None
-    if task=='artifact':
+    if balance_sources:
+        sampler=source_sampler(train_records,artifact=task=='artifact')
+    elif task=='artifact':
         labels=[int(bool(json.loads(r.geometry_path.read_text(encoding='utf-8'))['spine']['foreign_objects'])) for r in train_records]
         counts=np.bincount(labels,minlength=2)
         if np.all(counts>0):
@@ -224,11 +237,28 @@ def train_task(task: str, train_records, valid_records, output: Path, device,
                               shuffle=False, num_workers=loader_workers, collate_fn=collate,
                               persistent_workers=loader_workers>0,pin_memory=device.type=='cuda')
     model = _model(task, pretrained,architecture).to(device)
+    inference_metadata = {}
+    if initial_checkpoint is not None:
+        initial=torch.load(initial_checkpoint,map_location=device,weights_only=False)
+        if initial.get('task')!=task or initial.get('architecture','light')!=architecture:
+            raise ValueError('Warm-start checkpoint task/architecture mismatch')
+        model.load_state_dict(initial['state_dict'])
+        inference_metadata={k:initial[k] for k in ('axis_method','line_priors','artifact_threshold') if k in initial}
     parameters = [p for p in model.parameters() if p.requires_grad]
     learning_rate = (1e-3 if task == "router" else
                      3e-5 if task == "artifact" else 2e-4)
-    optimizer = torch.optim.AdamW(parameters, lr=learning_rate,
+    if encoder_lr is not None:
+        encoder=[];heads=[]
+        for name,p in model.named_parameters():
+            if p.requires_grad:
+                (encoder if name.startswith(('stem.','layer','backbone.')) or (name.startswith('net.') and not name.startswith('net.fc.')) else heads).append(p)
+        parameters_groups=[{'params':encoder,'lr':encoder_lr},{'params':heads,'lr':head_lr or learning_rate}]
+    else:parameters_groups=parameters
+    optimizer = torch.optim.AdamW(parameters_groups, lr=head_lr or learning_rate,
                                   weight_decay=1e-4)
+    scheduler=(torch.optim.lr_scheduler.CosineAnnealingLR(optimizer,max(epochs,1),eta_min=1e-6) if scheduler_name=='cosine'
+               else torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer,patience=2,factor=.5) if scheduler_name=='plateau' else None)
+    best=float('inf');stale=0;best_epoch=0
     history = []
     start = time.perf_counter()
     for epoch in range(epochs):
@@ -238,7 +268,8 @@ def train_task(task: str, train_records, valid_records, output: Path, device,
             if max_batches is not None and step >= max_batches:
                 break
             optimizer.zero_grad(set_to_none=True)
-            loss, details = _loss(task, model, images, targets, device)
+            with torch.autocast(device_type=device.type,dtype=torch.bfloat16,enabled=use_amp):
+                loss, details = loss_fn(task, model, images, targets, device)
             if not torch.isfinite(loss):
                 detail_values = ({key: float(value.detach().cpu()) for key, value in details.items()}
                                  if task == "artifact" else {})
@@ -265,7 +296,7 @@ def train_task(task: str, train_records, valid_records, output: Path, device,
                     if epoch == epochs - 1:
                         _preview(task, images, targets, predictions, output / f"{task}_preview.png")
                 else:
-                    loss, outputs = _loss(task, model, images, targets, device)
+                    loss, outputs = loss_fn(task, model, images, targets, device)
                     valid_losses.append(float(loss.detach().cpu()))
                     validation_stats.append(_validation_stats(task, outputs, targets, size))
                     if epoch == epochs - 1 and task in ("spine", "hip"):
@@ -275,21 +306,40 @@ def train_task(task: str, train_records, valid_records, output: Path, device,
         history.append({"epoch": epoch + 1, "train_loss": float(np.mean(train_losses)),
                         "validation_loss_or_detection_count": float(np.mean(valid_losses)),
                         "validation_metrics": _aggregate_stats(validation_stats, task)})
+        stats=history[-1]['validation_metrics']
+        box_f1=(2*stats.get('box_recall_iou50',0)*stats.get('box_precision_iou50',0)/max(1e-9,stats.get('box_recall_iou50',0)+stats.get('box_precision_iou50',0)))
+        selection=(-stats['accuracy'] if task=='router' else -box_f1 if task=='artifact'
+                   else float(np.mean(valid_losses)))
+        if selection_callback is not None:selection=selection_callback(model,device,stats)
+        history[-1]['selection_value']=selection
+        if selection<best:
+            best=selection;stale=0;best_epoch=epoch+1
+            torch.save({'task':task,'size':size,'state_dict':model.state_dict(),'pretrained':pretrained,'architecture':architecture,**inference_metadata},output/f'{task}_best.pt')
+        else:stale+=1
+        history[-1]['learning_rates']=[group['lr'] for group in optimizer.param_groups]
+        if scheduler is not None:
+            if scheduler_name=='plateau':scheduler.step(selection)
+            else:scheduler.step()
         print(json.dumps({'task':task,'epoch':epoch+1,'elapsed_seconds':time.perf_counter()-start,
                           **history[-1]},ensure_ascii=False),flush=True)
         (output/f'{task}_history.json').write_text(json.dumps(history,indent=2),encoding='utf-8')
         torch.save({'task':task,'size':size,'state_dict':model.state_dict(),
-                    'pretrained':pretrained,'architecture':architecture,'epoch':epoch+1},output/f'{task}.pt')
+                    'pretrained':pretrained,'architecture':architecture,'epoch':epoch+1,**inference_metadata},output/f'{task}.pt')
+        if patience and stale>=patience:break
     elapsed = time.perf_counter() - start
     output.mkdir(parents=True, exist_ok=True)
     torch.save({"task": task, "size": size, "state_dict": model.cpu().state_dict(),
-                "pretrained": pretrained,'architecture':architecture}, output / f"{task}.pt")
+                "pretrained": pretrained,'architecture':architecture,**inference_metadata}, output / f"{task}.pt")
+    if scheduler_name!='none' or patience:
+        import shutil
+        shutil.copy2(output/f'{task}_best.pt',output/f'{task}.pt')
     return {"task": task, "train_images": len(train_records),
-            "validation_images": len(valid_records), "epochs": epochs,
+            "validation_images": len(valid_records), "epochs": len(history),"max_epochs":epochs,
             "train_batches_per_epoch": len(train_losses), "seconds": elapsed,
             "history": history,
-            'artifact_class_balancing':sampler is not None,
+            'artifact_class_balancing':task=='artifact' and sampler is not None,
             'empty_negative_roi_batches':getattr(model.roi_heads, 'empty_negative_batches', 0) if task == 'artifact' else None,
+            'best_epoch':best_epoch,'scheduler':scheduler_name,'source_balancing':balance_sources,'mixed_precision':'bf16 forward / fp32 weights, losses, validation' if use_amp else 'fp32',
             "preview": str(output / f"{task}_preview.png") if task != "router" else None}
 
 
@@ -306,6 +356,12 @@ def main():
     parser.add_argument("--random-init", action="store_true")
     parser.add_argument('--architecture',choices=('light','heavy'),default='light')
     parser.add_argument('--loader-workers',type=int,default=0)
+    parser.add_argument('--selection-protocol',type=Path)
+    parser.add_argument('--encoder-lr',type=float)
+    parser.add_argument('--head-lr',type=float)
+    parser.add_argument('--scheduler',choices=('none','cosine','plateau'),default='none')
+    parser.add_argument('--patience',type=int,default=0)
+    parser.add_argument('--balance-sources',action='store_true')
     parser.add_argument("--augmented-root", type=Path,
                         help="Optional generator output; only train-side sources are added")
     parser.add_argument('--augmented-annotations-root',type=Path,help='Optional manual annotation overlay with labels.csv; keeps base generated JSON unchanged')
@@ -323,12 +379,21 @@ def main():
         torch.backends.cudnn.benchmark=True
     records = load_records(root)
     train_records, valid_records = split_records(records, args.fold)
+    if args.selection_protocol is None:
+        from .stratified_protocol import make_stratified_protocol
+        args.selection_protocol = output / 'protocol.json'
+        if not args.selection_protocol.exists():
+            make_stratified_protocol(records, args.selection_protocol)
+    if args.selection_protocol:
+        protocol=make_protocol(root,records,train_records,valid_records,args.selection_protocol)
+        train_records=[r for r in records if protocol['partition_by_path'][r.relative_path]=='train']
+        valid_records=[r for r in records if protocol['partition_by_path'][r.relative_path]=='validation']
     augmented_count = 0
     if args.augmented_root is not None:
         augmented = load_augmented_records(root, args.augmented_root.resolve(), records,args.augmented_annotations_root)
         train_studies = {record.study for record in train_records}
         train_records.extend(record for record in augmented if record.study in train_studies)
-        augmented_count = len(train_records) - (len(records) - len(valid_records))
+        augmented_count = sum(r.relative_path.startswith('aug/') for r in train_records)
         if {record.study for record in train_records} & {record.study for record in valid_records}:
             raise AssertionError("Augmented study leaked into validation")
     output.mkdir(parents=True, exist_ok=True)
@@ -338,12 +403,17 @@ def main():
               "smoke": args.smoke, "augmentation": bool(args.augmented_root),
               "augmented_train_images": augmented_count, "tasks": []}
     report['manual_augmented_annotation_overlay']=str(args.augmented_annotations_root) if args.augmented_annotations_root else None
+    report['selection_protocol']=str(args.selection_protocol) if args.selection_protocol else None
+    report['optimization']={'encoder_lr':args.encoder_lr,'head_lr':args.head_lr,'scheduler':args.scheduler,
+                            'patience':args.patience,'balance_sources':args.balance_sources,'seed':42,
+                            'architecture':args.architecture,'input_size':args.size,'batch_size':args.batch_size}
     for task in TASKS if args.task == "all" else (args.task,):
         result = train_task(task, train_records, valid_records, output, device,
                             1 if args.smoke else args.epochs,
                             args.size, args.batch_size,
                             2 if args.smoke else None,
-                            not args.random_init,args.architecture,args.loader_workers)
+                            not args.random_init,args.architecture,args.loader_workers,
+                            args.encoder_lr,args.head_lr,args.scheduler,args.patience,args.balance_sources)
         report["tasks"].append(result)
         (output / "report.json").write_text(json.dumps(report, ensure_ascii=False, indent=2),
                                               encoding="utf-8")

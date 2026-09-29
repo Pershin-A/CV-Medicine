@@ -30,6 +30,7 @@ class Record:
     study: str
     region: str
     spacing_mm: tuple[float,float] = (1.05,.6)
+    source_id: str = ''
 
 
 def load_records(root: Path) -> list[Record]:
@@ -83,7 +84,7 @@ def load_augmented_records(root: Path, augmented_root: Path,
         if not image.is_file() or not geometry.is_file():
             raise FileNotFoundError(f"Augmented image or geometry missing: {image}, {geometry}")
         records.append(Record(f"aug/{row['image_path']}", image, geometry, study, region,
-                              (float(row['row_spacing_mm']),float(row['col_spacing_mm']))))
+                              (float(row['row_spacing_mm']),float(row['col_spacing_mm'])),relative))
     return records
 
 
